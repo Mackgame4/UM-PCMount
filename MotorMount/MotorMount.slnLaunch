@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "DesktopCompile",
+    "Projects": [
+      {
+        "Path": "MotorMount.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "..\\BlazorWinForms\\BlazorWinForms.csproj",
+        "Action": "StartWithoutDebugging",
+        "DebugTarget": "BlazorWinForms"
+      }
+    ]
+  }
+]
