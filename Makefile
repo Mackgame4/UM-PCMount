@@ -9,8 +9,9 @@ dev-desktop:
 	powershell -Command "Start-Process 'dotnet' -ArgumentList 'run' -WorkingDirectory './BlazorWinForms'"
 
 # Runs the default "https" profile in development mode
+# cd ./MotorMount/ && dotnet run
 dev-web:
-	cd ./MotorMount/ && dotnet run
+	cd ./MotorMount/ && dotnet watch run
 
 build-web:
 	cd ./MotorMount/ && dotnet run --configuration Release
