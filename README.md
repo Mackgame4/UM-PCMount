@@ -1,2 +1,9 @@
-# UM-motormount
-🗂️ Course project for UM for LI4 in 2024/25
+# Motormount
+This project was developed for the subject LI4 from University of Minho - Software Engineering degree.
+
+## How to build
+
+## How to run
+
+### Developement Team
+AXXXXXX - Name
