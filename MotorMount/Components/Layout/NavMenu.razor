@@ -7,13 +7,14 @@
         <img src="/assets/motormountlogo.png" Slot="start" width="30px"/>
         <NavLink class="w-full" href="" Match="NavLinkMatch.All">
             <FluentButton class="hidden sm:inline-flex" Appearance="Appearance.Accent">
-                <span>MotorMount - @CurrentPageTitle</span>
+                <span>MotorMount @(CurrentPageTitle != null ? "- " + CurrentPageTitle : "")</span>
             </FluentButton>
         </NavLink>
+        <FluentSpacer />
+        <FluentButton id="themePopover" IconStart="@(new Icons.Regular.Size20.PaintBrush())" Appearance="Appearance.Outline" @onclick="() => _visibleThemePopover = !_visibleThemePopover"></FluentButton>
         <FluentCounterBadge Dot="true" Appearance="Appearance.Accent">
             <FluentButton IconStart="@(new Icons.Regular.Size16.Alert())" Appearance="Appearance.Outline"></FluentButton>
         </FluentCounterBadge>
-        <FluentProfileMenu Status="@PresenceStatus.Available" HeaderLabel="Microsoft" Initials="LI4" FullName="Bill Gates" EMail="bill.gates@microsoft.com" PopoverStyle="min-width: 330px;" />
     </FluentStack>
     <FluentDivider Style="width: 100%;" Role="DividerRole.Presentation"></FluentDivider>
     <div class="p-3">
@@ -44,35 +45,38 @@
 </FluentPopover>
 
 @code {
-    bool _visibleMenuPopover;
     bool _visibleThemePopover;
     public DesignThemeModes Mode { get; set; }
     public OfficeColor? OfficeColor { get; set; }
 
-    private RenderFragment RenderMenuOptions =  @<FluentStack Orientation="Orientation.Horizontal" Width="100%">
-        <NavLink class="w-full" href="" Match="NavLinkMatch.All">
-            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Home())" Appearance="Appearance.Lightweight">
-                <span class="hidden sm:block">Dashboard</span>
-            </FluentButton>
-        </NavLink>
-        <NavLink class="w-full" href="shop">
-            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Cart())" Appearance="Appearance.Lightweight">
-                <span class="hidden sm:block">Parts Shop</span>
-            </FluentButton>
-        </NavLink>
-        <NavLink class="w-full" href="inventory">
-            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Box())" Appearance="Appearance.Lightweight">
-                <span class="hidden sm:block">Inventory</span>
-            </FluentButton>
-        </NavLink>
-        <NavLink class="w-full" href="assembly">
-            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Wrench())" Appearance="Appearance.Lightweight">
-                <span class="hidden sm:block">Assembly</span>
-            </FluentButton>
-        </NavLink>
-        </FluentStack>;
+    public class PageMetadata
+    {
+        public required string Path { get; set; }
+        public required string Title { get; set; }
+        public required Microsoft.FluentUI.AspNetCore.Components.Icon Icon { get; set; }
+    }
 
-    private string CurrentPageTitle { get; set; } = "Home";
+    private List<PageMetadata> pagesmetadata = new List<PageMetadata>
+    {
+        new PageMetadata { Path = "/", Title = "Dashboard", Icon = new Icons.Regular.Size20.Home() },
+        new PageMetadata { Path = "/shop", Title = "Parts Shop", Icon = new Icons.Regular.Size20.Cart() },
+        new PageMetadata { Path = "/inventory", Title = "Inventory", Icon = new Icons.Regular.Size20.Box() },
+        new PageMetadata { Path = "/assembly", Title = "Assembly", Icon = new Icons.Regular.Size20.Wrench() }
+    };
+
+    private RenderFragment RenderMenuOptions => @<FluentStack Orientation="Orientation.Horizontal" Width="100%">
+        @foreach (var pagemetadata in pagesmetadata)
+        {
+            <NavLink class="w-full" href="@pagemetadata.Path" Match="NavLinkMatch.All">
+                <FluentButton class="w-full" IconStart="@pagemetadata.Icon" Appearance="Appearance.Lightweight">
+                    <span class="hidden sm:block">@pagemetadata.Title</span>
+                </FluentButton>
+            </NavLink>
+        }
+    </FluentStack>;
+
+    private string? CurrentPageTitle { get; set; }
+
     protected override void OnInitialized() // When component is loaded
     {
         base.OnInitialized();
@@ -80,25 +84,10 @@
         Navigation.LocationChanged += (sender, args) => SetPageTitle();  // Listen for navigation changes
     }
 
-    private void SetPageTitle()
-    {
+    private void SetPageTitle() {
         var uri = Navigation.Uri;
-        if (uri.EndsWith("/shop"))
-        {
-            CurrentPageTitle = "Parts Shop";
-        }
-        else if (uri.EndsWith("/inventory"))
-        {
-            CurrentPageTitle = "Inventory";
-        }
-        else if (uri.EndsWith("/assembly"))
-        {
-            CurrentPageTitle = "Assembly";
-        }
-        else
-        {
-            CurrentPageTitle = "Dashboard";
-        }
-        StateHasChanged();  // Trigger UI update (somehow blazor doesnt refresh on its own without it -.-)
+        var page = pagesmetadata.FirstOrDefault(p => uri.EndsWith(p.Path));
+        CurrentPageTitle = page?.Title ?? pagesmetadata[0].Title; // Default to "Dashboard" if no match found
+        StateHasChanged(); // Trigger UI update
     }
 }
