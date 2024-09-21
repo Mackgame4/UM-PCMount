@@ -1,65 +1,86 @@
 ﻿@page "/shop"
+@rendermode InteractiveServer
 @using Microsoft.FluentUI.AspNetCore.Components
 @using MotorMount.Components.Components
 @attribute [StreamRendering]
 <PageTitle>Parts Shop</PageTitle>
 
-<h1>Weather</h1>
+<FluentToolbar class="rounded-md py-2 mb-4">
+    <FluentMenuButton Text="Select brand"></FluentMenuButton>
+    <FluentMenuButton Text="Select model"></FluentMenuButton>
+    <FluentSpacer />
+    <FluentButton IconEnd="@(new Icons.Regular.Size16.Filter())">Filters</FluentButton>
+    <FluentSearch Placeholder="Search for Parts" />
+</FluentToolbar>
 
-<p>This component demonstrates showing data.</p>
-
-@if (forecasts == null)
+@if (products == null)
 {
 <LoadingDialog Title="Waiting page data request" />
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
+    @foreach(int element in Enumerable.Range(1, 14))
+    {
+    <FluentSkeleton Width="100%" Height="340px"></FluentSkeleton>
+    }
+</div>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
+    @foreach (string procuct in products)
+    {
+        <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2">
+            <FluentButton class="absolute top-2 left-2" IconStart="@(new Icons.Regular.Size16.Info())" Appearance="Appearance.Lightweight"></FluentButton>
+            <div class="w-36">
+                <img src="/assets/product-placeholder.png" class="object-cover w-full h-full" />
+            </div>
+            <h3 class="-mb-2">ProductName</h3>
+            <span>#ProductUID</span>
+            <div class="flex flex-row gap-2 justify-center items-center text-center">
+                <span>Price:</span><FluentBadge Appearance="Appearance.Neutral">$999</FluentBadge>
+                <FluentSpacer />
+                <!-- TODO: Only show when you have more that one of that product -->
+                <span>Cost:</span><FluentBadge Appearance="Appearance.Neutral"><span class="text-red-400">$999</span></FluentBadge>
+            </div>
+            <div class="w-full flex flex-row gap-1.5 justify-center items-center text-center">
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Subtract())" Appearance="Appearance.Accent"></FluentButton>
+                <FluentNumberField @bind-Value="exampleInt" />
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Accent"></FluentButton>
+            </div>
+            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.Cart())" Appearance="Appearance.Accent">Order</FluentButton>
+        </FluentCard>
+    }
+    </div>
 }
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private List<String>? products;
+    bool _visiblePopover = false;
+    
+    int exampleInt = 0;
 
     protected override async Task OnInitializedAsync()
     {
         // Simulate asynchronous loading to demonstrate streaming rendering
         await Task.Delay(500);
-
-        var startDate = DateOnly.FromDateTime(DateTime.Now);
-        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        {
-            Date = startDate.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = summaries[Random.Shared.Next(summaries.Length)]
-        }).ToArray();
-    }
-
-    private class WeatherForecast
-    {
-        public DateOnly Date { get; set; }
-        public int TemperatureC { get; set; }
-        public string? Summary { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        products = [
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+        ];
     }
 }

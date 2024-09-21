@@ -1,4 +1,25 @@
 ﻿@page "/"
+@using Microsoft.FluentUI.AspNetCore.Components
 <PageTitle>Dashboard</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="flex flex-col w-full h-full flex-1 gap-5">
+    <div class="grid grid-cols-3 gap-5">
+        <FluentCard class="w-full h-full" MinimalStyle="true">
+            <h2><FluentIcon Value="@(new Icons.Filled.Size24.BuildingShop())" /> Completed Assemblies</h2>
+        </FluentCard>
+        <FluentCard class="w-full h-full" MinimalStyle="true">
+            <h2><FluentIcon Value="@(new Icons.Filled.Size24.ChartMultiple())" /> Total Revenue</h2>
+        </FluentCard>
+        <FluentCard class="w-full h-full" MinimalStyle="true">
+            <h2><FluentIcon Value="@(new Icons.Filled.Size24.MoneyHand())" /> Expenses</h2>
+        </FluentCard>
+    </div>
+    <div class="grid grid-cols-4 gap-5">
+        <FluentCard class="w-full h-full col-span-3" MinimalStyle="true">
+            <h2><FluentIcon Value="@(new Icons.Filled.Size24.ShoppingBag())" /> Most shopped parts</h2>
+        </FluentCard>
+        <FluentCard class="w-full h-full" MinimalStyle="true">
+            <h2><FluentIcon Value="@(new Icons.Filled.Size24.Money())" /> Most Revenue</h2>
+        </FluentCard>
+    </div>
+</div>
