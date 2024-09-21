@@ -68,9 +68,8 @@
         @foreach (var pagemetadata in pagesmetadata)
         {
             <NavLink class="w-full" href="@pagemetadata.Path" Match="NavLinkMatch.All">
-                <FluentButton class="w-full" IconStart="@pagemetadata.Icon" Appearance="Appearance.Lightweight">
-                    <span class="hidden sm:block">@pagemetadata.Title</span>
-                </FluentButton>
+                <FluentButton class="w-full hidden sm:inline-flex" IconStart="@pagemetadata.Icon" Appearance="Appearance.Lightweight">@pagemetadata.Title</FluentButton>
+                <FluentButton class="w-full inline-flex sm:hidden" IconStart="@pagemetadata.Icon" Appearance="Appearance.Lightweight"></FluentButton>
             </NavLink>
         }
     </FluentStack>;
