@@ -1,7 +1,26 @@
 ﻿@using Microsoft.FluentUI.AspNetCore.Components
 @rendermode InteractiveServer
 
-<div class="hidden sm:flex relative w-64 min-h-screen p-4" style="border-right: solid 1px gray;">
+<div class="flex sm:hidden fixed w-full p-4">
+    <FluentButton id="menuPopover" IconStart="@(new Icons.Regular.Size24.List())" Appearance="Appearance.Lightweight" @onclick="() => _visibleMenuPopover = !_visibleMenuPopover"></FluentButton>
+</div>
+
+<FluentPopover Style="width: 300px;" VerticalThreshold="170" AnchorId="menuPopover" @bind-Open="_visibleMenuPopover">
+    <Header>
+        <div class="flex flex-row justify-center align-center text-center gap-4">
+            <img src="/assets/motormountlogo.png" Slot="start" width="30px"/>
+            <span class="text-xl mt-0.5">MotorMount</span>
+        </div>
+    </Header>
+    <Body>
+        <FluentStack Orientation="Orientation.Vertical" Width="100%">
+            @RenderMenuOptions
+        <FluentButton class="w-full mt-auto" id="themePopover" IconStart="@(new Icons.Regular.Size20.PaintBrush())" Appearance="Appearance.Outline" @onclick="() => _visibleThemePopover = !_visibleThemePopover">Theme</FluentButton>
+        </FluentStack>
+    </Body>
+</FluentPopover>
+
+<div class="hidden sm:flex relative w-72 min-h-screen p-4" style="border-right: solid 1px gray;">
     <FluentStack Orientation="Orientation.Vertical" Width="100%">
         <NavLink class="w-full" href="" Match="NavLinkMatch.All">
             <FluentButton class="w-full h-14" Appearance="Appearance.Accent">
@@ -9,24 +28,13 @@
                 <span class="text-xl">MotorMount</span>
             </FluentButton>
         </NavLink>
-        <NavLink class="w-full" href="" Match="NavLinkMatch.All">
-            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Home())" Appearance="Appearance.Lightweight">Dashboard</FluentButton>
-        </NavLink>
-        <NavLink class="w-full" href="counter">
-            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Cart())" Appearance="Appearance.Lightweight">Parts Shop</FluentButton>
-        </NavLink>
-        <NavLink class="w-full" href="weather">
-            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Box())" Appearance="Appearance.Lightweight">Inventory</FluentButton>
-        </NavLink>
-        <NavLink class="w-full" href="weather">
-            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Wrench())" Appearance="Appearance.Lightweight">Assembly</FluentButton>
-        </NavLink>
-        <FluentButton class="w-full mt-auto" id="themePopover" IconStart="@(new Icons.Regular.Size20.PaintBrush())" Appearance="Appearance.Outline" @onclick="() => _visiblePopover = !_visiblePopover">Theme</FluentButton>
+        @RenderMenuOptions
+        <FluentButton class="w-full mt-auto" id="themePopover" IconStart="@(new Icons.Regular.Size20.PaintBrush())" Appearance="Appearance.Outline" @onclick="() => _visibleThemePopover = !_visibleThemePopover">Theme</FluentButton>
     </FluentStack>
 </div>
 
 <FluentDesignTheme StorageName="theme" @bind-Mode="@Mode" @bind-OfficeColor="@OfficeColor" />
-<FluentPopover Style="width: 300px;" VerticalThreshold="170" AnchorId="themePopover" @bind-Open="_visiblePopover">
+<FluentPopover Style="width: 300px;" VerticalThreshold="170" AnchorId="themePopover" @bind-Open="_visibleThemePopover">
     <Header>@(new Emojis.Objects.Color.Default.Paintbrush().ToMarkup("20px")) Customize your experience</Header>
     <Body>
         <FluentGrid>
@@ -47,7 +55,23 @@
 </FluentPopover>
 
 @code {
-    bool _visiblePopover;
+    bool _visibleMenuPopover;
+    bool _visibleThemePopover;
     public DesignThemeModes Mode { get; set; }
     public OfficeColor? OfficeColor { get; set; }
+
+    private RenderFragment RenderMenuOptions =  @<FluentStack Orientation="Orientation.Vertical" Width="100%">
+        <NavLink class="w-full" href="" Match="NavLinkMatch.All">
+            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Home())" Appearance="Appearance.Lightweight">Dashboard</FluentButton>
+        </NavLink>
+        <NavLink class="w-full" href="counter">
+            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Cart())" Appearance="Appearance.Lightweight">Parts Shop</FluentButton>
+        </NavLink>
+        <NavLink class="w-full" href="weather">
+            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Box())" Appearance="Appearance.Lightweight">Inventory</FluentButton>
+        </NavLink>
+        <NavLink class="w-full" href="weather">
+            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Wrench())" Appearance="Appearance.Lightweight">Assembly</FluentButton>
+        </NavLink>
+        </FluentStack>;
 }
