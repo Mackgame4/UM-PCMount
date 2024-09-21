@@ -1,21 +1,53 @@
 ﻿@using Microsoft.FluentUI.AspNetCore.Components
+@rendermode InteractiveServer
 
-<div class="relative w-fit h-screen bg-red-300 p-4">
-    <img src="/assets/motormount.png" width="30px"/>
+<div class="hidden sm:flex relative w-64 min-h-screen p-4" style="border-right: solid 1px gray;">
     <FluentStack Orientation="Orientation.Vertical" Width="100%">
-        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-        <FluentButton Appearance="Appearance.Lightweight">Home</FluentButton>
+        <NavLink class="w-full" href="" Match="NavLinkMatch.All">
+            <FluentButton class="w-full h-14" Appearance="Appearance.Accent">
+                <img src="/assets/motormountlogo.png" Slot="start" width="30px"/>
+                <span class="text-xl">MotorMount</span>
+            </FluentButton>
         </NavLink>
-        <NavLink class="nav-link" href="counter">
-        <FluentButton Appearance="Appearance.Lightweight">Counter</FluentButton>
+        <NavLink class="w-full" href="" Match="NavLinkMatch.All">
+            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Home())" Appearance="Appearance.Lightweight">Dashboard</FluentButton>
         </NavLink>
-        <NavLink class="nav-link" href="weather">
-        <FluentButton Appearance="Appearance.Lightweight">Weather</FluentButton>
+        <NavLink class="w-full" href="counter">
+            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Cart())" Appearance="Appearance.Lightweight">Parts Shop</FluentButton>
         </NavLink>
+        <NavLink class="w-full" href="weather">
+            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Box())" Appearance="Appearance.Lightweight">Inventory</FluentButton>
+        </NavLink>
+        <NavLink class="w-full" href="weather">
+            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Wrench())" Appearance="Appearance.Lightweight">Assembly</FluentButton>
+        </NavLink>
+        <FluentButton class="w-full mt-auto" id="themePopover" IconStart="@(new Icons.Regular.Size20.PaintBrush())" Appearance="Appearance.Outline" @onclick="() => _visiblePopover = !_visiblePopover">Theme</FluentButton>
     </FluentStack>
 </div>
 
-@code
-{
-    bool Expanded = true;
+<FluentDesignTheme StorageName="theme" @bind-Mode="@Mode" @bind-OfficeColor="@OfficeColor" />
+<FluentPopover Style="width: 300px;" VerticalThreshold="170" AnchorId="themePopover" @bind-Open="_visiblePopover">
+    <Header>@(new Emojis.Objects.Color.Default.Paintbrush().ToMarkup("20px")) Customize your experience</Header>
+    <Body>
+        <FluentGrid>
+            <FluentGridItem>
+                <FluentSelect Label="Theme" Items="@(Enum.GetValues<DesignThemeModes>())" Width="250px" @bind-SelectedOption="@Mode" />
+            </FluentGridItem>
+            <FluentGridItem>
+                <FluentSelect Label="Color" Items="@(Enum.GetValues<OfficeColor>().Select(i => (OfficeColor?)i))" Height="200px" Width="250px" @bind-SelectedOption="@OfficeColor">
+                    <OptionTemplate>
+                        <FluentStack>
+                            <FluentLabel>@context</FluentLabel>  
+                        </FluentStack>
+                    </OptionTemplate> 
+                </FluentSelect>
+            </FluentGridItem>
+        </FluentGrid>
+    </Body>
+</FluentPopover>
+
+@code {
+    bool _visiblePopover;
+    public DesignThemeModes Mode { get; set; }
+    public OfficeColor? OfficeColor { get; set; }
 }
