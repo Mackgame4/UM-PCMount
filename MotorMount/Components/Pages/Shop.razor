@@ -1,7 +1,8 @@
-﻿@page "/weather"
+﻿@page "/shop"
+@using Microsoft.FluentUI.AspNetCore.Components
+@using MotorMount.Components.Components
 @attribute [StreamRendering]
-
-<PageTitle>Weather</PageTitle>
+<PageTitle>Parts Shop</PageTitle>
 
 <h1>Weather</h1>
 
@@ -9,7 +10,7 @@
 
 @if (forecasts == null)
 {
-    <p><em>Loading...</em></p>
+<LoadingDialog Title="Waiting page data request" />
 }
 else
 {
