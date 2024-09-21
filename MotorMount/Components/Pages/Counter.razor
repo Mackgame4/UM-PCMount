@@ -23,3 +23,34 @@
         currentCount++;
     }
 }
+
+<div style="display: flex; width=100%">
+    <FluentDesignTheme StorageName="theme" @bind-Mode="@Mode" @bind-OfficeColor="@OfficeColor" />
+    <FluentButton id="themePopover" IconStart="@(new Icons.Regular.Size20.PaintBrush())" @onclick="() => _visiblePopover = !_visiblePopover">Theme</FluentButton>
+    <FluentPopover Style="width: 300px;" VerticalThreshold="170" AnchorId="themePopover" @bind-Open="_visiblePopover">
+        <Header>@(new Emojis.Objects.Color.Default.Paintbrush().ToMarkup("20px")) Customize your experience</Header>
+        <Body>
+            <FluentGrid>
+                <FluentGridItem>
+                    <FluentSelect Label="Theme" Items="@(Enum.GetValues<DesignThemeModes>())" Width="250px" @bind-SelectedOption="@Mode" />
+                </FluentGridItem>
+                <FluentGridItem>
+                    <FluentSelect Label="Color" Items="@(Enum.GetValues<OfficeColor>().Select(i => (OfficeColor?)i))" Height="200px" Width="250px" @bind-SelectedOption="@OfficeColor">
+                        <OptionTemplate>
+                            <FluentStack>
+                                <FluentLabel>@context</FluentLabel>  
+                            </FluentStack>
+                        </OptionTemplate> 
+                    </FluentSelect>
+                </FluentGridItem>
+            </FluentGrid>
+        </Body>
+    </FluentPopover>
+</div>
+
+@code {
+    bool _visiblePopover;
+    public DesignThemeModes Mode { get; set; }
+
+    public OfficeColor? OfficeColor { get; set; }
+}
