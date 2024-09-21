@@ -1,36 +1,29 @@
 ﻿@using Microsoft.FluentUI.AspNetCore.Components
 @rendermode InteractiveServer
+@inject NavigationManager Navigation
 
-<div class="flex sm:hidden fixed w-full p-4">
-    <FluentButton id="menuPopover" IconStart="@(new Icons.Regular.Size24.List())" Appearance="Appearance.Lightweight" @onclick="() => _visibleMenuPopover = !_visibleMenuPopover"></FluentButton>
-</div>
-
-<FluentPopover Style="width: 300px;" VerticalThreshold="170" AnchorId="menuPopover" @bind-Open="_visibleMenuPopover">
-    <Header>
-        <div class="flex flex-row justify-center align-center text-center gap-4">
-            <img src="/assets/motormountlogo.png" Slot="start" width="30px"/>
-            <span class="text-xl mt-0.5">MotorMount</span>
-        </div>
-    </Header>
-    <Body>
-        <FluentStack Orientation="Orientation.Vertical" Width="100%">
-            @RenderMenuOptions
-        <FluentButton class="w-full mt-auto" id="themePopover" IconStart="@(new Icons.Regular.Size20.PaintBrush())" Appearance="Appearance.Outline" @onclick="() => _visibleThemePopover = !_visibleThemePopover">Theme</FluentButton>
-        </FluentStack>
-    </Body>
-</FluentPopover>
-
-<div class="hidden sm:flex relative w-72 min-h-screen p-4" style="border-right: solid 1px gray;">
-    <FluentStack Orientation="Orientation.Vertical" Width="100%">
+<div class="hidden sm:flex flex-col relative w-full h-34">
+    <FluentStack Orientation="Orientation.Horizontal" Width="100%" class="p-4">
+        <img src="/assets/motormountlogo.png" Slot="start" width="30px"/>
         <NavLink class="w-full" href="" Match="NavLinkMatch.All">
-            <FluentButton class="w-full h-14" Appearance="Appearance.Accent">
-                <img src="/assets/motormountlogo.png" Slot="start" width="30px"/>
-                <span class="text-xl">MotorMount</span>
+            <FluentButton Appearance="Appearance.Accent">
+                <span>MotorMount - @CurrentPageTitle</span>
             </FluentButton>
         </NavLink>
-        @RenderMenuOptions
-        <FluentButton class="w-full mt-auto" id="themePopover" IconStart="@(new Icons.Regular.Size20.PaintBrush())" Appearance="Appearance.Outline" @onclick="() => _visibleThemePopover = !_visibleThemePopover">Theme</FluentButton>
+        <FluentSearch Placeholder="Search" AriaLabel="Search"/>
+        <FluentProfileMenu Image=""
+                       Status="@PresenceStatus.Available"
+                       HeaderLabel="Microsoft"
+                       Initials="LI4"
+                       FullName="Bill Gates"
+                       EMail="bill.gates@microsoft.com"
+                       PopoverStyle="min-width: 330px;" />
     </FluentStack>
+    <FluentDivider Style="width: 100%;" Role="DividerRole.Presentation"></FluentDivider>
+    <div class="p-3">
+    @RenderMenuOptions
+    </div>
+    <FluentDivider Style="width: 100%;" Role="DividerRole.Presentation"></FluentDivider>
 </div>
 
 <FluentDesignTheme StorageName="theme" @bind-Mode="@Mode" @bind-OfficeColor="@OfficeColor" />
@@ -60,7 +53,7 @@
     public DesignThemeModes Mode { get; set; }
     public OfficeColor? OfficeColor { get; set; }
 
-    private RenderFragment RenderMenuOptions =  @<FluentStack Orientation="Orientation.Vertical" Width="100%">
+    private RenderFragment RenderMenuOptions =  @<FluentStack Orientation="Orientation.Horizontal" Width="100%">
         <NavLink class="w-full" href="" Match="NavLinkMatch.All">
             <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Home())" Appearance="Appearance.Lightweight">Dashboard</FluentButton>
         </NavLink>
@@ -74,4 +67,35 @@
             <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size20.Wrench())" Appearance="Appearance.Lightweight">Assembly</FluentButton>
         </NavLink>
         </FluentStack>;
+
+    private string CurrentPageTitle { get; set; } = "Home";  // Default page title
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SetPageTitle();  // Set title on initialization
+        Navigation.LocationChanged += (sender, args) => SetPageTitle();  // Listen for navigation changes
+    }
+
+    private void SetPageTitle()
+    {
+        var uri = Navigation.Uri;
+        if (uri.EndsWith("/shop"))
+        {
+            CurrentPageTitle = "Parts Shop";
+        }
+        else if (uri.EndsWith("/inventory"))
+        {
+            CurrentPageTitle = "Inventory";
+        }
+        else if (uri.EndsWith("/assembly"))
+        {
+            CurrentPageTitle = "Assembly";
+        }
+        else
+        {
+            CurrentPageTitle = "Dashboard"; // Default or fallback
+        }
+
+        StateHasChanged();  // Trigger UI update
+    }
 }
