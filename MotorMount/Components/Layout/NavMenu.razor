@@ -3,8 +3,15 @@
 <div class="relative w-fit h-screen bg-red-300 p-4">
     <img src="/assets/motormount.png" width="30px"/>
     <FluentStack Orientation="Orientation.Vertical" Width="100%">
-        <FluentButton Appearance="Appearance.Lightweight">Lightweight</FluentButton>
-        <FluentButton Appearance="Appearance.Lightweight">Lightweight</FluentButton>
+        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+        <FluentButton Appearance="Appearance.Lightweight">Home</FluentButton>
+        </NavLink>
+        <NavLink class="nav-link" href="counter">
+        <FluentButton Appearance="Appearance.Lightweight">Counter</FluentButton>
+        </NavLink>
+        <NavLink class="nav-link" href="weather">
+        <FluentButton Appearance="Appearance.Lightweight">Weather</FluentButton>
+        </NavLink>
     </FluentStack>
 </div>
 
