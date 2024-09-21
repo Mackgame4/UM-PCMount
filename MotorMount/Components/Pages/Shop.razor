@@ -1,5 +1,4 @@
 ﻿@page "/shop"
-@rendermode InteractiveServer
 @using Microsoft.FluentUI.AspNetCore.Components
 @using MotorMount.Components.Components
 @attribute [StreamRendering]
@@ -16,12 +15,6 @@
 @if (products == null)
 {
 <LoadingDialog Title="Waiting page data request" />
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
-    @foreach(int element in Enumerable.Range(1, 14))
-    {
-    <FluentSkeleton Width="100%" Height="340px"></FluentSkeleton>
-    }
-</div>
 }
 else
 {
@@ -30,21 +23,22 @@ else
     {
         <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2">
             <FluentButton class="absolute top-2 left-2" IconStart="@(new Icons.Regular.Size16.Info())" Appearance="Appearance.Lightweight"></FluentButton>
-            <div class="w-36">
-                <img src="/assets/product-placeholder.png" class="object-cover w-full h-full" />
+            <div class="w-36 rounded-md">
+                <img src="/assets/product-placeholder.png" class="object-cover w-full h-full rounded-md" />
             </div>
             <h3 class="-mb-2">ProductName</h3>
-            <span>#ProductUID</span>
+            <span>Brand - Model</span>
+            <FluentBadge Appearance="Appearance.Lightweight">#ProductUID</FluentBadge>
             <div class="flex flex-row gap-2 justify-center items-center text-center">
                 <span>Price:</span><FluentBadge Appearance="Appearance.Neutral">$999</FluentBadge>
                 <FluentSpacer />
                 <!-- TODO: Only show when you have more that one of that product -->
-                <span>Cost:</span><FluentBadge Appearance="Appearance.Neutral"><span class="text-red-400">$999</span></FluentBadge>
+                <span>Cost:</span><FluentBadge Appearance="Appearance.Neutral"><span class="text-red-500">$999</span></FluentBadge>
             </div>
             <div class="w-full flex flex-row gap-1.5 justify-center items-center text-center">
-                <FluentButton IconStart="@(new Icons.Regular.Size16.Subtract())" Appearance="Appearance.Accent"></FluentButton>
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Subtract())" Appearance="Appearance.Neutral"></FluentButton>
                 <FluentNumberField @bind-Value="exampleInt" />
-                <FluentButton IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Accent"></FluentButton>
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Neutral"></FluentButton>
             </div>
             <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.Cart())" Appearance="Appearance.Accent">Order</FluentButton>
         </FluentCard>
@@ -54,8 +48,7 @@ else
 
 @code {
     private List<String>? products;
-    bool _visiblePopover = false;
-    
+
     int exampleInt = 0;
 
     protected override async Task OnInitializedAsync()

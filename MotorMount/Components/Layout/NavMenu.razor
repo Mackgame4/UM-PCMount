@@ -15,6 +15,23 @@
         <FluentCounterBadge Dot="true" Appearance="Appearance.Accent">
             <FluentButton IconStart="@(new Icons.Regular.Size16.Alert())" Appearance="Appearance.Outline"></FluentButton>
         </FluentCounterBadge>
+        <FluentProfileMenu Initials="LI4">
+            <HeaderTemplate>
+                <FluentLabel Typo="@Typography.Header">Welcome,</FluentLabel>
+            </HeaderTemplate>
+            <ChildContent>
+                <div style="width: 250px; height: 80px">
+                    <FluentLabel Typo="@Typography.Header" Style="font-weight: bold;">User</FluentLabel>
+                    <FluentLabel>user@outlook.com</FluentLabel>
+                </div>
+            </ChildContent>
+            <FooterTemplate>
+                <FluentStack>
+                    <FluentSpacer />
+                    <span>This feature is still in development.</span>
+                </FluentStack>
+            </FooterTemplate>
+        </FluentProfileMenu>
     </FluentStack>
     <FluentDivider Style="width: 100%;" Role="DividerRole.Presentation"></FluentDivider>
     <div class="p-3">
@@ -24,15 +41,15 @@
 </div>
 
 <FluentDesignTheme StorageName="theme" @bind-Mode="@Mode" @bind-OfficeColor="@OfficeColor" />
-<FluentPopover Style="width: 300px;" VerticalThreshold="170" AnchorId="themePopover" @bind-Open="_visibleThemePopover">
+<FluentPopover class="rounded-md w-80" VerticalThreshold="170" AnchorId="themePopover" @bind-Open="_visibleThemePopover">
     <Header>@(new Emojis.Objects.Color.Default.Paintbrush().ToMarkup("20px")) Customize your experience</Header>
     <Body>
         <FluentGrid>
             <FluentGridItem>
-                <FluentSelect Label="Theme" Items="@(Enum.GetValues<DesignThemeModes>())" Width="250px" @bind-SelectedOption="@Mode" />
+                <FluentSelect class="w-full" Label="Theme" Items="@(Enum.GetValues<DesignThemeModes>())" Width="250px" @bind-SelectedOption="@Mode" />
             </FluentGridItem>
             <FluentGridItem>
-                <FluentSelect Label="Color" Items="@(Enum.GetValues<OfficeColor>().Select(i => (OfficeColor?)i))" Height="200px" Width="250px" @bind-SelectedOption="@OfficeColor">
+                <FluentSelect class="w-full" Label="Color" Items="@(Enum.GetValues<OfficeColor>().Select(i => (OfficeColor?)i))" Height="200px" Width="250px" @bind-SelectedOption="@OfficeColor">
                     <OptionTemplate>
                         <FluentStack>
                             <FluentLabel>@context</FluentLabel>  
