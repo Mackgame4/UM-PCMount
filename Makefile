@@ -29,11 +29,11 @@ relatorio: relatorio_build
 
 relatorio_build:
 	@echo "Compilando relatorio..."
-	@typst compile relatorio/relatorio.typ
+	@cd Relatorio && typst compile main.typ
 
 relatorio_watch:
 	@echo "Assistindo alterações no relatorio..."
-	@typst watch relatorio/relatorio.typ
+	@cd Relatorio && typst watch main.typ
 
 relatorio_clean:
-	@rm -rf relatorio/relatorio.pdf
+	@rm -rf Relatorio/main.typ
