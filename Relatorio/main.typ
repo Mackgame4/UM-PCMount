@@ -130,10 +130,12 @@ Veja mais sobre aqui: https://typst.app/docs/reference/meta/bibliography/.>>
 #heading(numbering: none)[Lista de Siglas e Acrónimos]
 
 / BD: Base de Dados
-/ DW: Data Warehouse
-/ OLTP: On-Line Analyical Processing
+// / DW: Data Warehouse
+// / OLTP: On-Line Analyical Processing
+/ SQL: Structured Query Language
+// / XML: eXtensible Markup Language
 
 #heading(numbering: none)[Anexos]
 <\<Os anexos deverão ser utilizados para a inclusão de informação adicional necessária para uma melhor compreensão do relatório o para complementar tópicos, secções ou assuntos abordados. Os anexos criados deverão ser numerados e possuir uma designação. Estes dados permitirão complementar o Índice geral do relatório relativamente à enumeração e apresentação dos diversos anexos.>>
 
-#attachment(caption: "Logo da Universidade do Minho", image("images/uminho.png"))
+#attachment(caption: "Logo da Universidade do Minho", image("images/uminho.png", width: 60%))
