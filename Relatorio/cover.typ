@@ -33,7 +33,7 @@
   
       // podes alterar o espaçamento entre paragrafos com `set par()` acho
         text(size: 20pt, fill: blue, weight: "bold", [Unidade Curricular de \ Laboratórios de Informática IV\ ])
-        text(size: 10pt, [Ano Letivo de 2023/2024])
+        text(size: 10pt, [Ano Letivo de 2024/2025])
       })
       place(dy: 520pt, text(size: 20pt, weight: "bold", title))
       place(dy: 590pt, render_authors)

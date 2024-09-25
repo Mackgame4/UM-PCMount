@@ -3,11 +3,13 @@
 
 #show: project
 
-#cover(title: "Título", authors: (
-  (name: "Aluno 1", number: "a100001"), 
+#cover(title: "MotorMount", authors: (
+  (name: "Alunlo 1", number: "A104365"), 
+  (name: "Aluno 2", number: "a100002"),
   (name: "Aluno 2", number: "a100002"), 
+  (name: "Aluno 2", number: "a100002"),
   (name: "Aluno 3", number: "a100003")), 
-  "Setembro, 2023")
+  "Setembro, 2024")
 
 #set page(numbering: "i", number-align: center)
 #counter(page).update(1)

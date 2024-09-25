@@ -7,7 +7,7 @@
         <NavLink href="" Match="NavLinkMatch.All" ><img src="/assets/motormountlogo.png" Slot="start" width="30px"/></NavLink>
         <NavLink class="w-full" href="" Match="NavLinkMatch.All">
             <FluentButton class="hidden sm:inline-flex" Appearance="Appearance.Accent">
-                <span>MotorMount - @(CurrentPageTitle != null ? CurrentPageTitle : "")</span>
+                <span>MotorMount @(CurrentPageTitle != null ? "- " + CurrentPageTitle : "")</span>
             </FluentButton>
         </NavLink>
         <FluentSpacer />
