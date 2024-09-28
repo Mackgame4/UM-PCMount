@@ -8,4 +8,5 @@ public class ApplicationDbContext : DbContext
 
     // DbSets (tables)
     public DbSet<User> Users { get; set; }
+    public DbSet<Part> Parts { get; set; }
 }
