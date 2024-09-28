@@ -20,6 +20,13 @@ html, body {
     /* End of Fluent UI Theme Config */
 }
 
+fluent-anchored-region {
+    /* make element not affect page height */
+    position: fixed !important;
+    width: fit-content !important;
+    height: fit-content !important;
+}
+
 ::-webkit-scrollbar {
     width: 8px;
 }
