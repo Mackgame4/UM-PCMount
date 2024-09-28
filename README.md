@@ -17,6 +17,11 @@ $ cd ./UM-motormount/
 $ sudo ./path/SQL2022-SSEI-Dev.exe /ConfigurationFile="ConfigurationFile.ini"
 ```
 
+###### After using the SQL Server Setup you can access the SQL Server Management Studio (SSMS) and use your Windows credentials to login or use the following credentials for development purposes:
+##### Server name: `localhost\MOTORMOUNTSQL`
+##### User: `sa`
+##### Password: `root`
+
 ###### Note: If you experience troubles with the NuGet packages run these commands:
 ```shell
 cd ./MotorMount/
@@ -47,4 +52,4 @@ $ make relatorio
 ###### Attention: You need to have [Typst](https://typst.app/) installed to compile
 
 ### Developement Team
-AXXXXXX - Name
+A104365 - Fabio Magalhaes
