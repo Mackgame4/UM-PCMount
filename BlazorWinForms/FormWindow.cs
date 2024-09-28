@@ -7,7 +7,12 @@ namespace BlazorWinForms
 {
     public partial class FormWindow : Form
     {
-        private const string Url = "https://localhost:7061";
+        private readonly List<string> Urls = [
+            "http://localhost:5106",
+            "http://localhost:7061",
+            "https://localhost:5106",
+            "https://localhost:7061"
+        ];
         private const int Threshold = 2000; // Tempo de espera em milissegundos
         private readonly HttpClient _httpClient;
 
@@ -18,28 +23,32 @@ namespace BlazorWinForms
             CheckServerAndLoadAsync();
         }
 
-        // Função assíncrona para verificar se o servidor está online e carregar o WebView
-        private async void CheckServerAndLoadAsync()
+        // Funcao assincrona para verificar se o servidor esta online e carregar o WebView
+        private void CheckServerAndLoadAsync()
         {
-            while (!await IsServerAvailableAsync())
+            Task.Run(async () =>
             {
-                await Task.Delay(Threshold);
-            }
-            webView2.Source = new Uri(Url);
-        }
-
-        // Função para verificar se o servidor está acessível
-        private async Task<bool> IsServerAvailableAsync()
-        {
-            try
-            {
-                var response = await _httpClient.GetAsync(Url);
-                return response.IsSuccessStatusCode;
-            }
-            catch (HttpRequestException)
-            {
-                return false;
-            }
+                foreach (var url in Urls)
+                {
+                    try
+                    {
+                        var response = await _httpClient.GetAsync(url);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            BeginInvoke(new Action(() =>
+                            {
+                                webView2.Source = new Uri(url);
+                            }));
+                            return;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // Ignorar excecoes
+                    }
+                    await Task.Delay(Threshold);
+                }
+            });
         }
     }
 }
