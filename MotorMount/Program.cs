@@ -1,4 +1,5 @@
 using Microsoft.FluentUI.AspNetCore.Components;
+using Microsoft.EntityFrameworkCore;
 using MotorMount.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+builder.Services.AddControllersWithViews();
+// Add DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Start of Fluent UI Config
 builder.Services.AddFluentUIComponents();
 builder.Services.AddHttpClient();

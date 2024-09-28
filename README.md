@@ -22,12 +22,24 @@ $ sudo ./path/SQL2022-SSEI-Dev.exe /ConfigurationFile="ConfigurationFile.ini"
 ##### User: `sa`
 ##### Password: `root`
 
+###### After setting up the SQL Server you need to create the database and tables by running the following commands:
+```shell
+$ cd ./MotorMount/
+# Install the Entity Framework Core tools by running:
+$ dotnet tool install --global dotnet-ef
+# Create the database by running:
+$ dotnet ef migrations add InitialCreate
+$ dotnet ef database update
+```
+
 ###### Note: If you experience troubles with the NuGet packages run these commands:
 ```shell
 cd ./MotorMount/
 $ dotnet add package Microsoft.FluentUI.AspNetCore.Components
 $ dotnet add package Microsoft.FluentUI.AspNetCore.Components.Icons
 $ dotnet add package Microsoft.FluentUI.AspNetCore.Components.Emoji
+$ dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+$ dotnet add package Microsoft.EntityFrameworkCore.Tools
 ```
 
 ## How to build
