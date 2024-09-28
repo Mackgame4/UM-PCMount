@@ -30,7 +30,12 @@ $ dotnet tool install --global dotnet-ef
 # Create the database by running:
 $ dotnet ef migrations add InitialCreate
 $ dotnet ef database update
+# or:
+$ cd ..
+$ make db
 ```
+
+##### Note: You can also use the SQL Server Management Studio (SSMS) to create the database and tables by running the SQL scripts found in the `./MotorMount/Data/Scripts` folder.
 
 ###### Note: If you experience troubles with the NuGet packages run these commands:
 ```shell
