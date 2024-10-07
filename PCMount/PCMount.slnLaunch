@@ -3,7 +3,7 @@
     "Name": "DesktopCompile",
     "Projects": [
       {
-        "Path": "MotorMount.csproj",
+        "Path": "PCMount.csproj",
         "Action": "Start",
         "DebugTarget": "https"
       },

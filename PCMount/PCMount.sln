@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MotorMount", "MotorMount.csproj", "{D631E848-20DA-4122-AD4F-907C2912A24C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCMount", "PCMount.csproj", "{D631E848-20DA-4122-AD4F-907C2912A24C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWinForms", "..\BlazorWinForms\BlazorWinForms.csproj", "{72EAFEFB-F1CB-4D0D-A17C-6DD1BB4FB8AC}"
 EndProject

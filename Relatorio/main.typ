@@ -3,7 +3,7 @@
 
 #show: project
 
-#cover(title: "MotorMount", authors: (
+#cover(title: "PCMount", authors: (
   (name: "Alunlo 1", number: "A104365"), 
   (name: "Aluno 2", number: "a100002"),
   (name: "Aluno 2", number: "a100002"), 

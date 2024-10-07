@@ -1,6 +1,6 @@
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
-using MotorMount.Components;
+using PCMount.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
