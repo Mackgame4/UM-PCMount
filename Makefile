@@ -2,6 +2,10 @@ all: dev
 
 dev: dev-web
 
+web: dev-web
+
+desktop: dev-desktop
+
 # Launch profiles from "./Properties/launchSettings.json"
 # Runs the two commands in parallel
 # powershell -Command "Start-Process 'dotnet' -ArgumentList 'run' -WorkingDirectory './MotorMount' -NoNewWindow"
