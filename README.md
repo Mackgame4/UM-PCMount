@@ -1,4 +1,4 @@
-# Motormount
+# PCMount
 This project was developed for the subject LI4 from University of Minho - Software Engineering degree.
 
 #### Requirements:
@@ -12,19 +12,19 @@ To run this project you might need to install some of its dependencies:
 ## How to install
 ```shell
 $ git clone
-$ cd ./UM-motormount/
+$ cd ./UM-pcmount/
 # After downloading the SQL Server Setup run the following command (example for SQL Server 2022 Developer Edition):
 $ sudo ./path/SQL2022-SSEI-Dev.exe /ConfigurationFile="ConfigurationFile.ini"
 ```
 
 ###### After using the SQL Server Setup you can access the SQL Server Management Studio (SSMS) and use your Windows credentials to login or use the following credentials for development purposes:
-##### Server name: `localhost\MOTORMOUNTSQL`
+##### Server name: `localhost\PCMOUNTSQL`
 ##### User: `sa`
 ##### Password: `root`
 
 ###### After setting up the SQL Server you need to create the database and tables by running the following commands:
 ```shell
-$ cd ./MotorMount/
+$ cd ./PCMount/
 # Install the Entity Framework Core tools by running:
 $ dotnet tool install --global dotnet-ef
 # Create the database by running:
@@ -35,11 +35,11 @@ $ cd ..
 $ make db
 ```
 
-##### Note: You can also use the SQL Server Management Studio (SSMS) to create the database and tables by running the SQL scripts found in the `./MotorMount/Data/Scripts` folder.
+##### Note: You can also use the SQL Server Management Studio (SSMS) to create the database and tables by running the SQL scripts found in the `./PCMount/Data/Scripts` folder.
 
 ###### Note: If you experience troubles with the NuGet packages run these commands:
 ```shell
-cd ./MotorMount/
+cd ./PCMount/
 $ dotnet add package Microsoft.FluentUI.AspNetCore.Components
 $ dotnet add package Microsoft.FluentUI.AspNetCore.Components.Icons
 $ dotnet add package Microsoft.FluentUI.AspNetCore.Components.Emoji

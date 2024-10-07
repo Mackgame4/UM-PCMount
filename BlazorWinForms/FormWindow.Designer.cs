@@ -54,7 +54,7 @@
             Controls.Add(webView2);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "FormWindow";
-            Text = "MotorMount";
+            Text = "PCMount";
             ((System.ComponentModel.ISupportInitialize)webView2).EndInit();
             ResumeLayout(false);
         }
