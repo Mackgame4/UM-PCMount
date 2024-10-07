@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;  // Added to support List<>
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -7,48 +8,57 @@ namespace BlazorWinForms
 {
     public partial class FormWindow : Form
     {
-        private readonly List<string> Urls = [
+        private readonly List<string> Urls = new List<string>
+        {
             "http://localhost:5106",
             "http://localhost:7061",
             "https://localhost:5106",
             "https://localhost:7061"
-        ];
-        private const int Threshold = 2000; // Tempo de espera em milissegundos
+        };
+
+        private const int Threshold = 800; // Waiting time between retries in milliseconds
         private readonly HttpClient _httpClient;
 
         public FormWindow()
         {
             InitializeComponent();
-            _httpClient = new HttpClient();
-            CheckServerAndLoadAsync();
+
+            // Optional: Ignore SSL certificate validation (useful in development with self-signed certs)
+            System.Net.ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+            _httpClient = new HttpClient
+            {
+                Timeout = TimeSpan.FromSeconds(10)  // Set custom timeout for the HTTP client
+            };
+            _ = CheckServerAndLoadAsync();
         }
 
-        // Funcao assincrona para verificar se o servidor esta online e carregar o WebView
-        private void CheckServerAndLoadAsync()
+        // Check if a server is available and load the corresponding page
+        private async Task CheckServerAndLoadAsync()
         {
-            Task.Run(async () =>
+            foreach (var url in Urls)
             {
-                foreach (var url in Urls)
+                try
                 {
-                    try
+                    var response = await _httpClient.GetAsync(url);
+                    if (response.IsSuccessStatusCode)
                     {
-                        var response = await _httpClient.GetAsync(url);
-                        if (response.IsSuccessStatusCode)
-                        {
-                            BeginInvoke(new Action(() =>
-                            {
-                                webView2.Source = new Uri(url);
-                            }));
-                            return;
-                        }
+                        Invoke(new Action(() => LoadPage(url)));
+                        break;
                     }
-                    catch (Exception)
-                    {
-                        // Ignorar excecoes
-                    }
-                    await Task.Delay(Threshold);
                 }
-            });
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error while connecting to {url}: {ex.Message}");
+                }
+                await Task.Delay(Threshold);
+            }
+        }
+
+        private void LoadPage(string url)
+        {
+            webView2.Source = new Uri(url);
+            //Console.WriteLine($"Loading page: {url}");
         }
     }
 }
