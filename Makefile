@@ -38,15 +38,15 @@ rand=%RANDOM%
 build-db:
 	@cd ./PCMount/ && dotnet ef migrations add $(rand) && dotnet ef database update
 
-relatorio: relatorio_build
+relatorio: relatorio-build
 
-relatorio_build:
+relatorio-build:
 	@echo "Compilando relatorio..."
 	@cd Relatorio && typst compile main.typ
 
-relatorio_watch:
+relatorio-watch:
 	@echo "Assistindo alterações no relatorio..."
 	@cd Relatorio && typst watch main.typ
 
-relatorio_clean:
+relatorio-clean:
 	@rm -rf Relatorio/main.typ

@@ -62,7 +62,7 @@ $ make dev
 ```
 
 ## Report
-The pre-compiled version of the report can be found in the Relatório folder. If you want to compile it yourself, you can do so by running:
+The pre-compiled version of the report can be found in the `Relatorio` folder (`main.pdf`). If you want to compile it yourself, you can do so by running:
 ```shell
 $ make relatorio
 ```
