@@ -21,7 +21,7 @@
 
 *Área de Aplicação*: Processos de construção de software e especificação e desenvolvimento de aplicações do mundo real.
 
-*Palavras-Chave*: .NET, C\#, Base de Dados, Web, Web App, SQL Server, Entity Framework, ASP.NET Core, Razor, Blazor, HTML, CSS, Diagrama UML, Modelo Dominio, Entidades, Relacionamentos, Diagrama de Classes, Diagrama de Casos de Uso, Diagrama de Sequência, Engenharia Software, Interface do Utilizador
+*Palavras-Chave*: .NET, C\#, Base de Dados, Web, Web App, SQL Server, Entity Framework, ASP.NET Core, Razor, Blazor, HTML, CSS, Diagrama UML, Modelo Dominio, Entidades, Relacionamentos, Diagrama de Classes, Diagrama de Casos de Uso, Diagrama de Sequência, Engenharia Software, Interface do Utilizador, Sistema de Gestão, Linha de Montagem
 
 #show outline: it => {
     show heading: set text(size: 18pt)
