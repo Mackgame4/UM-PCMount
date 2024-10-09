@@ -4,9 +4,9 @@
 
 #let cover(title: "", authors: (), string_date) = {
   let render_authors = grid(columns: authors.len(),
-                            column-gutter: 15pt,
+                            column-gutter: 11pt,
                             ..authors.map(it => [
-                              #text(size:12pt, weight: "bold", it.name) \
+                              #text(size:11pt, weight: "bold", it.name) \
                               #text(size: 11pt, it.number)
                             ])
                            )
