@@ -5,17 +5,17 @@
 
 #cover(title: "PCMount", authors: (
   (name: "Fabio Magalhaes", number: "A104365"), 
-  (name: "Aluno 2", number: "a100002"),
-  (name: "Aluno 2", number: "a100002"), 
-  (name: "Aluno 2", number: "a100002"),
-  (name: "Aluno 3", number: "a100003")), 
+  (name: "João Machado", number: "a104084"),
+  (name: "Pedro Gomes", number: "A104540"), 
+  (name: "André Pinto", number: "a104267"),
+  (name: "Ricardo Sousa", number: "a104524")), 
   "Outubro, 2024")
 
 #set page(numbering: "i", number-align: center)
 #counter(page).update(1)
 
 #heading(numbering: none, outlined: false)[Resumo]
-<\<O resumo tem como objectivo descrever de forma sucinta o trabalho realizado. Deverá conter uma pequena introdução, seguida por uma breve descrição do trabalho realizado e terminando com uma indicação sumária do seu estado final. Não deverá exceder as 400 palavras.>>   
+<\<O resumo tem como objetivo descrever de forma sucinta o trabalho realizado. Deverá conter uma pequena introdução, seguida por uma breve descrição do trabalho realizado e terminando com uma indicação sumária do seu estado final. Não deverá exceder as 400 palavras.>>   
 
 #v(2em)
 
