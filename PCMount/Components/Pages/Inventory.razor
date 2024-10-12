@@ -8,7 +8,7 @@
     <PropertyColumn Property="@(p => p.PersonId)" Sortable="true" />
     <PropertyColumn Property="@(c => c.Name)" InitialSortDirection=SortDirection.Descending Sortable="true" IsDefaultSortColumn=true>
         <ColumnOptions>
-          <FluentSearch type="search" Autofocus=true Placeholder="Country name..." />
+            <FluentSearch type="search" Autofocus=true Placeholder="Country name..." />
         </ColumnOptions>
     </PropertyColumn>
     <PropertyColumn Property="@(p => p.BirthDate)" Format="yyyy-MM-dd" Sortable="true" />
