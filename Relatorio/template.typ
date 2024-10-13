@@ -1,7 +1,7 @@
 #let project(body) = {
   // Set the documents basic properties.
   set page(paper: "a4", margin:(top: 2.5cm, bottom: 2.5cm, left: 3cm, right: 3cm))
-  set text(font: "Calibri", lang: "pt", region: "PT", size: 10pt)
+  set text(font: "Calibri", lang: "pt", region: "PT", size: 12pt)
 
   // Main body.
   set par(justify: true)
