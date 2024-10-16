@@ -62,14 +62,14 @@ A identidade visual do _*PCMount*_ será focada na simplicidade e na funcionalid
 O sistema visa consolidar a imagem da _*SpaceEletronics*_ como uma empresa que prioriza a experiência do cliente e a eficiência operacional sem menosprezar o grau de excelência e elevada tecnologia.
 
 == Recursos necessários
-Materiais
+_*Materiais*_
 
 - A própria Web App onde se comercializam os produtos;
 - SGBD (Microsoft SQL Server);
 - Servidores para hospedar a aplicação e a base de dados;
 - Um estabelecimento físico.
 
-Humanos
+_*Humanos*_
 
 - Analistas de dados;
 - Designers gráficos;
@@ -89,8 +89,48 @@ Humanos
 = Levantamento e Análise de Requisitos
 
 == Apresentação da estratégia e método
+Para garantir o sucesso do desenvolvimento do _*PCMount*_, é essencial adotar uma estratégia clara e um método estruturado para o levantamento e análise de requisitos. Este processo determinará quais funcionalidades e características o sistema deverá ter para atender às necessidades tanto da _*SpaceEletronics*_ como dos seus clientes, garantindo que o projeto seja executado de maneira eficiente e alinhada aos objetivos da empresa.
+
+Para este efeito, a estratégia central para o levantamento e análise de requisitos será baseada no envolvimento ativo dos _*stakeholders*_ (partes interessadas), seguido de uma abordagem iterativa e incremental. Envolver os _*stakeholders*_ é crucial para obter uma visão abrangente das necessidades, tanto dos colaboradores internos (equipas de montagem, vendas, gestão de stock) quanto dos clientes (usuários finais que fazem encomendas personalizadas). Isso garantirá que o sistema atenda tanto aos objetivos operacionais da empresa quanto às expectativas de seus clientes.
+
+O processo de levantamento decorrerá em atividades curtas e consecutivas até uma data limite, garantindo que os requisitos sejam refinados e validados de forma contínua. Cada ciclo incluirá a coleta de requisitos com base no _*feedback*_ dos _*stakeholders*_ e na avaliação das funcionalidades propostas.
+
+Para obter uma compreensão detalhada das necessidades, serão utilizadas diversas técnicas iterativas de levantamento de requisitos:
+
+_*Entrevistas com stakeholders*_: Realização de entrevistas estruturadas com os principais _*stakeholders*_ da empresa, incluindo a equipa de vendas, montagem e de suporte ao cliente, para entender as suas necessidades operacionais e identificar os desafios atuais na gestão de encomendas e stock. Além disso, será entrevistada uma amostra de clientes habituais, (tão habituais quanto possível) para captar as suas expectativas e preferências em relação ao sistema de personalização de computadores.
+
+_*Workshops colaborativos:*_ Organização de workshops com as equipas envolvidas para promover discussões abertas sobre os problemas atuais, funcionalidades desejadas e melhorias que o _*PCMount*_ pode proporcionar. A ideia é estimular a colaboração entre setores, garantindo que todos os aspetos do processo de encomenda, montagem e faturação sejam cobertos.
+
+_*Questionários e Pesquisas:*_ Aplicação de questionários com perguntas fechadas e abertas aos clientes da _*SpaceEletronics*_ para identificar quais características do sistema de encomenda e montagem são mais importantes para eles.
+
+_*Observação direta:*_ Acompanhamento dos processos atuais de montagem e gestão de stock para identificar oportunidades de automação e áreas onde o sistema pode trazer maior eficiência. Esta observação permitirá obter uma visão prática das operações diárias e os pontos críticos que precisam ser resolvidos.
+
 
 == Descrição geral dos requisitos (funcionais e não funcionais)
+=== Requisitos funcionais
+
+#table(
+  columns: 2,
+  align: center + horizon,
+  [*Requisitos Cliente*], [*Requisitos Sistema*],
+  table.cell(rowspan:2, [1 - Deve ser possível criar contas de
+administradores na aplicação]), 
+  [1 - O sistema deverá solicitar o nome, sexo, NIF, morada, email e contacto telefónico, username, password e um código administrativo privado de autenticação],
+  [2 – O sistema apenas irá disponibilizar a lista total das encomendas(entregues e por entregar) e a lista quantitativa do stock total depois de um administrador se ter autenticado],
+  table.cell(rowspan: 2, [1 - O cliente deve ser capaz de criar
+  uma conta na aplicação]), 
+  [1 - O sistema deverá solicitar o nome, sexo, NIF, morada, email
+  contacto telefónico, username e password], 
+  [2 - O sistema não deve permitir a criação de duas contas cliente que
+  possuam o mesmo username, NIF, contacto telefónico ou email],
+  table.cell(rowspan: 2, [3 - Qualquer utilizador deve ser capaz de realizar o login na sua conta depois de criada]),
+  [1 - Depois de o username e a password serem introduzidos pelo utilizador, o sistema deve verificar se existe alguma conta com a combinação destes mesmos campos, e caso exista, garantir o acesso à conta], 
+  [2 - O sistema deve negar o acesso a utilizadores que utilizem uma combinação de username e password errados, e devolver ainda uma mensagem de erro, sem especificar qual dos campos estava incorreto],
+  [100g], [35-40% cocoa chocolate],
+  [2], [Eggs],
+  [Pinch], [Salt],
+  [Drizzle], [Vanilla extract],
+)
 
 == Validação dos requisitos estabelecidos
 
