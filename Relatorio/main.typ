@@ -4,22 +4,23 @@
 #show: project
 
 #cover(title: "PCMount", authors: (
-  (name: "Fabio Magalhaes", number: "A104365"), 
-  (name: "João Machado", number: "a104084"),
+  (name: "Fábio Magalhães", number: "A104365"), 
+  (name: "João Machado", number: "A104084"),
   (name: "Pedro Gomes", number: "A104540"), 
-  (name: "André Pinto", number: "a104267"),
-  (name: "Ricardo Sousa", number: "a104524")), 
+  (name: "André Pinto", number: "A104267"),
+  (name: "Ricardo Sousa", number: "A104524")), 
   "Outubro, 2024")
 
 #set page(numbering: "i", number-align: center)
 #counter(page).update(1)
 
+
 #heading(numbering: none, outlined: false)[Resumo]
-<\<O resumo tem como objetivo descrever de forma sucinta o trabalho realizado. Deverá conter uma pequena introdução, seguida por uma breve descrição do trabalho realizado e terminando com uma indicação sumária do seu estado final. Não deverá exceder as 400 palavras.>>   
+<\<O resumo tem como objetivo descrever de forma sucinta o trabalho realizado. Deverá conter uma pequena introdução, seguida por uma breve descrição do trabalho realizado e terminando com uma indicação sumária do seu estado final. Não deverá exceder as 400 palavras.>>
 
 #v(2em)
 
-*Área de Aplicação*: Processos de construção de software e especificação e desenvolvimento de aplicações do mundo real.
+*Área de Aplicação*: Processos de construção de software / Especificação e desenvolvimento de aplicações do mundo real.
 
 *Palavras-Chave*: .NET, C\#, Base de Dados, Web, Web App, SQL Server, Entity Framework, ASP.NET Core, Razor, Blazor, HTML, CSS, Diagrama UML, Modelo Dominio, Entidades, Relacionamentos, Diagrama de Classes, Diagrama de Casos de Uso, Diagrama de Sequência, Engenharia Software, Interface do Utilizador, Sistema de Gestão, Linha de Montagem
 
