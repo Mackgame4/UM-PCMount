@@ -1,7 +1,7 @@
+namespace PCMount.Data.Models;
+
 using System.ComponentModel.DataAnnotations;
 
-#pragma warning disable CA1050 // Declare types in namespaces
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor
 public class Part
 {
     [Key]
@@ -16,7 +16,7 @@ public class Part
     public required string Name { get; set; }
 
     [StringLength(500)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     public int Price { get; set; }
 }

@@ -15,14 +15,18 @@ dev-desktop:
 
 # Runs the default "https" profile in development mode
 # cd ./PCMount/ && dotnet run
+# cd ./PCMount/ && dotnet watch run
 dev-web:
-	@cd ./PCMount/ && dotnet watch run
+	@cd ./PCMount/ && dotnet watch run -q
 
 dev-web-https:
 	@cd ./PCMount/ && dotnet run --launch-profile "https"
 
 dev-web-http:
 	@cd ./PCMount/ && dotnet run --launch-profile "http"
+
+dev-clean:
+	@cd ./PCMount/ && dotnet clean
 
 build: build-web
 

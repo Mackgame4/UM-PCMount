@@ -1,4 +1,6 @@
-﻿@using Microsoft.FluentUI.AspNetCore.Components
+﻿@namespace PCMount.Components.Layout
+
+@using Microsoft.FluentUI.AspNetCore.Components
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
 
@@ -15,24 +17,28 @@
             <FluentButton id="notificationsPopover" IconStart="@(new Icons.Regular.Size20.BoxMultiple())" Appearance="Appearance.Outline" @onclick="() => _visibleNotificationsPopover = !_visibleNotificationsPopover"></FluentButton>
         </FluentCounterBadge>
         <FluentButton IconStart="@(new Icons.Regular.Size20.Add())" Appearance="Appearance.Outline"></FluentButton>
-        <FluentProfileMenu Initials="LI4">
-            <HeaderTemplate>
-                <FluentLabel Typo="@Typography.Subject">Welcome,</FluentLabel>
-            </HeaderTemplate>
-            <ChildContent>
-                <div class="min-w-[250px] mb-6">
-                    <FluentLabel Typo="@Typography.Header" Style="font-weight: bold;">LabInfo4</FluentLabel>
-                    <FluentLabel>labinfo4@uminho.com</FluentLabel>
-                </div>
-            </ChildContent>
-            <FooterTemplate>
-                <FluentStack>
-                    <FluentButton id="themePopover" IconStart="@(new Icons.Regular.Size20.PaintBrush())" Appearance="Appearance.Outline" @onclick="() => _visibleThemePopover = !_visibleThemePopover">Theme</FluentButton>
-                    <FluentSpacer />
-                    <FluentButton IconStart="@(new Icons.Regular.Size20.ArrowExit())" Appearance="Appearance.Outline">Logout</FluentButton>
-                </FluentStack>
-            </FooterTemplate>
-        </FluentProfileMenu>
+        <AuthorizeView Roles="Admin, User">
+            <Authorized>
+                <FluentProfileMenu Initials="LI4">
+                    <HeaderTemplate>
+                        <FluentLabel Typo="@Typography.Subject">Welcome,</FluentLabel>
+                    </HeaderTemplate>
+                    <ChildContent>
+                        <div class="min-w-[250px] mb-6">
+                            <FluentLabel Typo="@Typography.Header" Style="font-weight: bold;">LabInfo4</FluentLabel>
+                            <FluentLabel>labinfo4@uminho.com</FluentLabel>
+                        </div>
+                    </ChildContent>
+                    <FooterTemplate>
+                        <FluentStack>
+                            <FluentButton id="themePopover" IconStart="@(new Icons.Regular.Size20.PaintBrush())" Appearance="Appearance.Outline" @onclick="() => _visibleThemePopover = !_visibleThemePopover">Theme</FluentButton>
+                            <FluentSpacer />
+                            <FluentButton IconStart="@(new Icons.Regular.Size20.ArrowExit())" Appearance="Appearance.Outline">Logout</FluentButton>
+                        </FluentStack>
+                    </FooterTemplate>
+                </FluentProfileMenu>
+            </Authorized>
+        </AuthorizeView>
     </FluentStack>
     <FluentDivider Style="width: 100%;" Role="DividerRole.Presentation"></FluentDivider>
     <div class="p-3">

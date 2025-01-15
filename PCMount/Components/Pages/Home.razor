@@ -1,25 +1,20 @@
 ﻿@page "/"
-@using Microsoft.FluentUI.AspNetCore.Components
-<PageTitle>Dashboard</PageTitle>
 
-<div class="flex flex-col w-full h-full flex-1 gap-5">
-    <div class="grid grid-cols-3 gap-5">
-        <FluentCard class="w-full h-full" MinimalStyle="true">
-            <h2><FluentIcon Value="@(new Icons.Filled.Size24.BuildingShop())" /> Completed Assemblies</h2>
-        </FluentCard>
-        <FluentCard class="w-full h-full" MinimalStyle="true">
-            <h2><FluentIcon Value="@(new Icons.Filled.Size24.ChartMultiple())" /> Total Revenue</h2>
-        </FluentCard>
-        <FluentCard class="w-full h-full" MinimalStyle="true">
-            <h2><FluentIcon Value="@(new Icons.Filled.Size24.MoneyHand())" /> Expenses</h2>
-        </FluentCard>
-    </div>
-    <div class="grid grid-cols-4 gap-5">
-        <FluentCard class="w-full h-full col-span-3" MinimalStyle="true">
-            <h2><FluentIcon Value="@(new Icons.Filled.Size24.ShoppingBag())" /> Most shopped parts</h2>
-        </FluentCard>
-        <FluentCard class="w-full h-full" MinimalStyle="true">
-            <h2><FluentIcon Value="@(new Icons.Filled.Size24.Money())" /> Most Revenue</h2>
-        </FluentCard>
-    </div>
+@rendermode InteractiveServer
+
+@inject IJSRuntime JS
+@inject IHttpClientFactory HttpClientFacory
+
+<PageTitle>Shop</PageTitle>
+
+<div>
+    <h2>Welcome <span class="text-danger">to PCMount</span></h2>
+    <AuthorizeView>
+        <NotAuthorized>
+            <span>You are not logged in. Please <a href="/login" >click here</a> to login!</span>
+        </NotAuthorized>
+        <Authorized>
+            <span>You are logged in as <b>@context.User.Identity!.Name</b>. <a href="/logout" >Click here</a> to logout.</span>
+        </Authorized>
+    </AuthorizeView>
 </div>
