@@ -68,5 +68,27 @@ $ make relatorio
 ```
 ###### Attention: You need to have [Typst](https://typst.app/) installed to compile
 
+# Something for the Visual Studio users
+Solution launch settings. Add the following code to a `PCMount.slnLaunch` in the `PCMount` root directory:
+```shell
+[
+  {
+    "Name": "DesktopCompile",
+    "Projects": [
+      {
+        "Path": "PCMount.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "..\\BlazorWinForms\\BlazorWinForms.csproj",
+        "Action": "StartWithoutDebugging",
+        "DebugTarget": "BlazorWinForms"
+      }
+    ]
+  }
+]
+```
+
 ### Developement Team
 A104365 - Fabio Magalhaes
