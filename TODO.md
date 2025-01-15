@@ -1,0 +1,1 @@
+- [ ] Check auth example github repo (https://github.com/conzoli/BlazorSimpleAuthTemplate)
