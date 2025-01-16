@@ -6,6 +6,10 @@
 @using PCMount.Data.Models
 @inject ApplicationDbContext DbContext
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+@using PCMount.Components.Layout
+@layout DashboardLayout
 <PageTitle>PCMount - Inventory</PageTitle>
 
 <div class="rounded-md py-2 mb-4 flex justify-between">
