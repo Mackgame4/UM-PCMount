@@ -1,7 +1,9 @@
 ﻿@page "/"
 
 @using Microsoft.FluentUI.AspNetCore.Components
-@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "User")]
+@attribute [AllowAnonymous]
 <PageTitle>Shop</PageTitle>
 
 <div>
@@ -17,7 +19,6 @@
             <NavLink href="/dashboard" Match="NavLinkMatch.All">
                 <FluentButton IconStart="@(new Icons.Regular.Size20.Board())" Appearance="Appearance.Lightweight" class="absolute top-2 right-2">Dashboard</FluentButton>
             </NavLink>
-            <span><a href="/logout" >Click here</a> to logout.</span>
         </Authorized>
     </AuthorizeView>
 </div>
