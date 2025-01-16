@@ -1,20 +1,23 @@
 ﻿@page "/"
 
+@using Microsoft.FluentUI.AspNetCore.Components
 @rendermode InteractiveServer
-
-@inject IJSRuntime JS
-@inject IHttpClientFactory HttpClientFacory
-
 <PageTitle>Shop</PageTitle>
 
 <div>
-    <h2>Welcome <span class="text-danger">to PCMount</span></h2>
     <AuthorizeView>
         <NotAuthorized>
-            <span>You are not logged in. Please <a href="/login" >click here</a> to login!</span>
+            <h2>Welcome to PCMount</h2>
+            <NavLink href="/login" Match="NavLinkMatch.All">
+                <FluentButton IconStart="@(new Icons.Regular.Size20.Person())" Appearance="Appearance.Accent" class="absolute top-2 right-2">Login</FluentButton>
+            </NavLink>
         </NotAuthorized>
         <Authorized>
-            <span>You are logged in as <b>@context.User.Identity!.Name</b>. <a href="/logout" >Click here</a> to logout.</span>
+            <h2>Welcome back, <b>@context.User.Identity!.Name</b>.</h2>
+            <NavLink href="/dashboard" Match="NavLinkMatch.All">
+                <FluentButton IconStart="@(new Icons.Regular.Size20.Board())" Appearance="Appearance.Lightweight" class="absolute top-2 right-2">Dashboard</FluentButton>
+            </NavLink>
+            <span><a href="/logout" >Click here</a> to logout.</span>
         </Authorized>
     </AuthorizeView>
 </div>

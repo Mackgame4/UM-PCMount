@@ -26,6 +26,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
+//builder.Services.AddLocalHttpClient();
+// Add Logging
+builder.Services.AddLogging();
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Add Fluent UI Config
@@ -44,12 +47,12 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts(); // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 }
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 //app.UseHttpsRedirection(); // If the app is being served over HTTPS, uncomment this line
 app.UseStaticFiles();
 app.UseAntiforgery();
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 

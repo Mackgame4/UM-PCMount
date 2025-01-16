@@ -7,11 +7,11 @@ public static class ServiceCollectionExtensions {
         return services;
     }
 
-    public static IServiceCollection AddLocalHttpClient(this IServiceCollection services)
+    /*public static IServiceCollection AddLocalHttpClient(this IServiceCollection services)
     {
         services.AddHttpClient("local", HttpClient => {
             HttpClient.BaseAddress = new Uri("http://localhost:5007");
         });
         return services;
-    }
+    }*/
 }
