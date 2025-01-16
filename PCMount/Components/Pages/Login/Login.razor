@@ -58,7 +58,7 @@
                 return;
             }
             var userAccount = usersAccounts.FirstOrDefault(u => u.UserName == LoginModel.UserName);
-            if (userAccount is null || userAccount.Password != LoginModel.Password) {
+            if (userAccount is null || userAccount.Password != PasswordHasher.Base64Encode(LoginModel.Password)) {
                 errorMessage = "Invalid Username or Password.";
                 return;
             }
