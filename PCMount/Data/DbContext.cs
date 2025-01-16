@@ -9,13 +9,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
         // Create the table for the User model
-        modelBuilder.Entity<User>().ToTable("users");
+        //modelBuilder.Entity<User>().ToTable("users");
         // Pre-populate the table with data
         modelBuilder.Entity<User>().HasData(
             new User { Id = 1, UserName = "admin", Password = "admin", Role = "Admin" }
         );
-        modelBuilder.Entity<Part>().ToTable("componentes");
-        modelBuilder.Entity<Inventario>().ToTable("inventario");
     }
 
     public DbSet<User> Users { get; set; }
