@@ -6,8 +6,10 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.FluentUI.AspNetCore.Components
-@inject IUserAccountService UserAccountService
 @inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+@using PCMount.Data
+@inject ApplicationDbContext DbContext
 
 <FluentDialog>
     <FluentDialogHeader Visible="false" />
@@ -44,13 +46,18 @@
     private string? errorMessage;
 
     private async Task Authenticate() {
+        bool redirect = false;
         try {
-            var UserList = await UserAccountService.GetAccountsAsync();
-            if (UserList == null || !UserList.Any()) {
+            List<User> usersAccounts = await DbContext.Users.ToListAsync();
+            if (usersAccounts == null || !usersAccounts.Any()) {
                 errorMessage = "No users found.";
                 return;
             }
-            var userAccount = UserList.FirstOrDefault(x => x.UserName == LoginModel.UserName);
+            if (string.IsNullOrWhiteSpace(LoginModel.UserName) || string.IsNullOrWhiteSpace(LoginModel.Password)) {
+                errorMessage = "Username and Password are required.";
+                return;
+            }
+            var userAccount = usersAccounts.FirstOrDefault(u => u.UserName == LoginModel.UserName);
             if (userAccount is null || userAccount.Password != LoginModel.Password) {
                 errorMessage = "Invalid Username or Password.";
                 return;
@@ -64,9 +71,13 @@
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
             await HttpContext!.SignInAsync(principal);
+            redirect = true;
         } catch (Exception ex) {
             errorMessage = $"Authentication failed: {ex.Message}";
+        } finally {
+            if (redirect) {
+                NavigationManager.NavigateTo("/", true);
+            }
         }
-        NavigationManager.NavigateTo("/", true);
     }
 }

@@ -4,11 +4,21 @@ using Microsoft.EntityFrameworkCore;
 
 using PCMount.Data.Models;
 
-public class ApplicationDbContext : DbContext
-{
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options) {
+    // Populate the database with the tables
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        base.OnModelCreating(modelBuilder);
+        // Create the table for the User model
+        modelBuilder.Entity<User>().ToTable("users");
+        // Pre-populate the table with data
+        modelBuilder.Entity<User>().HasData(
+            new User { Id = 1, UserName = "admin", Password = "admin", Role = "Admin" }
+        );
+        modelBuilder.Entity<Part>().ToTable("componentes");
+        modelBuilder.Entity<Inventario>().ToTable("inventario");
+    }
 
-    public DbSet<User> Utilizadores { get; set; }
+    public DbSet<User> Users { get; set; }
     public DbSet<Part> Componentes { get; set; }
     public DbSet<Inventario> Inventario { get; set; } // Add this if you have an Inventario table
 }

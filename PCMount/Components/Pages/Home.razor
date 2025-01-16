@@ -4,21 +4,23 @@
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize(Roles = "User")]
 @attribute [AllowAnonymous]
-<PageTitle>Shop</PageTitle>
+<PageTitle>PCMount - Shop</PageTitle>
 
-<div>
+<FluentToolbar class="rounded-md py-2 mb-4">
+    <FluentSearch Placeholder="Search for Products" />
+    <FluentButton IconEnd="@(new Icons.Regular.Size16.Filter())">Filters</FluentButton>
+    <FluentSpacer />
+    <FluentButton IconEnd="@(new Icons.Regular.Size16.Cart())"></FluentButton>
     <AuthorizeView>
         <NotAuthorized>
-            <h2>Welcome to PCMount</h2>
             <NavLink href="/login" Match="NavLinkMatch.All">
-                <FluentButton IconStart="@(new Icons.Regular.Size20.Person())" Appearance="Appearance.Accent" class="absolute top-2 right-2">Login</FluentButton>
+                <FluentButton IconStart="@(new Icons.Regular.Size20.Person())" Appearance="Appearance.Accent">Login</FluentButton>
             </NavLink>
         </NotAuthorized>
         <Authorized>
-            <h2>Welcome back, <b>@context.User.Identity!.Name</b>.</h2>
             <NavLink href="/dashboard" Match="NavLinkMatch.All">
-                <FluentButton IconStart="@(new Icons.Regular.Size20.Board())" Appearance="Appearance.Lightweight" class="absolute top-2 right-2">Dashboard</FluentButton>
+                <FluentButton IconStart="@(new Icons.Regular.Size20.Board())" Appearance="Appearance.Lightweight">Dashboard</FluentButton>
             </NavLink>
         </Authorized>
     </AuthorizeView>
-</div>
+</FluentToolbar>
