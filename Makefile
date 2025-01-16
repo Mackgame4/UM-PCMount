@@ -28,7 +28,7 @@ build-web:
 rand=%RANDOM%
 build-db:
 	@cd ./PCMount/ && if exist "./Migrations" rd /s /q "./Migrations" || true
-	@cd ./PCMount/ && dotnet ef database drop --force
+	@cd ./PCMount/ && dotnet ef database drop --force --msbuildprojectextensionspath build/obj/
 	@cd ./PCMount/ && dotnet ef migrations add $(rand) --msbuildprojectextensionspath build/obj/ && dotnet ef database update
 	@cd ./PCMount/ && if exist "./obj" rd /s /q "./obj" || true
 	@cd ./PCMount/ && if exist "./Migrations" rd /s /q "./Migrations" || true
