@@ -1,6 +1,8 @@
 @page "/inventory"
 @using Microsoft.FluentUI.AspNetCore.Components
 @using PCMount.Components.Components
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext DbContext
 @rendermode InteractiveServer
 <PageTitle>Inventory</PageTitle>
 
@@ -16,7 +18,7 @@
     </div>
 </div>
 
-@if (products == null)
+@if (filteredProducts == null)
 {
     <LoadingDialog Title="Loading Inventory..." />
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
@@ -28,10 +30,16 @@
 }
 else
 {
+    @if (filteredProducts != null && !filteredProducts.Any())
+    {
+        <div class="text-center text-xl text-gray-200 mt-8">
+            No products found.
+        </div>
+    }
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
         @foreach (Product product in filteredProducts)
         {
-            <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2">
+            <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2 hover:translate-y-2">
                 <FluentButton 
                     class="absolute top-2 left-2" 
                     IconStart="@(new Icons.Regular.Size16.Info())"
@@ -98,15 +106,32 @@ else
     private bool isDialogVisible = false;
     private List<Product>? filteredProducts; // Filtered list of products
     private Product? selectedProduct;
+    private List<Inventario>? inventoryItems;
 
     private string searchTerm = string.Empty; // Search term
 
     protected override async Task OnInitializedAsync()
     {
-        // Simulate asynchronous loading to demonstrate streaming rendering
-        await Task.Delay(1000);
-        products = GetSampleProducts();
-        filteredProducts = products; // Initialize filteredProducts with all products
+         await Task.Delay(500);
+        // Query the database to fetch Inventario data
+        inventoryItems = await DbContext.Inventario
+            .Include(i => i.Part) // Include the related Part data
+            .ToListAsync();
+
+        // Map Inventario data to the Product model
+        products = inventoryItems.Select(i => new Product
+        {
+            Name = i.Part.name,
+            Category = i.Part.tipo, // Assuming "Type" maps to "Category"
+            StockCode = i.Part.partId.ToString(), // Use PartId as StockCode
+            Price = (decimal)i.Part.preco, // Convert float to decimal
+            Quantity = i.quantidade,
+            Description = i.Part.descricao,
+            ImageUrl = i.Part.image
+        }).ToList();
+
+        // Initialize filteredProducts with all products
+        filteredProducts = products;
     }
 
     private List<Product> GetSampleProducts()

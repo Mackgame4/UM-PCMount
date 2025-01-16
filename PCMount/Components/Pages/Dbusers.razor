@@ -23,8 +23,8 @@ else
             @foreach (var part in parts)
             {
                 <tr>
-                    <td>@part.PartNum</td>
-                    <td>@part.Name</td>
+                    <td>@part.partId</td>
+                    <td>@part.name</td>
                 </tr>
             }
         </tbody>
@@ -36,6 +36,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        parts = await DbContext.Parts.ToListAsync();
+        parts = await DbContext.Componentes.ToListAsync();
     }
 }

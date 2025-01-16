@@ -1,22 +1,30 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 #pragma warning disable CA1050 // Declare types in namespaces
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor
+[Table("Componente")] // Explicitly map to the Componente table
 public class Part
 {
     [Key]
-    public int Id { get; set; }
+    public int partId { get; set; } // Maps to partId in the Componente table
 
     [Required]
-    [StringLength(30)] // max length of part number will normally be 17 characters but we'll allow for more
-    public required string PartNum { get; set; }
+    [StringLength(45)] // Matches the Componente.name field
+    public required string name { get; set; }
 
     [Required]
-    [StringLength(120)]
-    public required string Name { get; set; }
+    public double preco { get; set; } // Matches the Componente.preco field (FLOAT)
 
-    [StringLength(500)]
-    public string Description { get; set; }
+    [Required]
+    [StringLength(45)] // Matches the Componente.tipo field
+    public required string tipo { get; set; }
 
-    public int Price { get; set; }
+    [StringLength(500)] // Matches the Componente.descricao field
+    public string descricao { get; set; }
+
+    [StringLength(45)] // Matches the Componente.image field
+    public string image { get; set; }
+
+    public int portId { get; set; } // Matches the Componente.portId field
 }
