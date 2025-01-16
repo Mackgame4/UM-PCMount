@@ -15,22 +15,24 @@
     <FluentDialogHeader Visible="false" />
     <FluentDialogBody Class="flex flex-col items-center justify-center space-y-4 p-8">
         <img src="assets/pcmountlogo.png" alt="PCMount Logo" class="w-32 h-32 mx-auto" />
-        <EditForm Model="@LoginModel" OnValidSubmit="Authenticate" FormName="LoginForm">
+        <h1 class="text-2xl font-bold text-center">Welcome to PCMount</h1>
+        <span class="text-sm text-center">Enter your credentials to continue.</span>
+        <EditForm Model="@LoginModel" OnValidSubmit="Authenticate" FormName="LoginForm" class="w-full">
             <DataAnnotationsValidator />
-            <div class="flex flex-col items-center text-center justify-center space-y-2">
-                <b>Username</b>
-                <div>
-                    <InputText @bind-Value="@LoginModel.UserName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" placeholder="Username" />
+            <FluentStack Orientation="Orientation.Vertical">
+                <div class="w-full">
+                    <label for="username" class="block text-sm font-medium mb-1.5">Username</label>
+                    <InputText @bind-Value="@LoginModel.UserName" class="text-md rounded-lg block w-full h-10 p-2.5 shadow-sm" style="border: none; background-color: var(--neutral-fill-layer-rest); color: var(--neutral-foreground-rest);" placeholder="Username" />
                     <ValidationMessage style="color: red;" For="() => LoginModel.UserName" />
                 </div>
-                <b>Password</b>
-                <div>
-                    <InputText @bind-Value="@LoginModel.Password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" placeholder="Password" type="password" />
+                <div class="w-full">
+                    <label for="password" class="block text-sm font-medium mb-1.5">Password</label>
+                    <InputText @bind-Value="@LoginModel.Password" class="text-md rounded-lg block w-full h-10 p-2.5 shadow-sm" style="border: none; background-color: var(--neutral-fill-layer-rest); color: var(--neutral-foreground-rest);" placeholder="•••••••••" type="password" />
                     <ValidationMessage style="color: red;" For="() => LoginModel.Password" />
                 </div>
                 <span style="color: red;">@errorMessage</span>
-                <FluentButton IconStart="@(new Icons.Regular.Size16.Key())" Type="ButtonType.Submit" Appearance="Appearance.Accent">Login</FluentButton>
-            </div>
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Key())" Type="ButtonType.Submit" Class="w-full shadow-sm" Appearance="Appearance.Accent">Login</FluentButton>
+            </FluentStack>
         </EditForm>
     </FluentDialogBody>
     <FluentDialogFooter Visible="false" />
