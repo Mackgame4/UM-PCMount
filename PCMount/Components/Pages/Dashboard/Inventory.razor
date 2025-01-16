@@ -1,7 +1,9 @@
-@page "/inventory"
+@page "/dashboard/inventory"
 @using Microsoft.FluentUI.AspNetCore.Components
-@using PCMount.Components.Components
+@using PCMount.Components.UI
 @using Microsoft.EntityFrameworkCore
+@using PCMount.Data
+@using PCMount.Data.Models
 @inject ApplicationDbContext DbContext
 @rendermode InteractiveServer
 <PageTitle>Inventory</PageTitle>
@@ -37,7 +39,7 @@ else
         </div>
     }
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
-        @foreach (Product product in filteredProducts)
+        @foreach (Product product in filteredProducts!)
         {
             <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2 hover:translate-y-2">
                 <FluentButton 
@@ -121,13 +123,13 @@ else
         // Map Inventario data to the Product model
         products = inventoryItems.Select(i => new Product
         {
-            Name = i.Part.name,
-            Category = i.Part.tipo, // Assuming "Type" maps to "Category"
-            StockCode = i.Part.partId.ToString(), // Use PartId as StockCode
-            Price = (decimal)i.Part.preco, // Convert float to decimal
-            Quantity = i.quantidade,
-            Description = i.Part.descricao,
-            ImageUrl = i.Part.image
+            Name = i.Part!.Name,
+            Category = i.Part.Tipo, // Assuming "Type" maps to "Category"
+            StockCode = i.Part.PartId.ToString(), // Use PartId as StockCode
+            Price = (decimal)i.Part.Preco, // Convert float to decimal
+            Quantity = i.Quantidade,
+            Description = i.Part.Descricao!,
+            ImageUrl = i.Part.Image!
         }).ToList();
 
         // Initialize filteredProducts with all products

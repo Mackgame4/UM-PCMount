@@ -1,8 +1,8 @@
+namespace PCMount.Data;
+
 using Microsoft.EntityFrameworkCore;
 
-#pragma warning disable CA1050 // Declare types in namespaces
-#pragma warning disable IDE0290 // Use primary constructor
-using Microsoft.EntityFrameworkCore;
+using PCMount.Data.Models;
 
 public class ApplicationDbContext : DbContext
 {

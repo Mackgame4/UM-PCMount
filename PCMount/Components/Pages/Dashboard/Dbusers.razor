@@ -1,5 +1,12 @@
-﻿@page "/dbusers"
+﻿@page "/dashboard/dbusers"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+@using PCMount.Components.Layout
+@layout DashboardLayout
+
 @using Microsoft.EntityFrameworkCore
+@using PCMount.Data
+@using PCMount.Data.Models
 @inject ApplicationDbContext DbContext
 
 <!-- Example DB data page -->
@@ -23,8 +30,8 @@ else
             @foreach (var part in parts)
             {
                 <tr>
-                    <td>@part.partId</td>
-                    <td>@part.name</td>
+                    <td>@part.PartId</td>
+                    <td>@part.Name</td>
                 </tr>
             }
         </tbody>

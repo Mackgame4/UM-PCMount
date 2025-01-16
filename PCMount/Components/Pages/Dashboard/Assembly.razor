@@ -1,6 +1,11 @@
-﻿@page "/assembly"
+﻿@page "/dashboard/assembly"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+@using PCMount.Components.Layout
+@layout DashboardLayout
+
 @using Microsoft.FluentUI.AspNetCore.Components
-@using PCMount.Components.Components
+@using PCMount.Components.UI
 @attribute [StreamRendering]
 <PageTitle>Assembly</PageTitle>
 

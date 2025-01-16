@@ -1,3 +1,5 @@
+namespace PCMount.Data.Models;
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -6,11 +8,11 @@ public class Inventario
 {
     [Key]
     [ForeignKey("Part")] // Explicitly define the foreign key
-    public int partId { get; set; } // Foreign and primary key to Componente
+    public int PartId { get; set; } // Foreign and primary key to Componente
 
     [Required]
-    public int quantidade { get; set; }
+    public required int Quantidade { get; set; }
 
     // Navigation property
-    public Part Part { get; set; }
+    public Part? Part { get; set; }
 }

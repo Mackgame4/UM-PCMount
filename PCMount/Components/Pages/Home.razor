@@ -1,25 +1,24 @@
 ﻿@page "/"
-@using Microsoft.FluentUI.AspNetCore.Components
-<PageTitle>Dashboard</PageTitle>
 
-<div class="flex flex-col w-full h-full flex-1 gap-5">
-    <div class="grid grid-cols-3 gap-5">
-        <FluentCard class="w-full h-full" MinimalStyle="true">
-            <h2><FluentIcon Value="@(new Icons.Filled.Size24.BuildingShop())" /> Completed Assemblies</h2>
-        </FluentCard>
-        <FluentCard class="w-full h-full" MinimalStyle="true">
-            <h2><FluentIcon Value="@(new Icons.Filled.Size24.ChartMultiple())" /> Total Revenue</h2>
-        </FluentCard>
-        <FluentCard class="w-full h-full" MinimalStyle="true">
-            <h2><FluentIcon Value="@(new Icons.Filled.Size24.MoneyHand())" /> Expenses</h2>
-        </FluentCard>
-    </div>
-    <div class="grid grid-cols-4 gap-5">
-        <FluentCard class="w-full h-full col-span-3" MinimalStyle="true">
-            <h2><FluentIcon Value="@(new Icons.Filled.Size24.ShoppingBag())" /> Most shopped parts</h2>
-        </FluentCard>
-        <FluentCard class="w-full h-full" MinimalStyle="true">
-            <h2><FluentIcon Value="@(new Icons.Filled.Size24.Money())" /> Most Revenue</h2>
-        </FluentCard>
-    </div>
+@using Microsoft.FluentUI.AspNetCore.Components
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "User")]
+@attribute [AllowAnonymous]
+<PageTitle>Shop</PageTitle>
+
+<div>
+    <AuthorizeView>
+        <NotAuthorized>
+            <h2>Welcome to PCMount</h2>
+            <NavLink href="/login" Match="NavLinkMatch.All">
+                <FluentButton IconStart="@(new Icons.Regular.Size20.Person())" Appearance="Appearance.Accent" class="absolute top-2 right-2">Login</FluentButton>
+            </NavLink>
+        </NotAuthorized>
+        <Authorized>
+            <h2>Welcome back, <b>@context.User.Identity!.Name</b>.</h2>
+            <NavLink href="/dashboard" Match="NavLinkMatch.All">
+                <FluentButton IconStart="@(new Icons.Regular.Size20.Board())" Appearance="Appearance.Lightweight" class="absolute top-2 right-2">Dashboard</FluentButton>
+            </NavLink>
+        </Authorized>
+    </AuthorizeView>
 </div>

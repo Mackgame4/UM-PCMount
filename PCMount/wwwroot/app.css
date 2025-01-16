@@ -1,46 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
-* {
-    box-sizing: border-box;
-    font-family: 'Inter', Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-
 html, body {
     line-height: 1.5;
     margin: 0;
     padding: 0;
     height: 100vh;
-    /* Start of Fluent UI Theme Config */
+    scroll-behavior: smooth;
+    overscroll-behavior: none;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    /* Fluent UI Theme Config */
     font-family: var(--body-font);
     font-size: var(--type-ramp-base-font-size);
     line-height: var(--type-ramp-base-line-height);
     font-weight: var(--font-weight);
     color: var(--neutral-foreground-rest);
     background: var(--neutral-fill-layer-rest);
-    /* End of Fluent UI Theme Config */
 }
 
 fluent-anchored-region {
-    /* make element not affect page height */
+    /* Make element not affect page height */
     position: fixed !important;
     width: fit-content !important;
     height: fit-content !important;
-}
-
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--neutral-fill-layer-rest);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--neutral-foreground-rest);
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), var(--neutral-foreground-rest);
 }
 
 .blazor-error-boundary {
@@ -51,4 +33,27 @@ fluent-anchored-region {
 
 .blazor-error-boundary::after {
     content: "An error has occurred."
+}
+
+* {
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--neutral-fill-layer-rest)) transparent;
+}
+
+*:focus {
+    outline: none;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
 }

@@ -1,10 +1,14 @@
-﻿@namespace PCMount.Components.Layout
+@namespace PCMount.Components.Layout
 
+@using PCMount.Components.UI
 @using Microsoft.FluentUI.AspNetCore.Components
 @inherits LayoutComponentBase
 
 <div class="relative flex flex-col w-full min-h-screen">
-    @Body
+    <NavMenu />
+    <main class="relative flex flex-col flex-1 w-full min-h-full p-4">
+        @Body
+    </main>
 </div>
 
 <div id="blazor-error-ui">

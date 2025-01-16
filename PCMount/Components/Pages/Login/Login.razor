@@ -1,0 +1,72 @@
+@page "/login"
+
+@using PCMount.Data.Models
+
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.FluentUI.AspNetCore.Components
+@inject IUserAccountService UserAccountService
+@inject NavigationManager NavigationManager
+
+<FluentDialog>
+    <FluentDialogHeader Visible="false" />
+    <FluentDialogBody Class="flex flex-col items-center justify-center space-y-4 p-8">
+        <img src="assets/pcmountlogo.png" alt="PCMount Logo" class="w-32 h-32 mx-auto" />
+        <EditForm Model="@LoginModel" OnValidSubmit="Authenticate" FormName="LoginForm">
+            <DataAnnotationsValidator />
+            <div class="flex flex-col items-center text-center justify-center space-y-2">
+                <b>Username</b>
+                <div>
+                    <InputText @bind-Value="@LoginModel.UserName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" placeholder="Username" />
+                    <ValidationMessage style="color: red;" For="() => LoginModel.UserName" />
+                </div>
+                <b>Password</b>
+                <div>
+                    <InputText @bind-Value="@LoginModel.Password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" placeholder="Password" type="password" />
+                    <ValidationMessage style="color: red;" For="() => LoginModel.Password" />
+                </div>
+                <span style="color: red;">@errorMessage</span>
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Key())" Type="ButtonType.Submit" Appearance="Appearance.Accent">Login</FluentButton>
+            </div>
+        </EditForm>
+    </FluentDialogBody>
+    <FluentDialogFooter Visible="false" />
+</FluentDialog>
+
+@code{
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    [SupplyParameterFromForm]
+    private LoginViewModel LoginModel { get; set; } = new ();
+
+    private string? errorMessage;
+
+    private async Task Authenticate() {
+        try {
+            var UserList = await UserAccountService.GetAccountsAsync();
+            if (UserList == null || !UserList.Any()) {
+                errorMessage = "No users found.";
+                return;
+            }
+            var userAccount = UserList.FirstOrDefault(x => x.UserName == LoginModel.UserName);
+            if (userAccount is null || userAccount.Password != LoginModel.Password) {
+                errorMessage = "Invalid Username or Password.";
+                return;
+            }
+
+            var claims = new List<Claim> {
+                new Claim(ClaimTypes.Name, userAccount.UserName!),
+                new Claim(ClaimTypes.Role, userAccount.Role!)
+            };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+            await HttpContext!.SignInAsync(principal);
+        } catch (Exception ex) {
+            errorMessage = $"Authentication failed: {ex.Message}";
+        }
+        NavigationManager.NavigateTo("/", true);
+    }
+}

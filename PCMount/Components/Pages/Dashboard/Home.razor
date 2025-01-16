@@ -1,0 +1,9 @@
+@page "/dashboard"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+@using PCMount.Components.Layout
+@layout DashboardLayout
+<PageTitle>Dashboard</PageTitle>
+
+<h2>Dashboard</h2>
+<a href="/logout">Logout</a>
