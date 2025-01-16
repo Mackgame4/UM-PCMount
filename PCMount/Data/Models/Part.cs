@@ -1,22 +1,30 @@
 namespace PCMount.Data.Models;
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
+[Table("Componente")] // Explicitly map to the Componente table
 public class Part
 {
     [Key]
-    public int Id { get; set; }
+    public int PartId { get; set; } // Maps to partId in the Componente table
 
     [Required]
-    [StringLength(30)] // max length of part number will normally be 17 characters but we'll allow for more
-    public required string PartNum { get; set; }
-
-    [Required]
-    [StringLength(120)]
+    [StringLength(45)] // Matches the Componente.name field
     public required string Name { get; set; }
 
-    [StringLength(500)]
-    public string? Description { get; set; }
+    [Required]
+    public required double Preco { get; set; } // Matches the Componente.preco field (FLOAT)
 
-    public int Price { get; set; }
+    [Required]
+    [StringLength(45)] // Matches the Componente.tipo field
+    public required string Tipo { get; set; }
+
+    [StringLength(500)] // Matches the Componente.descricao field
+    public string? Descricao { get; set; }
+
+    [StringLength(45)] // Matches the Componente.image field
+    public string? Image { get; set; }
+
+    public int? PortId { get; set; } // Matches the Componente.portId field
 }

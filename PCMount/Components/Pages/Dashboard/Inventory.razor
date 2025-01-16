@@ -1,0 +1,242 @@
+@page "/dashboard/inventory"
+@using Microsoft.FluentUI.AspNetCore.Components
+@using PCMount.Components.UI
+@using Microsoft.EntityFrameworkCore
+@using PCMount.Data
+@using PCMount.Data.Models
+@inject ApplicationDbContext DbContext
+@rendermode InteractiveServer
+<PageTitle>Inventory</PageTitle>
+
+<div class="rounded-md py-2 mb-4 flex justify-between">
+    <div class="flex gap-6 w-1/3">
+        <FluentMenuButton Text="Select model"></FluentMenuButton>
+    </div>
+    <div class="ml-4 w-1/3 flex gap-4">
+        <FluentSearch class="w-full" Placeholder="Search for Parts" Value="@searchTerm" @oninput="OnSearchInput" />
+        <FluentMenuButton Text="Order by"></FluentMenuButton>
+    </div>
+    <div class="flex w-1/3">
+    </div>
+</div>
+
+@if (filteredProducts == null)
+{
+    <LoadingDialog Title="Loading Inventory..." />
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
+        @foreach (int element in Enumerable.Range(1, 14))
+        {
+            <FluentSkeleton Width="100%" Height="340px"></FluentSkeleton>
+        }
+    </div>
+}
+else
+{
+    @if (filteredProducts != null && !filteredProducts.Any())
+    {
+        <div class="text-center text-xl text-gray-200 mt-8">
+            No products found.
+        </div>
+    }
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
+        @foreach (Product product in filteredProducts!)
+        {
+            <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2 hover:translate-y-2">
+                <FluentButton 
+                    class="absolute top-2 left-2" 
+                    IconStart="@(new Icons.Regular.Size16.Info())"
+                    Appearance="Appearance.Lightweight"
+                    @onclick="() => ShowDescription(product)">
+                </FluentButton>
+                <div class="w-36 rounded-md">
+                    <img src="@product.ImageUrl" class="object-cover w-full h-full rounded-md" />
+                </div>
+                <h3 class="-mb-2">
+                    @product.Name
+                </h3>
+                <span>
+                    @product.Category
+                </span>
+                <FluentBadge Appearance="Appearance.Lightweight">
+                    #LI4
+                    <span>
+                        @product.StockCode
+                    </span>
+                </FluentBadge>
+                <div class="flex flex-row gap-2 justify-center items-center text-center">
+                    <span class="text-lg">Price:</span>
+                    <FluentBadge Appearance="Appearance.Neutral">
+                        <span class="text-green-500">
+                            @product.Price€
+                        </span>
+                    </FluentBadge>
+                    <FluentSpacer />
+                    <span class="text-lg">Quantity:</span>
+                    <FluentBadge Appearance="Appearance.Neutral">
+                        <span class="text-green-500">
+                            @product.Quantity                            
+                        </span>
+                    </FluentBadge>
+                </div>
+            </FluentCard>
+        }
+    </div>
+
+    @if (isDialogVisible == true)
+    {
+        <!-- FluentDialog for displaying product description -->
+        <FluentDialog>
+            <DialogTitle>
+                <p class="font-bold text-xl text-center relative">@selectedProduct?.Name</p>
+            </DialogTitle>
+            <DialogContent>
+                <p class="text-justify italic">
+                    @selectedProduct?.Description
+                </p>
+            </DialogContent>
+            <DialogActions class=" absolute flex items-center justify-center top-5 right-5">
+                <FluentButton class="font-bold text-lg text-gray-300" @onclick="() => CloseDescription()">
+                    x
+                </FluentButton>
+            </DialogActions>
+        </FluentDialog>
+    }
+}
+
+@code {
+    private List<Product>? products;
+    private bool isDialogVisible = false;
+    private List<Product>? filteredProducts; // Filtered list of products
+    private Product? selectedProduct;
+    private List<Inventario>? inventoryItems;
+
+    private string searchTerm = string.Empty; // Search term
+
+    protected override async Task OnInitializedAsync()
+    {
+         await Task.Delay(500);
+        // Query the database to fetch Inventario data
+        inventoryItems = await DbContext.Inventario
+            .Include(i => i.Part) // Include the related Part data
+            .ToListAsync();
+
+        // Map Inventario data to the Product model
+        products = inventoryItems.Select(i => new Product
+        {
+            Name = i.Part!.Name,
+            Category = i.Part.Tipo, // Assuming "Type" maps to "Category"
+            StockCode = i.Part.PartId.ToString(), // Use PartId as StockCode
+            Price = (decimal)i.Part.Preco, // Convert float to decimal
+            Quantity = i.Quantidade,
+            Description = i.Part.Descricao!,
+            ImageUrl = i.Part.Image!
+        }).ToList();
+
+        // Initialize filteredProducts with all products
+        filteredProducts = products;
+    }
+
+    private List<Product> GetSampleProducts()
+    {
+        return new List<Product>
+        {
+            new Product
+            {
+                Name = "Intel Core i9-14900K 3.2/6GHz",
+                Category = "Processor",
+                StockCode = "1",
+                Price = 999.99M,
+                Quantity = 2,
+                Description = "The Intel Core i9-14900K is a high-performance 14th-generation desktop processor designed for demanding workloads. With a base clock speed of 3.2GHz and a turbo boost up to 6.0GHz, it offers exceptional performance for gaming, content creation, and multitasking. Featuring multiple cores and threads, advanced overclocking capabilities, and support for DDR5 and PCIe 5.0, it ensures seamless performance for the most intensive applications. Perfect for enthusiasts and professionals seeking top-tier computing power.",
+                ImageUrl = "/assets/intelCorei9.png"
+            },
+            new Product
+            {
+                Name = "NVIDIA GeForce RTX 4090",
+                Category = "Graphics Card",
+                StockCode = "2",
+                Price = 1599.99M,
+                Quantity = 5,
+                Description = "The NVIDIA GeForce RTX 4090 is the pinnacle of gaming and creative performance, powered by the advanced NVIDIA Ada Lovelace architecture. With an unprecedented level of GPU power, it delivers stunning 4K and beyond gaming experiences, lightning-fast ray tracing, and AI-enhanced graphics through DLSS 3. Equipped with 24GB of GDDR6X memory, it handles the most demanding games and creative applications with ease. Perfect for gamers, 3D artists, and professionals seeking unmatched graphics performance and efficiency.",
+                ImageUrl = "/assets/product-placeholder.png"
+            },
+            new Product
+            {
+                Name = "Samsung 970 EVO Plus 1TB",
+                Category = "SSD",
+                StockCode = "3",
+                Price = 129.99M,
+                Quantity = 10,
+                Description = "The Samsung 970 EVO Plus 1TB is a high-performance NVMe SSD designed for speed and reliability. Leveraging PCIe Gen 3.0 and V-NAND technology, it delivers blazing-fast read speeds of up to 3,500MB/s and write speeds of up to 3,300MB/s, making it ideal for gaming, video editing, and multitasking. With a compact M.2 form factor, advanced thermal management, and Samsung's trusted software suite, it offers enhanced storage performance and durability for any setup. Perfect for users seeking exceptional speed and efficiency in their storage solutions.",
+                ImageUrl = "/assets/product-placeholder.png"
+            },
+            new Product
+            {
+                Name = "Corsair Vengeance LPX 32GB",
+                Category = "RAM",
+                StockCode = "4",
+                Price = 149.99M,
+                Description = "The Corsair Vengeance LPX 32GB DDR4 RAM is engineered for high-performance computing and overclocking. With a sleek, low-profile heat spreader for optimal thermal performance, it fits easily in compact cases while keeping your system cool. Offering speeds up to 3200MHz (varies by model) and compatibility with a wide range of motherboards, it ensures fast and reliable performance for gaming, multitasking, and professional workloads. Backed by Corsair's reputation for quality, it's the perfect choice for building or upgrading your system.",
+                Quantity = 8,
+                ImageUrl = "/assets/product-placeholder.png"
+            },
+            new Product
+            {
+                Name = "ASUS ROG Strix X570-E",
+                Category = "Motherboard",
+                StockCode = "5",
+                Price = 299.99M,
+                Quantity = 3,
+                Description = "The ASUS ROG Strix X570-E is a high-performance motherboard designed for AMD Ryzen processors, featuring the powerful AMD X570 chipset. With support for PCIe 4.0, dual M.2 slots, and Wi-Fi 6, it ensures top-tier connectivity and blazing-fast speeds. The motherboard is equipped with robust power delivery, advanced cooling solutions, and Aura Sync RGB lighting for enhanced aesthetics. Perfect for gamers and enthusiasts, it delivers exceptional performance, stability, and customization options for building a cutting-edge system.",
+                ImageUrl = "/assets/product-placeholder.png"
+            }
+        };
+    }
+
+    private void ShowDescription(Product product)
+    {
+        selectedProduct = product;
+        isDialogVisible = true;
+    }
+
+    private void CloseDescription()
+    {
+        isDialogVisible = false;
+    }
+
+    private void FilterProducts()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            // If the search term is empty, show all products
+            filteredProducts = products;
+        }
+        else
+        {
+            // Filter products whose names contain the search term (case-insensitive)
+            filteredProducts = products?
+                .Where(p => p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        // Explicitly tell Blazor to re-render the UI
+        StateHasChanged();
+    }
+    // This method is called whenever the user types in the search box
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? string.Empty; // Update the search term
+        FilterProducts(); // Filter the products
+    }
+
+    public class Product
+    {
+        public required string Name { get; set; }
+        public required string Category { get; set; }
+        public required string StockCode { get; set; }
+        public required decimal Price { get; set; }
+        public required int Quantity { get; set; }
+        public required string Description { get; set; }
+        public required string ImageUrl { get; set; }
+    }
+}

@@ -1,0 +1,90 @@
+﻿@page "/dashboard/shop"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+@using PCMount.Components.Layout
+@layout DashboardLayout
+
+@using Microsoft.FluentUI.AspNetCore.Components
+@using PCMount.Components.UI
+@attribute [StreamRendering]
+<PageTitle>Parts Shop</PageTitle>
+
+<FluentToolbar class="rounded-md py-2 mb-4">
+    <FluentMenuButton Text="Select brand"></FluentMenuButton>
+    <FluentMenuButton Text="Select model"></FluentMenuButton>
+    <FluentSpacer />
+    <FluentButton IconEnd="@(new Icons.Regular.Size16.Filter())">Filters</FluentButton>
+    <FluentSearch Placeholder="Search for Parts" />
+</FluentToolbar>
+
+@if (products == null)
+{
+<LoadingDialog Title="Waiting page data request" />
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
+    @foreach(int element in Enumerable.Range(1, 14))
+    {
+    <FluentSkeleton Width="100%" Height="340px"></FluentSkeleton>
+    }
+</div>
+}
+else
+{
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
+    @foreach (string procuct in products)
+    {
+        <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2">
+            <FluentButton class="absolute top-2 left-2" IconStart="@(new Icons.Regular.Size16.Info())" Appearance="Appearance.Lightweight"></FluentButton>
+            <div class="w-36 rounded-md">
+                <img src="/assets/product-placeholder.png" class="object-cover w-full h-full rounded-md" />
+            </div>
+            <h3 class="-mb-2">ProductName</h3>
+            <span>Brand - Model</span>
+            <FluentBadge Appearance="Appearance.Lightweight">#ProductUID</FluentBadge>
+            <div class="flex flex-row gap-2 justify-center items-center text-center">
+                <span>Price:</span><FluentBadge Appearance="Appearance.Neutral">$999</FluentBadge>
+                <FluentSpacer />
+                <!-- TODO: Only show when you have more that one of that product -->
+                <span>Cost:</span><FluentBadge Appearance="Appearance.Neutral"><span class="text-red-500">$999</span></FluentBadge>
+            </div>
+            <div class="w-full flex flex-row gap-1.5 justify-center items-center text-center">
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Subtract())" Appearance="Appearance.Neutral"></FluentButton>
+                <FluentNumberField @bind-Value="exampleInt" />
+                <FluentButton IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Neutral"></FluentButton>
+            </div>
+            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.Cart())" Appearance="Appearance.Accent">Order</FluentButton>
+        </FluentCard>
+    }
+    </div>
+}
+
+@code {
+    private List<String>? products;
+
+    int exampleInt = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+        products = [
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+            "Product 1",
+        ];
+    }
+}
