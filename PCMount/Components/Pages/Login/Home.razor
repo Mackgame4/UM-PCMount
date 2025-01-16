@@ -9,8 +9,9 @@
 @inject IUserAccountService UserAccountService
 @inject NavigationManager NavigationManager
 
-<div class="p-28 h-screen">
-    <FluentCard MinimalStyle="true" class="flex flex-col items-center justify-center space-y-4 p-8">
+<FluentDialog>
+    <FluentDialogHeader Visible="false" />
+    <FluentDialogBody Class="flex flex-col items-center justify-center space-y-4 p-8">
         <img src="assets/pcmountlogo.png" alt="PCMount Logo" class="w-32 h-32 mx-auto" />
         <EditForm Model="@LoginModel" OnValidSubmit="Authenticate" FormName="LoginForm">
             <DataAnnotationsValidator />
@@ -29,8 +30,9 @@
                 <FluentButton IconStart="@(new Icons.Regular.Size16.Key())" Type="ButtonType.Submit" Appearance="Appearance.Accent">Login</FluentButton>
             </div>
         </EditForm>
-    </FluentCard>
-</div>
+    </FluentDialogBody>
+    <FluentDialogFooter Visible="false" />
+</FluentDialog>
 
 @code{
     [CascadingParameter]
@@ -65,6 +67,6 @@
         } catch (Exception ex) {
             errorMessage = $"Authentication failed: {ex.Message}";
         }
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/", true);
     }
 }
