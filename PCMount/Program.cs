@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 using PCMount.Components;
-using PCMount.Services;
 using PCMount.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +16,6 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddControllersWithViews();
 */
 // Add Authentication
-builder.Services.AddUserAccountService();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>{
         options.LoginPath = "/login";
         options.Cookie.Name = "auth_token";
@@ -26,7 +24,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
-//builder.Services.AddLocalHttpClient();
 // Add Logging
 builder.Services.AddLogging();
 // Add DbContext
