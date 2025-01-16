@@ -20,7 +20,7 @@ public class Part
     [StringLength(45)] // Matches the Componente.tipo field
     public required string Tipo { get; set; }
 
-    [StringLength(500)] // Matches the Componente.descricao field
+    [StringLength(600)] // Matches the Componente.descricao field
     public string? Descricao { get; set; }
 
     [StringLength(45)] // Matches the Componente.image field
