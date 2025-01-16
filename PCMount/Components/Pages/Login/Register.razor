@@ -1,11 +1,8 @@
-@page "/login"
-<PageTitle>PCMount - Login</PageTitle>
+@page "/register"
+<PageTitle>PCMount - Register</PageTitle>
 
 @using PCMount.Data.Models
 
-@using System.Security.Claims
-@using Microsoft.AspNetCore.Authentication
-@using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.FluentUI.AspNetCore.Components
 @inject NavigationManager NavigationManager
 @using Microsoft.EntityFrameworkCore
@@ -17,8 +14,8 @@
     <FluentDialogBody Class="flex flex-col items-center justify-center space-y-4 p-8">
         <img src="assets/pcmountlogo.png" alt="PCMount Logo" class="w-32 h-32 mx-auto" />
         <h1 class="text-2xl font-bold text-center">Welcome to PCMount</h1>
-        <span class="text-sm text-center">Please enter your credentials to continue.</span>
-        <EditForm Model="@LoginModel" OnValidSubmit="Authenticate" FormName="LoginForm" class="w-full">
+        <span class="text-sm text-center">Please enter your credentials to register.</span>
+        <EditForm Model="@LoginModel" OnValidSubmit="RegisterAccount" FormName="LoginForm" class="w-full">
             <DataAnnotationsValidator />
             <FluentStack Orientation="Orientation.Vertical">
                 <div class="w-full">
@@ -32,13 +29,13 @@
                     <ValidationMessage style="color: red;" For="() => LoginModel.Password" />
                 </div>
                 <span style="color: red;">@errorMessage</span>
-                <FluentButton IconStart="@(new Icons.Regular.Size16.Key())" Type="ButtonType.Submit" Class="w-full shadow-sm" Appearance="Appearance.Accent">Login</FluentButton>
+                <FluentButton IconStart="@(new Icons.Regular.Size16.AddCircle())" Type="ButtonType.Submit" Class="w-full shadow-sm" Appearance="Appearance.Accent">Register</FluentButton>
                 <div class="flex flex-row w-full">
                     <NavLink href="/" Match="NavLinkMatch.All">
                         <FluentButton IconStart="@(new Icons.Regular.Size16.ArrowLeft())" Class="w-full shadow-sm" Appearance="Appearance.Lightweight">Back</FluentButton>
                     </NavLink>
-                    <NavLink href="/register" Match="NavLinkMatch.All" class="ml-auto">
-                        <FluentButton IconStart="@(new Icons.Regular.Size16.AddCircle())" Class="w-full shadow-sm" Appearance="Appearance.Lightweight">Register</FluentButton>
+                    <NavLink href="/login" Match="NavLinkMatch.All" class="ml-auto">
+                        <FluentButton IconStart="@(new Icons.Regular.Size16.Key())" Class="w-full shadow-sm" Appearance="Appearance.Lightweight">Login</FluentButton>
                     </NavLink>
                 </div>
             </FluentStack>
@@ -48,46 +45,31 @@
 </FluentDialog>
 
 @code{
-    [CascadingParameter]
-    public HttpContext? HttpContext { get; set; }
-
     [SupplyParameterFromForm]
     private LoginViewModel LoginModel { get; set; } = new ();
 
     private string? errorMessage;
 
-    private async Task Authenticate() {
+    private async Task RegisterAccount() {
         bool redirect = false;
         try {
-            List<User> usersAccounts = await DbContext.Users.ToListAsync();
-            if (usersAccounts == null || !usersAccounts.Any()) {
-                errorMessage = "No users found.";
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(LoginModel.UserName) || string.IsNullOrWhiteSpace(LoginModel.Password)) {
-                errorMessage = "Username and Password are required.";
-                return;
-            }
-            var userAccount = usersAccounts.FirstOrDefault(u => u.UserName == LoginModel.UserName);
-            if (userAccount is null || PasswordHasher.VerifyHashedPassword(userAccount.Password, LoginModel.Password) == false) {
-                errorMessage = "Invalid Username or Password.";
-                return;
-            }
-
-            var claims = new List<Claim> {
-                new Claim(ClaimTypes.Name, userAccount.UserName!),
-                new Claim(ClaimTypes.Role, userAccount.Role!)
+            var user = new User {
+                UserName = LoginModel.UserName!,
+                Password = PasswordHasher.HashPassword(LoginModel.Password!),
+                Role = "Admin" // Registered users are admins by default
             };
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-            await HttpContext!.SignInAsync(principal);
-            redirect = true;
+            if (DbContext.Users.Any(u => u.UserName == user.UserName)) {
+                errorMessage = "Username already exists.";
+            } else {
+                DbContext.Users.Add(user);
+                await DbContext.SaveChangesAsync();
+                redirect = true;
+            }
         } catch (Exception ex) {
             errorMessage = $"Authentication failed: {ex.Message}";
         } finally {
             if (redirect) {
-                NavigationManager.NavigateTo("/dashboard", true);
+                NavigationManager.NavigateTo("/login", true);
             }
         }
     }

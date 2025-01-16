@@ -13,7 +13,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         //modelBuilder.Entity<User>().ToTable("users");
         // Pre-populate the table with data
         modelBuilder.Entity<User>().HasData(
-            new User { Id = 1, UserName = "admin", Password = PasswordHasher.Base64Encode("admin"), Role = "Admin" }
+            new User { Id = 1, UserName = "admin", Password = PasswordHasher.HashPassword("admin"), Role = "Admin" }
         );
 
         modelBuilder.Entity<Part>().ToTable("componentes");

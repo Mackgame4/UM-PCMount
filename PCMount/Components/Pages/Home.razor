@@ -6,11 +6,11 @@
 @attribute [AllowAnonymous]
 <PageTitle>PCMount - Shop</PageTitle>
 
-<FluentToolbar class="rounded-md py-2 mb-4">
+<FluentToolbar class="py-2 mb-4">
     <FluentSearch Placeholder="Search for Products" />
     <FluentButton IconEnd="@(new Icons.Regular.Size16.Filter())">Filters</FluentButton>
     <FluentSpacer />
-    <FluentButton IconEnd="@(new Icons.Regular.Size16.Cart())"></FluentButton>
+    <FluentButton IconStart="@(new Icons.Regular.Size16.Cart())"></FluentButton>
     <AuthorizeView>
         <NotAuthorized>
             <NavLink href="/login" Match="NavLinkMatch.All">
