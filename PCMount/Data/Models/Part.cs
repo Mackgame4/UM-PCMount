@@ -3,28 +3,38 @@ namespace PCMount.Data.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("Componente")] // Explicitly map to the Componente table
+[Table("componentes")] // Explicitly map to the Componente table
 public class Part
 {
     [Key]
-    public int PartId { get; set; } // Maps to partId in the Componente table
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Column("PartId")]
+    public int PartId { get; set; }
 
     [Required]
-    [StringLength(45)] // Matches the Componente.name field
+    [Column("Name")]
+    [StringLength(45)]
     public required string Name { get; set; }
 
     [Required]
-    public required double Preco { get; set; } // Matches the Componente.preco field (FLOAT)
+    [Column("Preco")]
+    [DataType(DataType.Currency)]
+    public required double Preco { get; set; }
 
     [Required]
-    [StringLength(45)] // Matches the Componente.tipo field
+    [Column("Tipo")]
+    [StringLength(45)]
     public required string Tipo { get; set; }
 
-    [StringLength(600)] // Matches the Componente.descricao field
+    [Column("Descricao")]
+    [StringLength(600)]
     public string? Descricao { get; set; }
 
-    [StringLength(45)] // Matches the Componente.image field
+    [Column("Image")]
+    [StringLength(100)]
     public string? Image { get; set; }
 
-    public int? PortId { get; set; } // Matches the Componente.portId field
+    [Column("PortId")]
+    [ForeignKey("PortId")]
+    public int? PortId { get; set; }
 }
