@@ -7,13 +7,17 @@
 @attribute [Authorize(Roles = "Admin, User")]
 @attribute [AllowAnonymous]
 @attribute [StreamRendering]
+@inject IDialogService DialogService
 @rendermode InteractiveServer
 <PageTitle>PCMount - Shop</PageTitle>
 
+<main class="fixed z-10"
+    <FluentDialogProvider />
+</main>
 <FluentToolbar class="py-2 sticky top-0 z-10">
-    <FluentSearch Placeholder="Search for Products" />
-    <FluentButton IconEnd="@(new Icons.Regular.Size16.Filter())">Filters</FluentButton>
-    <FluentButton IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Lightweight">Order Custom Build</FluentButton>
+    <FluentSearch Placeholder="Search for Product" @bind-Value="@searchTerm" @bind-Value:after="@OnSearchInput" Immediate="true" />
+    <!--<FluentButton IconEnd="@(new Icons.Regular.Size16.Filter())">Filters</FluentButton>-->
+    <FluentButton IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Lightweight" @onclick="@OpenDialogAsync">Order Custom Build</FluentButton>
     <FluentSpacer />
     <FluentCounterBadge Count="@cart?.Count" Appearance="Appearance.Accent">
         <FluentButton id="notificationsPopover" IconStart="@(new Icons.Regular.Size16.Cart())" @onclick="() => _visibleNotificationsPopover = !_visibleNotificationsPopover"></FluentButton>
@@ -40,11 +44,15 @@
             }
         </div>
     } else {
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
-            @foreach (var product in computers!) {
-                <ProductCard Product="@product" OnAddToCart="AddToCart" />
-            }
-        </div>
+        @if (filteredProducts != null && !filteredProducts.Any()) {
+            <span class="text-center text-xl text-gray-200 mt-8">No products found.</span>
+        } else {
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
+                @foreach (var product in filteredProducts!) {
+                    <ProductCard Product="@product" OnAddToCart="AddToCart" />
+                }
+            </div>
+        }
     }
 </div>
 
@@ -61,7 +69,12 @@
                         <img src="@product.Image" class="w-12 h-12 rounded-md" />
                         <div class="flex flex-col gap-1">
                             <span>@product.Name</span>
-                            <FluentBadge Fill="highlight" BackgroundColor="#166534" Color="white" style="width: fit-content;">$@product.Price</FluentBadge>
+                            <div class="flex gap-1.5 items-center">
+                                <FluentBadge Fill="highlight" BackgroundColor="#166534" Color="white" style="width: fit-content;">$@product.Price</FluentBadge>
+                                @if (product.Discount > 0) {
+                                    <FluentBadge Fill="highlight" BackgroundColor="#991b1b" Color="white" style="width: fit-content;">-@product.Discount%</FluentBadge>
+                                }
+                            </div>
                         </div>
                     </div>
                     <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" Appearance="Appearance.Lightweight" @onclick="() => RemoveFromCart(product)"></FluentButton>
@@ -71,25 +84,27 @@
         }
     </Body>
     <Footer>
+        <span><b>Total:</b> $@(cart?.Sum(x => x.Price) - (cart?.Sum(x => x.Price) * cart?.Sum(x => x.Discount) / 100))</span>
         <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.ShoppingBag())" Appearance="Appearance.Lightweight" @onclick="OrderCart">Confirm Order</FluentButton>
     </Footer>
 </FluentPopover>
 
 @code {
-    bool _visibleNotificationsPopover;
+    private bool _visibleNotificationsPopover;
     private List<Computer>? computers;
-
+    private List<Computer>? filteredProducts;
     private List<Computer>? cart = new List<Computer>();
 
     protected override Task OnInitializedAsync() {
         computers = new List<Computer> {
-            new Computer { Name = "NZXT H5 Gaming Elite", Price = 1000, Image = "/assets/cdn/computer-nzxt-h5.png", Discount = 10 },
-            new Computer { Name = "Panorama Glass Gaming", Price = 2000, Image = "/assets/cdn/computer-panorama-gaming.png" },
-            new Computer { Name = "Periphio Astral 5600G", Price = 1500, Image = "/assets/cdn/computer-periphio-astral-5600g.png", Discount = 25 },
-            new Computer { Name = "Elite AvaDirect 3687Y", Price = 1500, Image = "/assets/cdn/computer-elite-avadirect.png" },
-            new Computer { Name = "CyberPower MultiColor", Price = 1000, Image = "/assets/cdn/computer-cyberpower-pc.png" },
-            new Computer { Name = "Corsair Vengeance", Price = 1000, Image = "/assets/cdn/computer-vengeance-i5200.png" },
+            new Computer { Name = "NZXT H5 Gaming Elite", Price = 1000, Image = "/assets/cdn/computer-nzxt-h5.png", Discount = 10, Motherboard = new Part { PartId = 1, Name = "ASUS ROG Strix Z590-E", Preco = 300, Tipo = "Motherboard" }, GraphicsCard = new Part { PartId = 2, Name = "NVIDIA GeForce RTX 3080", Preco = 800, Tipo = "Graphics Card" }, Processor = new Part { PartId = 3, Name = "Intel Core i9-11900K", Preco = 700, Tipo = "Processor" }, Memory = new Part { PartId = 4, Name = "Corsair Vengeance RGB Pro", Preco = 200, Tipo = "Memory" }, Storage = new Part { PartId = 5, Name = "Samsung 970 EVO Plus", Preco = 200, Tipo = "Storage" }, PowerSupply = new Part { PartId = 6, Name = "Corsair RM850x", Preco = 150, Tipo = "Power Supply" }, Case = new Part { PartId = 7, Name = "NZXT H510", Preco = 100, Tipo = "Case" } },
+            new Computer { Name = "Panorama Glass Gaming", Price = 2000, Image = "/assets/cdn/computer-panorama-gaming.png", Motherboard = new Part { PartId = 8, Name = "ASUS ROG Strix Z590-E", Preco = 300, Tipo = "Motherboard" }, GraphicsCard = new Part { PartId = 9, Name = "NVIDIA GeForce RTX 3090", Preco = 1000, Tipo = "Graphics Card" }, Processor = new Part { PartId = 10, Name = "Intel Core i9-11900K", Preco = 700, Tipo = "Processor" }, Memory = new Part { PartId = 11, Name = "Corsair Vengeance RGB Pro", Preco = 200, Tipo = "Memory" }, Storage = new Part { PartId = 12, Name = "Samsung 970 EVO Plus", Preco = 200, Tipo = "Storage" }, PowerSupply = new Part { PartId = 13, Name = "Corsair RM850x", Preco = 150, Tipo = "Power Supply" }, Case = new Part { PartId = 14, Name = "NZXT H510", Preco = 100, Tipo = "Case" } },
+            new Computer { Name = "Periphio Astral 5600G", Price = 1500, Image = "/assets/cdn/computer-periphio-astral-5600g.png", Discount = 25, Motherboard = new Part { PartId = 15, Name = "ASUS ROG Strix Z590-E", Preco = 300, Tipo = "Motherboard" }, GraphicsCard = new Part { PartId = 16, Name = "NVIDIA GeForce RTX 3070", Preco = 600, Tipo = "Graphics Card" }, Processor = new Part { PartId = 17, Name = "AMD Ryzen 5 5600G", Preco = 300, Tipo = "Processor" }, Memory = new Part { PartId = 18, Name = "Corsair Vengeance RGB Pro", Preco = 200, Tipo = "Memory" }, Storage = new Part { PartId = 19, Name = "Samsung 970 EVO Plus", Preco = 200, Tipo = "Storage" }, PowerSupply = new Part { PartId = 20, Name = "Corsair RM850x", Preco = 150, Tipo = "Power Supply" }, Case = new Part { PartId = 21, Name = "NZXT H510", Preco = 100, Tipo = "Case" } },
+            new Computer { Name = "Elite AvaDirect 3687Y", Price = 1500, Image = "/assets/cdn/computer-elite-avadirect.png", Motherboard = new Part { PartId = 22, Name = "ASUS ROG Strix Z590-E", Preco = 300, Tipo = "Motherboard" }, GraphicsCard = new Part { PartId = 23, Name = "NVIDIA GeForce RTX 3070", Preco = 600, Tipo = "Graphics Card" }, Processor = new Part { PartId = 24, Name = "AMD Ryzen 5 5600G", Preco = 300, Tipo = "Processor" }, Memory = new Part { PartId = 25, Name = "Corsair Vengeance RGB Pro", Preco = 200, Tipo = "Memory" }, Storage = new Part { PartId = 26, Name = "Samsung 970 EVO Plus", Preco = 200, Tipo = "Storage" }, PowerSupply = new Part { PartId = 27, Name = "Corsair RM850x", Preco = 150, Tipo = "Power Supply" }, Case = new Part { PartId = 28, Name = "NZXT H510", Preco = 100, Tipo = "Case" } },
+            new Computer { Name = "CyberPower MultiColor", Price = 1000, Image = "/assets/cdn/computer-cyberpower-pc.png", Motherboard = new Part { PartId = 29, Name = "ASUS ROG Strix Z590-E", Preco = 300, Tipo = "Motherboard" }, GraphicsCard = new Part { PartId = 30, Name = "NVIDIA GeForce RTX 3070", Preco = 600, Tipo = "Graphics Card" }, Processor = new Part { PartId = 31, Name = "AMD Ryzen 5 5600G", Preco = 300, Tipo = "Processor" }, Memory = new Part { PartId = 32, Name = "Corsair Vengeance RGB Pro", Preco = 200, Tipo = "Memory" }, Storage = new Part { PartId = 33, Name = "Samsung 970 EVO Plus", Preco = 200, Tipo = "Storage" }, PowerSupply = new Part { PartId = 34, Name = "Corsair RM850x", Preco = 150, Tipo = "Power Supply" }, Case = new Part { PartId = 35, Name = "NZXT H510", Preco = 100, Tipo = "Case" } },
+            new Computer { Name = "Corsair Vengeance", Price = 1000, Image = "/assets/cdn/computer-vengeance-i5200.png", Motherboard = new Part { PartId = 36, Name = "ASUS ROG Strix Z590-E", Preco = 300, Tipo = "Motherboard" }, GraphicsCard = new Part { PartId = 37, Name = "NVIDIA GeForce RTX 3070", Preco = 600, Tipo = "Graphics Card" }, Processor = new Part { PartId = 38, Name = "AMD Ryzen 5 5600G", Preco = 300, Tipo = "Processor" }, Memory = new Part { PartId = 39, Name = "Corsair Vengeance RGB Pro", Preco = 200, Tipo = "Memory" }, Storage = new Part { PartId = 40, Name = "Samsung 970 EVO Plus", Preco = 200, Tipo = "Storage" }, PowerSupply = new Part { PartId = 41, Name = "Corsair RM850x", Preco = 150, Tipo = "Power Supply" }, Case = new Part { PartId = 42, Name = "NZXT H510", Preco = 100, Tipo = "Case" } },
         };
+        filteredProducts = computers;
         return Task.CompletedTask;
     }
 
@@ -103,5 +118,39 @@
 
     private void OrderCart() {
         Console.WriteLine($"Ordered {cart!.Count} products");
+    }
+
+    private string searchTerm = string.Empty;
+    private void OnSearchInput() {
+        if (string.IsNullOrWhiteSpace(searchTerm)) {
+            filteredProducts = computers;
+            searchTerm = string.Empty;
+        } else {
+            filteredProducts = computers?.Where(p => p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        StateHasChanged();
+    }
+
+    private Computer? customBuild { get; set; } = null;
+    private async Task OpenDialogAsync() {
+        DialogParameters parameters = new() {
+            Title = "Create Your Own Custom Build",
+            TrapFocus = true,
+            Modal = true,
+            PreventScroll = true 
+        };
+        IDialogReference dialog = await DialogService.ShowDialogAsync<CustomBuildDialog>(customBuild!, parameters);
+        DialogResult? result = await dialog.Result;
+
+        if (result.Data is not null) {
+            Computer? customBuild = result.Data as Computer;
+            Console.WriteLine($"Dialog closed - Custom Build: {customBuild?.Name}");
+            Console.WriteLine($"Dialog closed - Price: {customBuild?.Price}");
+            if (customBuild != null) {
+                cart!.Add(customBuild);
+            }
+        } else {
+            Console.WriteLine($"Dialog closed - Canceled: {result.Cancelled}");
+        }
     }
 }
