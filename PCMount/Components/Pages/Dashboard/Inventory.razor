@@ -134,7 +134,7 @@ else
         products = inventoryItems.Select(i => new Product
         {
             Name = i.Part!.Name,
-            Category = i.Part.Tipo, // Assuming "Type" maps to "Category"
+            Category = i.Part.Tipo.ToString(), // Assuming "Type" maps to "Category"
             StockCode = i.Part.PartId.ToString(), // Use PartId as StockCode
             Price = (decimal)i.Part.Preco, // Convert float to decimal
             Quantity = i.Quantidade,

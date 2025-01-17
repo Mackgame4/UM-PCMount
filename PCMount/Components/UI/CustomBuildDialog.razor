@@ -38,57 +38,51 @@
     public FluentDialog? Dialog { get; set; }
 
     IEnumerable<Part> SelectedMotherboards = Array.Empty<Part>();
+    private Part? SelectedMotherboard;
     IEnumerable<Part> SelectedProcessors = Array.Empty<Part>();
+    private Part? SelectedProcessor;
     IEnumerable<Part> SelectedMemories = Array.Empty<Part>();
+    private Part? SelectedMemory;
     IEnumerable<Part> SelectedGraphicsCards = Array.Empty<Part>();
+    private Part? SelectedGraphicsCard;
     IEnumerable<Part> SelectedStorages = Array.Empty<Part>();
+    private Part? SelectedStorage;
     IEnumerable<Part> SelectedPowerSupplies = Array.Empty<Part>();
+    private Part? SelectedPowerSupply;
     IEnumerable<Part> SelectedCases = Array.Empty<Part>();
+    private Part? SelectedCase;
 
     Part[] Components = Array.Empty<Part>();
 
     protected override async Task OnInitializedAsync() {
         Components = await DbContext.Componentes.ToArrayAsync();
+        SelectedMotherboard = SelectedMotherboards.FirstOrDefault();
+        SelectedProcessor = SelectedProcessors.FirstOrDefault();
+        SelectedMemory = SelectedMemories.FirstOrDefault();
+        SelectedGraphicsCard = SelectedGraphicsCards.FirstOrDefault();
+        SelectedStorage = SelectedStorages.FirstOrDefault();
+        SelectedPowerSupply = SelectedPowerSupplies.FirstOrDefault();
+        SelectedCase = SelectedCases.FirstOrDefault();
     }
 
     private void OnSearch(OptionsSearchEventArgs<Part> e, string partType) {
-        e.Items = Components
-            .Where(part => part.Tipo == partType && part.Name.Contains(e.Text, StringComparison.OrdinalIgnoreCase));
+        e.Items = Components.Where(part => part.Tipo.ToString() == partType && part.Name.Contains(e.Text, StringComparison.OrdinalIgnoreCase));
     }
 
     private double calculatePrice() {
-        double price = 0;
-        price += (double)(SelectedMotherboards.FirstOrDefault()?.Preco ?? 0);
-        price += (double)(SelectedProcessors.FirstOrDefault()?.Preco ?? 0);
-        price += (double)(SelectedMemories.FirstOrDefault()?.Preco ?? 0);
-        price += (double)(SelectedGraphicsCards.FirstOrDefault()?.Preco ?? 0);
-        price += (double)(SelectedStorages.FirstOrDefault()?.Preco ?? 0);
-        price += (double)(SelectedPowerSupplies.FirstOrDefault()?.Preco ?? 0);
-        price += (double)(SelectedCases.FirstOrDefault()?.Preco ?? 0);
+        double price = (SelectedMotherboard?.Preco ?? 0) + (SelectedProcessor?.Preco ?? 0) + (SelectedMemory?.Preco ?? 0) + (SelectedGraphicsCard?.Preco ?? 0) + (SelectedStorage?.Preco ?? 0) + (SelectedPowerSupply?.Preco ?? 0) + (SelectedCase?.Preco ?? 0);
         return price;
     }
 
     private async Task SaveAsync() {
-        Console.WriteLine("CustomBuild with:");
-        Console.WriteLine($"Motherboard: {SelectedMotherboards.FirstOrDefault()?.Name}");
-        Console.WriteLine($"Processor: {SelectedProcessors.FirstOrDefault()?.Name}");
-        Console.WriteLine($"Memory: {SelectedMemories.FirstOrDefault()?.Name}");
-        Console.WriteLine($"Graphics Card: {SelectedGraphicsCards.FirstOrDefault()?.Name}");
-        Console.WriteLine($"Storage: {SelectedStorages.FirstOrDefault()?.Name}");
-        Console.WriteLine($"Power Supply: {SelectedPowerSupplies.FirstOrDefault()?.Name}");
-        Console.WriteLine($"Case: {SelectedCases.FirstOrDefault()?.Name}");
-        Content = new Computer {
-            Name = "Custom Build",
-            Price = calculatePrice(),
-            Image = "/assets/cdn/computer-custom-build.png",
-            Motherboard = SelectedMotherboards.FirstOrDefault(),
-            Processor = SelectedProcessors.FirstOrDefault(),
-            Memory = SelectedMemories.FirstOrDefault(),
-            GraphicsCard = SelectedGraphicsCards.FirstOrDefault(),
-            Storage = SelectedStorages.FirstOrDefault(),
-            PowerSupply = SelectedPowerSupplies.FirstOrDefault(),
-            Case = SelectedCases.FirstOrDefault()
-        };
+        Content = new Computer { Name = "Custom Build", Price = calculatePrice(), Image = "/assets/cdn/computer-custom-build.png", Motherboard = SelectedMotherboard!, Processor = SelectedProcessor!, Memory = SelectedMemory!, GraphicsCard = SelectedGraphicsCard!, Storage = SelectedStorage!, PowerSupply = SelectedPowerSupply!, Case = SelectedCase! };
+        Console.WriteLine($"Motherboard: {Content.Motherboard?.Name}");
+        Console.WriteLine($"Processor: {Content.Processor?.Name}");
+        Console.WriteLine($"Memory: {Content.Memory?.Name}");
+        Console.WriteLine($"Graphics Card: {Content.GraphicsCard?.Name}");
+        Console.WriteLine($"Storage: {Content.Storage?.Name}");
+        Console.WriteLine($"Power Supply: {Content.PowerSupply?.Name}");
+        Console.WriteLine($"Case: {Content.Case?.Name}");
         Console.WriteLine($"Price: {Content.Price}");
         await Dialog!.CloseAsync(Content);
     }
