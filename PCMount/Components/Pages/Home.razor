@@ -67,8 +67,8 @@
                     <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" Appearance="Appearance.Lightweight" @onclick="() => RemoveFromCart(product)"></FluentButton>
                 </div>
             }
+            </div>
         }
-        </div>
     </Body>
     <Footer>
         <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.ShoppingBag())" Appearance="Appearance.Lightweight" @onclick="OrderCart">Confirm Order</FluentButton>
@@ -90,6 +90,7 @@
             new Computer { Name = "CyberPower MultiColor", Price = 1000, Image = "/assets/cdn/computer-cyberpower-pc.png" },
             new Computer { Name = "Corsair Vengeance", Price = 1000, Image = "/assets/cdn/computer-vengeance-i5200.png" },
         };
+        return Task.CompletedTask;
     }
 
     private void AddToCart(Computer product) {
