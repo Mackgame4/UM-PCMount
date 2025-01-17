@@ -1,90 +1,304 @@
 ﻿@page "/dashboard/shop"
+@using Microsoft.FluentUI.AspNetCore.Components
+@using PCMount.Components.UI
+@using Microsoft.EntityFrameworkCore
+@using PCMount.Data
+@using PCMount.Data.Models
+@inject ApplicationDbContext DbContext
+@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize(Roles = "Admin")]
 @using PCMount.Components.Layout
 @layout DashboardLayout
-
-@using Microsoft.FluentUI.AspNetCore.Components
-@using PCMount.Components.UI
 @attribute [StreamRendering]
+
 <PageTitle>PCMount - Parts Shop</PageTitle>
 
-<FluentToolbar class="rounded-md py-2 mb-4">
-    <FluentMenuButton Text="Select brand"></FluentMenuButton>
-    <FluentMenuButton Text="Select model"></FluentMenuButton>
-    <FluentSpacer />
-    <FluentButton IconEnd="@(new Icons.Regular.Size16.Filter())">Filters</FluentButton>
-    <FluentSearch Placeholder="Search for Parts" />
-</FluentToolbar>
-
-@if (products == null)
-{
-<LoadingDialog Title="Waiting page data request" />
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
-    @foreach(int element in Enumerable.Range(1, 14))
-    {
-    <FluentSkeleton Width="100%" Height="340px"></FluentSkeleton>
-    }
+<div class="rounded-md py-2 mb-4 flex justify-between">
+    <div class="flex gap-6 w-1/3">
+        <FluentMenuButton Text="Select model"></FluentMenuButton>
+    </div>
+    <div class="ml-4 w-1/3 flex gap-4">
+        <FluentSearch class="w-full" Placeholder="Search for Parts" Value="@searchTerm" @oninput="OnSearchInput" />
+        <FluentMenuButton Text="Order by"></FluentMenuButton>
+    </div>
+    <div class="flex w-1/3">
+    </div>
 </div>
+
+@if (filteredProducts == null)
+{
+    <LoadingDialog Title="Loading Parts Shop..." />
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
+        @foreach (int element in Enumerable.Range(1, 14))
+        {
+            <FluentSkeleton Width="100%" Height="340px"></FluentSkeleton>
+        }
+    </div>
 }
 else
 {
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
-    @foreach (string procuct in products)
+    @if (filteredProducts != null && !filteredProducts.Any())
     {
-        <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2">
-            <FluentButton class="absolute top-2 left-2" IconStart="@(new Icons.Regular.Size16.Info())" Appearance="Appearance.Lightweight"></FluentButton>
-            <div class="w-36 rounded-md">
-                <img src="/assets/product-placeholder.png" class="object-cover w-full h-full rounded-md" />
-            </div>
-            <h3 class="-mb-2">ProductName</h3>
-            <span>Brand - Model</span>
-            <FluentBadge Appearance="Appearance.Lightweight">#ProductUID</FluentBadge>
-            <div class="flex flex-row gap-2 justify-center items-center text-center">
-                <span>Price:</span><FluentBadge Appearance="Appearance.Neutral">$999</FluentBadge>
-                <FluentSpacer />
-                <!-- TODO: Only show when you have more that one of that product -->
-                <span>Cost:</span><FluentBadge Appearance="Appearance.Neutral"><span class="text-red-500">$999</span></FluentBadge>
-            </div>
-            <div class="w-full flex flex-row gap-1.5 justify-center items-center text-center">
-                <FluentButton IconStart="@(new Icons.Regular.Size16.Subtract())" Appearance="Appearance.Neutral"></FluentButton>
-                <FluentNumberField @bind-Value="exampleInt" />
-                <FluentButton IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Neutral"></FluentButton>
-            </div>
-            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.Cart())" Appearance="Appearance.Accent">Order</FluentButton>
-        </FluentCard>
+        <div class="text-center text-xl text-gray-200 mt-8">
+            No products found.
+        </div>
     }
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
+        @foreach (Product product in filteredProducts!)
+        {
+            <div class="tr1 transition duration-300 ease-in-out">
+                <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2 hover:translate-y-2">
+                    <FluentButton 
+                        class="absolute top-2 left-2" 
+                        IconStart="@(new Icons.Regular.Size16.Info())"
+                        Appearance="Appearance.Lightweight"
+                        @onclick="() => ShowDescription(product)">
+                    </FluentButton>
+                    <div class="w-36 rounded-md relative pb-6 mb-1">
+                        <img src="@product.ImageUrl" class="object-cover w-full h-full rounded-md" />
+                        <div class="absolute pos z-40 tr transition duration-200 ease-in-out">
+                            <FluentBadge Appearance="Appearance.Neutral">
+                                <span class="text-green-500 font-medium text-xl">
+                                    @product.Price€
+                                </span>
+                            </FluentBadge>
+                        </div>
+                    </div>
+                    <h3 class="-mb-2">
+                        @product.Name
+                    </h3>
+                    <span>
+                        @product.Category
+                    </span>
+                    <FluentBadge Appearance="Appearance.Lightweight" class="font-bold">
+                        #LI4
+                        <span>
+                            @product.StockCode
+                        </span>
+                    </FluentBadge>
+                    <div class="flex flex-col gap-2 justify-center items-center text-center">
+                        <div class="w-full flex flex-row gap-1.5 justify-center items-center text-center">
+                            <FluentButton IconStart="@(new Icons.Regular.Size16.Subtract())" Appearance="Appearance.Neutral" @onclick="() => DecrementQuantity(product)"></FluentButton>
+                            <FluentNumberField @bind-Value=@product.Quantity ReadOnly="true"/>
+                            <FluentButton IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Neutral" @onclick="() => IncrementQuantity(product)"></FluentButton>
+                        </div>
+                        <FluentButton 
+                            class="w-full" 
+                            IconStart="@(new Icons.Regular.Size16.Cart())" 
+                            Appearance="Appearance.Accent"
+                            @onclick="() => OrderProduct(product)">
+                                Order
+                        </FluentButton>
+                    </div>
+                </FluentCard>
+            </div>
+        }
     </div>
+
+    @if (isDialogVisible == true)
+    {
+        <!-- FluentDialog for displaying product description -->
+        <FluentDialog>
+            <DialogTitle>
+                <p class="font-bold text-xl text-center relative">
+                    @selectedProduct?.Name
+                </p>
+            </DialogTitle>
+            <DialogContent>
+                <p class="text-justify italic">
+                    @selectedProduct?.Description
+                </p>
+            </DialogContent>
+            <DialogActions class=" absolute flex items-center justify-center top-5 right-5">
+                <FluentButton class="font-bold text-lg text-gray-300" @onclick="() => CloseDescription()">
+                    x
+                </FluentButton>
+            </DialogActions>
+        </FluentDialog>
+    }
 }
 
 @code {
-    private List<String>? products;
+    private List<Product>? products;
+    private bool isDialogVisible = false;
+    private List<Product>? filteredProducts; // Filtered list of products
+    private Product? selectedProduct;
+    private List<Part>? existentComponents;
 
-    int exampleInt = 0;
+    private string searchTerm = string.Empty; // Search term
 
     protected override async Task OnInitializedAsync()
     {
-        // Simulate asynchronous loading to demonstrate streaming rendering
-        await Task.Delay(500);
-        products = [
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-            "Product 1",
-        ];
+         await Task.Delay(500);
+        // Query the database to fetch Componentes data
+        existentComponents = await DbContext.Componentes.ToListAsync();
+
+        // Map Componente data to the Product model
+        products = existentComponents.Select(i => new Product
+        {
+            Name = i.Name,
+            Category = i.Tipo, // Assuming "Type" maps to "Category"
+            StockCode = i.PartId.ToString(), // Use PartId as StockCode
+            Price = (decimal)i.Preco, // Convert float to decimal
+            Quantity = 0,
+            Description = i.Descricao!,
+            ImageUrl = i.Image!
+        }).ToList();
+
+        // Initialize filteredProducts with all products
+        filteredProducts = products;
+    }
+
+    private void ShowDescription(Product product)
+    {
+        selectedProduct = product;
+        isDialogVisible = true;
+    }
+
+    private void CloseDescription()
+    {
+        isDialogVisible = false;
+    }
+
+    private void FilterProducts()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            // If the search term is empty, show all products
+            filteredProducts = products;
+        }
+        else
+        {
+            // Filter products whose names contain the search term (case-insensitive)
+            filteredProducts = products?
+                .Where(p => p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        // Explicitly tell Blazor to re-render the UI
+        StateHasChanged();
+    }
+    // This method is called whenever the user types in the search box
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? string.Empty; // Update the search term
+        FilterProducts(); // Filter the products
+    }
+
+    // Method to increment the quantity
+    private void IncrementQuantity(Product product)
+    {
+        product.Quantity++;
+        StateHasChanged(); // Re-render the UI
+    }
+
+    // Method to decrement the quantity
+    private void DecrementQuantity(Product product)
+    {
+        if (product.Quantity > 0)
+        {
+            product.Quantity--;
+            StateHasChanged(); // Re-render the UI
+        }
+    }
+
+   private async Task UpdateQuantityInDatabase(Product product)
+    {
+        // Start a transaction
+        using var transaction = await DbContext.Database.BeginTransactionAsync();
+
+        try
+        {
+            // Find the corresponding inventory record for the product
+            var inventoryItem = await DbContext.Inventario
+                .FirstOrDefaultAsync(i => i.PartId == int.Parse(product.StockCode));
+
+            if (inventoryItem != null)
+            {
+                // Update the quantity in the inventory
+                inventoryItem.Quantidade += product.Quantity;
+            }
+            else
+            {
+                // If the inventory item doesn't exist, create a new one
+                inventoryItem = new Inventario
+                {
+                    PartId = int.Parse(product.StockCode),
+                    Quantidade = product.Quantity
+                };
+
+                // Add the new inventory item to the database
+                DbContext.Inventario.Add(inventoryItem);
+            }
+
+            // Save changes to the database
+            await DbContext.SaveChangesAsync();
+
+            // Commit the transaction
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            // Roll back the transaction in case of an error
+            await transaction.RollbackAsync();
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+    }
+
+    private async Task OrderProduct(Product product)
+    {
+        if (product.Quantity > 0)
+        {
+            // Update the quantity in the database
+            await UpdateQuantityInDatabase(product);
+            // Optionally, show a success message or notification
+            Console.WriteLine($"Order placed for {product.Name} with quantity {product.Quantity}");
+            // Reset the quantity in the UI
+            product.Quantity = 0;
+        }
+        else
+        {
+            // Optionally, show an error message or notification
+            Console.WriteLine("Quantity must be greater than 0 to place an order.");
+        }
+    }
+
+    public class Product
+    {
+        public required string Name { get; set; }
+        public required string Category { get; set; }
+        public required string StockCode { get; set; }
+        public required decimal Price { get; set; }
+        public required int Quantity { get; set; }
+        public required string Description { get; set; }
+        public required string ImageUrl { get; set; }
     }
 }
+
+<style scoped>
+.pos {
+    bottom: 0px;
+    left: -20px;
+    transform: rotate(10deg);
+    poin
+}
+
+.tr1:hover {
+  transform: scale(1.05); 
+}
+
+.tr:hover {
+  transform: scale(1.15); 
+}
+
+fluent-number-field::part(step-up),
+fluent-number-field::part(step-down) {
+    display: none;
+}
+
+fluent-number-field::part(control) {
+    text-align: center;
+}
+
+</style>
