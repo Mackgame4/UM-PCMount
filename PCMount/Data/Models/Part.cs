@@ -3,7 +3,7 @@ namespace PCMount.Data.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("componentes")] // Explicitly map to the Componente table
+[Table("Componentes")] // Explicitly map to the Componente table
 public class Part
 {
     [Key]

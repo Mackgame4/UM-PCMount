@@ -3,7 +3,7 @@ namespace PCMount.Data.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("users")] // Explicitly map to a table
+[Table("Users")] // Explicitly map to a table
 public class User
 {
     [Key]

@@ -3,7 +3,7 @@ namespace PCMount.Data.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("inventario")] // Explicitly map to the Inventario table
+[Table("Inventario")] // Explicitly map to the Inventario table
 public class Inventario
 {
     [Key]
