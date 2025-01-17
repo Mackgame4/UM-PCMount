@@ -1,6 +1,9 @@
 @namespace PCMount.Components.UI
 @using Microsoft.FluentUI.AspNetCore.Components
 @using PCMount.Data.Models
+@using Microsoft.EntityFrameworkCore
+@using PCMount.Data
+@inject ApplicationDbContext DbContext
 @implements IDialogContentComponent<Computer>
 
 <FluentDialogHeader ShowDismiss="true">
@@ -16,9 +19,9 @@
         <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Motherboard" OnOptionsSearch="@(e => OnSearch(e, "Motherboard"))" Placeholder="Select Motherboard" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedMotherboards" />
         <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Processor" OnOptionsSearch="@(e => OnSearch(e, "Processor"))" Placeholder="Select Processor" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedProcessors" />
         <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Memory" OnOptionsSearch="@(e => OnSearch(e, "Memory"))" Placeholder="Select Memory" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedMemories" />
-        <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Graphics Card" OnOptionsSearch="@(e => OnSearch(e, "Graphics Card"))" Placeholder="Select Graphics Card" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedGraphicsCards" />
+        <FluentAutocomplete TOption="Part" AutoComplete="off" Label="GraphicsCard" OnOptionsSearch="@(e => OnSearch(e, "Graphics Card"))" Placeholder="Select Graphics Card" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedGraphicsCards" />
         <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Storage" OnOptionsSearch="@(e => OnSearch(e, "Storage"))" Placeholder="Select Storage" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedStorages" />
-        <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Power Supply" OnOptionsSearch="@(e => OnSearch(e, "Power Supply"))" Placeholder="Select Power Supply" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedPowerSupplies" />
+        <FluentAutocomplete TOption="Part" AutoComplete="off" Label="PowerSupply" OnOptionsSearch="@(e => OnSearch(e, "Power Supply"))" Placeholder="Select Power Supply" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedPowerSupplies" />
         <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Case" OnOptionsSearch="@(e => OnSearch(e, "Case"))" Placeholder="Select Case" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedCases" />
     </FluentStack>
 </FluentDialogBody>
@@ -42,30 +45,26 @@
     IEnumerable<Part> SelectedPowerSupplies = Array.Empty<Part>();
     IEnumerable<Part> SelectedCases = Array.Empty<Part>();
 
-    Part[] Components = [
-        new Part { PartId = 1, Name = "ASUS ROG Strix Z590-E", Preco = 300, Tipo = "Motherboard" },
-        new Part { PartId = 2, Name = "NVIDIA GeForce RTX 3080", Preco = 800, Tipo = "Graphics Card" },
-        new Part { PartId = 3, Name = "Intel Core i9-11900K", Preco = 700, Tipo = "Processor" },
-        new Part { PartId = 4, Name = "Corsair Vengeance RGB Pro", Preco = 200, Tipo = "Memory" },
-        new Part { PartId = 5, Name = "Samsung 970 EVO Plus", Preco = 200, Tipo = "Storage" },
-        new Part { PartId = 6, Name = "Corsair RM850x", Preco = 150, Tipo = "Power Supply" },
-        new Part { PartId = 7, Name = "NZXT H510", Preco = 100, Tipo = "Case" }
-    ];
+    Part[] Components = Array.Empty<Part>();
+
+    protected override async Task OnInitializedAsync() {
+        Components = await DbContext.Componentes.ToArrayAsync();
+    }
 
     private void OnSearch(OptionsSearchEventArgs<Part> e, string partType) {
         e.Items = Components
             .Where(part => part.Tipo == partType && part.Name.Contains(e.Text, StringComparison.OrdinalIgnoreCase));
     }
 
-    private decimal calculatePrice() {
-        decimal price = 0;
-        price += (decimal)(SelectedMotherboards.FirstOrDefault()?.Preco ?? 0);
-        price += (decimal)(SelectedProcessors.FirstOrDefault()?.Preco ?? 0);
-        price += (decimal)(SelectedMemories.FirstOrDefault()?.Preco ?? 0);
-        price += (decimal)(SelectedGraphicsCards.FirstOrDefault()?.Preco ?? 0);
-        price += (decimal)(SelectedStorages.FirstOrDefault()?.Preco ?? 0);
-        price += (decimal)(SelectedPowerSupplies.FirstOrDefault()?.Preco ?? 0);
-        price += (decimal)(SelectedCases.FirstOrDefault()?.Preco ?? 0);
+    private double calculatePrice() {
+        double price = 0;
+        price += (double)(SelectedMotherboards.FirstOrDefault()?.Preco ?? 0);
+        price += (double)(SelectedProcessors.FirstOrDefault()?.Preco ?? 0);
+        price += (double)(SelectedMemories.FirstOrDefault()?.Preco ?? 0);
+        price += (double)(SelectedGraphicsCards.FirstOrDefault()?.Preco ?? 0);
+        price += (double)(SelectedStorages.FirstOrDefault()?.Preco ?? 0);
+        price += (double)(SelectedPowerSupplies.FirstOrDefault()?.Preco ?? 0);
+        price += (double)(SelectedCases.FirstOrDefault()?.Preco ?? 0);
         return price;
     }
 

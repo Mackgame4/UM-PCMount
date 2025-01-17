@@ -8,6 +8,9 @@
 @attribute [AllowAnonymous]
 @attribute [StreamRendering]
 @inject IDialogService DialogService
+@using Microsoft.EntityFrameworkCore
+@using PCMount.Data
+@inject ApplicationDbContext DbContext
 @rendermode InteractiveServer
 <PageTitle>PCMount - Shop</PageTitle>
 
@@ -117,7 +120,11 @@
     }
 
     private void OrderCart() {
-        Console.WriteLine($"Ordered {cart!.Count} products");
+        foreach (var product in cart!) {
+            DbContext.Orders.Add(product);
+        }
+        DbContext.SaveChanges();
+        cart!.Clear();
     }
 
     private string searchTerm = string.Empty;

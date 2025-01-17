@@ -3,6 +3,8 @@ namespace PCMount.Data.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+public enum PartTipo { Processor, Motherboard, GraphicsCard, Memory, Storage, PowerSupply, Case }
+
 [Table("Componentes")] // Explicitly map to the Componente table
 public class Part
 {
@@ -23,8 +25,8 @@ public class Part
 
     [Required]
     [Column("Tipo")]
-    [StringLength(45)]
-    public required string Tipo { get; set; }
+    [EnumDataType(typeof(PartTipo))]
+    public required PartTipo Tipo { get; set; }
 
     [Column("Descricao")]
     [StringLength(600)]

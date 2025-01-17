@@ -3,7 +3,7 @@ namespace PCMount.Data.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("Computers")] // Explicitly map to the Inventario table
+[Table("Orders")]
 public class Computer {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -17,10 +17,11 @@ public class Computer {
 
     [Required]
     [Column("Price")]
-    public required decimal Price { get; set; }
+    [DataType(DataType.Currency)]
+    public required double Price { get; set; }
 
     [Column("Discount")]
-    public decimal? Discount { get; set; }
+    public double? Discount { get; set; }
 
     [Column("Description")]
     [StringLength(255)]
