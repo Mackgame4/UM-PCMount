@@ -7,6 +7,7 @@
 @attribute [Authorize(Roles = "Admin, User")]
 @attribute [AllowAnonymous]
 @attribute [StreamRendering]
+@rendermode InteractiveServer
 <PageTitle>PCMount - Shop</PageTitle>
 
 <FluentToolbar class="py-2 sticky top-0 z-10">
@@ -14,7 +15,9 @@
     <FluentButton IconEnd="@(new Icons.Regular.Size16.Filter())">Filters</FluentButton>
     <FluentButton IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Lightweight">Order Custom Build</FluentButton>
     <FluentSpacer />
-    <FluentButton IconStart="@(new Icons.Regular.Size16.Cart())"></FluentButton>
+    <FluentCounterBadge Count="@cart?.Count" Appearance="Appearance.Accent">
+        <FluentButton id="notificationsPopover" IconStart="@(new Icons.Regular.Size16.Cart())" @onclick="() => _visibleNotificationsPopover = !_visibleNotificationsPopover"></FluentButton>
+    </FluentCounterBadge>
     <AuthorizeView>
         <NotAuthorized>
             <NavLink href="/login" Match="NavLinkMatch.All">
@@ -39,17 +42,46 @@
     } else {
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
             @foreach (var product in computers!) {
-                <ProductCard ProductName="@product.Name" ProductPrice="@product.Price" ProductImage="@product.Image" ProductDiscount="@product.Discount" />
+                <ProductCard Product="@product" OnAddToCart="AddToCart" />
             }
         </div>
     }
 </div>
 
+<FluentPopover class="rounded-md w-80" VerticalThreshold="170" AnchorId="notificationsPopover" @bind-Open="_visibleNotificationsPopover">
+    <Header>@(new Emojis.Objects.Color.Default.ShoppingCart().ToMarkup("20px")) Cart</Header>
+    <Body>
+        @if (cart == null || cart.Count == 0) {
+            <span class="flex items-center gap-2 text-lg">@(new Microsoft.FluentUI.AspNetCore.Components.Emojis.Symbols.Color.Default.Warning().ToMarkup("20px")) Cart is empty</span>
+        } else {
+            <div class="flex flex-col gap-2 p-4">
+            @foreach (var product in cart) {
+                <div class="flex justify-between items-center gap-2">
+                    <div class="flex gap-2 items-center">
+                        <img src="@product.Image" class="w-12 h-12 rounded-md" />
+                        <div class="flex flex-col gap-1">
+                            <span>@product.Name</span>
+                            <FluentBadge Fill="highlight" BackgroundColor="#166534" Color="white" style="width: fit-content;">$@product.Price</FluentBadge>
+                        </div>
+                    </div>
+                    <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" Appearance="Appearance.Lightweight" @onclick="() => RemoveFromCart(product)"></FluentButton>
+                </div>
+            }
+        }
+        </div>
+    </Body>
+    <Footer>
+        <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.ShoppingBag())" Appearance="Appearance.Lightweight" @onclick="OrderCart">Confirm Order</FluentButton>
+    </Footer>
+</FluentPopover>
+
 @code {
+    bool _visibleNotificationsPopover;
     private List<Computer>? computers;
 
-    protected override async Task OnInitializedAsync() {
-        await Task.Delay(500);
+    private List<Computer>? cart = new List<Computer>();
+
+    protected override Task OnInitializedAsync() {
         computers = new List<Computer> {
             new Computer { Name = "NZXT H5 Gaming Elite", Price = 1000, Image = "/assets/cdn/computer-nzxt-h5.png", Discount = 10 },
             new Computer { Name = "Panorama Glass Gaming", Price = 2000, Image = "/assets/cdn/computer-panorama-gaming.png" },
@@ -58,5 +90,17 @@
             new Computer { Name = "CyberPower MultiColor", Price = 1000, Image = "/assets/cdn/computer-cyberpower-pc.png" },
             new Computer { Name = "Corsair Vengeance", Price = 1000, Image = "/assets/cdn/computer-vengeance-i5200.png" },
         };
+    }
+
+    private void AddToCart(Computer product) {
+        cart!.Add(product);
+    }
+
+    private void RemoveFromCart(Computer product) {
+        cart!.Remove(product);
+    }
+
+    private void OrderCart() {
+        Console.WriteLine($"Ordered {cart!.Count} products");
     }
 }

@@ -1,17 +1,19 @@
 @namespace PCMount.Components.UI
 
 @using Microsoft.FluentUI.AspNetCore.Components
+@using PCMount.Data.Models
+@rendermode InteractiveServer
 
 <FluentCard MinimalStyle="true" class="relative flex flex-col justify-between items-center text-center gap-2 h-full">
     <div class="w-36 h-36 rounded-md">
-        <img src="@ProductImage" class="object-cover w-full h-full rounded-md" />
+        <img src="@Product!.Image" class="object-cover w-full h-full rounded-md" />
     </div>
-    @if (ProductDiscount > 0)
+    @if (Product!.Discount > 0)
     {
-        <FluentBadge Fill="highlight" BackgroundColor="#991b1b" Color="white" Class="absolute top-3 left-3">-@ProductDiscount%</FluentBadge>
+        <FluentBadge Fill="highlight" BackgroundColor="#991b1b" Color="white" Class="absolute top-3 left-3">-@Product!.Discount%</FluentBadge>
     }
-    <FluentBadge Fill="highlight" BackgroundColor="#166534" Color="white" Class="absolute top-3 right-3">$@ProductPrice</FluentBadge>
-    <h3 class="mb-0">@ProductName</h3>
+    <FluentBadge Fill="highlight" BackgroundColor="#166534" Color="white" Class="absolute top-3 right-3">$@Product!.Price</FluentBadge>
+    <h3 class="mb-0">@Product!.Name</h3>
     <div class="mt-auto">
         <div class="flex flex-col gap-1 justify-start items-start text-left text-sm mb-1.5">
             <span><FluentBadge Appearance="Appearance.Neutral">Motherboard:</FluentBadge> Motherboard</span>
@@ -19,21 +21,19 @@
             <span><FluentBadge Appearance="Appearance.Neutral">GPU:</FluentBadge> GPU</span>
         </div>
         <div class="mt-2 w-full">
-            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.Cart())" Appearance="Appearance.Accent">Add to Cart</FluentButton>
+            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.Cart())" Appearance="Appearance.Accent" OnClick="@(() => AddToCart(Product))">Add to Cart</FluentButton>
         </div>
     </div>
 </FluentCard>
 
 @code {
     [Parameter]
-    public string? ProductName { get; set; } = "ProductName";
+    public Computer? Product { get; set; } = null;
 
     [Parameter]
-    public decimal ProductPrice { get; set; } = 0;
+    public EventCallback<Computer> OnAddToCart { get; set; }
 
-    [Parameter]
-    public string? ProductImage { get; set; } = "/assets/product-placeholder.png";
-
-    [Parameter]
-    public decimal? ProductDiscount { get; set; } = 0;
+    private void AddToCart(Computer product) {
+        OnAddToCart.InvokeAsync(product);
+    }
 }
