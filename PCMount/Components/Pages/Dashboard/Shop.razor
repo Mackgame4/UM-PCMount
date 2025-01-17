@@ -125,7 +125,6 @@ else
     private List<Product>? filteredProducts; // Filtered list of products
     private Product? selectedProduct;
     private List<Part>? existentComponents;
-
     private string searchTerm = string.Empty; // Search term
 
     protected override async Task OnInitializedAsync()
@@ -138,7 +137,7 @@ else
         products = existentComponents.Select(i => new Product
         {
             Name = i.Name,
-            Category = i.Tipo.ToString(), // Assuming "Type" maps to "Category"
+            Category = i.Tipo.ToString() == "GraphicsCard" ? "Graphics Card" : i.Tipo.ToString() == "PowerSupply" ? "Power Supply" : i.Tipo.ToString(), // Assuming "Type" maps to "Category"
             StockCode = i.PartId.ToString(), // Use PartId as StockCode
             Price = (decimal)i.Preco, // Convert float to decimal
             Quantity = 0,
