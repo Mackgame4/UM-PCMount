@@ -2,31 +2,38 @@
 
 @using Microsoft.FluentUI.AspNetCore.Components
 
-<FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2">
-    <FluentButton class="absolute top-2 left-2" IconStart="@(new Icons.Regular.Size16.Info())" Appearance="Appearance.Lightweight"></FluentButton>
-    <div class="w-36 rounded-md">
-        <img src="/assets/product-placeholder.png" class="object-cover w-full h-full rounded-md" />
+<FluentCard MinimalStyle="true" class="relative flex flex-col justify-between items-center text-center gap-2 h-full">
+    <div class="w-36 h-36 rounded-md">
+        <img src="@ProductImage" class="object-cover w-full h-full rounded-md" />
     </div>
-    <h3 class="-mb-2">ProductName</h3>
-    <span>Brand - Model</span>
-    <FluentBadge Appearance="Appearance.Lightweight">#ProductUID</FluentBadge>
-    <div class="flex flex-row gap-2 justify-center items-center text-center">
-        <span>Price:</span><FluentBadge Appearance="Appearance.Neutral">$999</FluentBadge>
-        <FluentSpacer />
-        <!-- TODO: Only show when you have more that one of that product -->
-        <span>Cost:</span><FluentBadge Appearance="Appearance.Neutral"><span class="text-red-500">$999</span></FluentBadge>
+    @if (ProductDiscount > 0)
+    {
+        <FluentBadge Fill="highlight" BackgroundColor="#991b1b" Color="white" Class="absolute top-3 left-3">-@ProductDiscount%</FluentBadge>
+    }
+    <FluentBadge Fill="highlight" BackgroundColor="#166534" Color="white" Class="absolute top-3 right-3">$@ProductPrice</FluentBadge>
+    <h3 class="mb-0">@ProductName</h3>
+    <div class="mt-auto">
+        <div class="flex flex-col gap-1 justify-start items-start text-left text-sm mb-1.5">
+            <span><FluentBadge Appearance="Appearance.Neutral">Motherboard:</FluentBadge> Motherboard</span>
+            <span><FluentBadge Appearance="Appearance.Neutral">CPU:</FluentBadge> CPU</span>
+            <span><FluentBadge Appearance="Appearance.Neutral">GPU:</FluentBadge> GPU</span>
+        </div>
+        <div class="mt-2 w-full">
+            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.Cart())" Appearance="Appearance.Accent">Add to Cart</FluentButton>
+        </div>
     </div>
-    <div class="w-full flex flex-row gap-1.5 justify-center items-center text-center">
-        <FluentButton IconStart="@(new Icons.Regular.Size16.Subtract())" Appearance="Appearance.Neutral"></FluentButton>
-        <FluentNumberField @bind-Value="exampleInt" />
-        <FluentButton IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Neutral"></FluentButton>
-    </div>
-    <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.Cart())" Appearance="Appearance.Accent">Order</FluentButton>
 </FluentCard>
 
 @code {
     [Parameter]
-    public string Title { get; set; } = "Waiting";
+    public string? ProductName { get; set; } = "ProductName";
 
-    int exampleInt = 0;
+    [Parameter]
+    public decimal ProductPrice { get; set; } = 0;
+
+    [Parameter]
+    public string? ProductImage { get; set; } = "/assets/product-placeholder.png";
+
+    [Parameter]
+    public decimal? ProductDiscount { get; set; } = 0;
 }
