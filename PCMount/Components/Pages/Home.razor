@@ -139,7 +139,7 @@
                 Status = OrderStatus.Pending,
                 Name = product.Name,
                 Price = product.Price,
-                Discount = product.Discount,
+                Discount = product.Discount ?? 0,
                 Image = product.Image,
                 MotherboardId = product.MotherboardId,
                 ProcessorId = product.ProcessorId,
@@ -186,7 +186,7 @@
             Console.WriteLine($"Dialog closed - Custom Build: {customBuild?.Name}");
             Console.WriteLine($"Dialog closed - Price: {customBuild?.Price}");
             if (customBuild != null) {
-                cart!.Add(customBuild);
+                AddToCart(customBuild);
             }
         } else {
             Console.WriteLine($"Dialog closed - Canceled: {result.Cancelled}");

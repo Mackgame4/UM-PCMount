@@ -38,31 +38,17 @@
     public FluentDialog? Dialog { get; set; }
 
     IEnumerable<Part> SelectedMotherboards = Array.Empty<Part>();
-    private Part? SelectedMotherboard;
     IEnumerable<Part> SelectedProcessors = Array.Empty<Part>();
-    private Part? SelectedProcessor;
     IEnumerable<Part> SelectedMemories = Array.Empty<Part>();
-    private Part? SelectedMemory;
     IEnumerable<Part> SelectedGraphicsCards = Array.Empty<Part>();
-    private Part? SelectedGraphicsCard;
     IEnumerable<Part> SelectedStorages = Array.Empty<Part>();
-    private Part? SelectedStorage;
     IEnumerable<Part> SelectedPowerSupplies = Array.Empty<Part>();
-    private Part? SelectedPowerSupply;
     IEnumerable<Part> SelectedCases = Array.Empty<Part>();
-    private Part? SelectedCase;
 
     Part[] Components = Array.Empty<Part>();
 
     protected override async Task OnInitializedAsync() {
         Components = await DbContext.Componentes.ToArrayAsync();
-        SelectedMotherboard = SelectedMotherboards.FirstOrDefault();
-        SelectedProcessor = SelectedProcessors.FirstOrDefault();
-        SelectedMemory = SelectedMemories.FirstOrDefault();
-        SelectedGraphicsCard = SelectedGraphicsCards.FirstOrDefault();
-        SelectedStorage = SelectedStorages.FirstOrDefault();
-        SelectedPowerSupply = SelectedPowerSupplies.FirstOrDefault();
-        SelectedCase = SelectedCases.FirstOrDefault();
     }
 
     private void OnSearch(OptionsSearchEventArgs<Part> e, string partType) {
@@ -70,19 +56,12 @@
     }
 
     private double calculatePrice() {
-        double price = 0;
-        price += SelectedMotherboard?.Preco ?? 0;
-        price += SelectedProcessor?.Preco ?? 0;
-        price += SelectedMemory?.Preco ?? 0;
-        price += SelectedGraphicsCard?.Preco ?? 0;
-        price += SelectedStorage?.Preco ?? 0;
-        price += SelectedPowerSupply?.Preco ?? 0;
-        price += SelectedCase?.Preco ?? 0;
+        double price = (SelectedMotherboards.FirstOrDefault()?.Preco ?? 0) + (SelectedProcessors.FirstOrDefault()?.Preco ?? 0) + (SelectedMemories.FirstOrDefault()?.Preco ?? 0) + (SelectedGraphicsCards.FirstOrDefault()?.Preco ?? 0) + (SelectedStorages.FirstOrDefault()?.Preco ?? 0) + (SelectedPowerSupplies.FirstOrDefault()?.Preco ?? 0) + (SelectedCases.FirstOrDefault()?.Preco ?? 0);
         return price;
     }
 
     private async Task SaveAsync() {
-        Content = new Computer { Name = "Custom Build", Price = calculatePrice(), Image = "/assets/cdn/computer-custom-build.png", Motherboard = SelectedMotherboard!, Processor = SelectedProcessor!, Memory = SelectedMemory!, GraphicsCard = SelectedGraphicsCard!, Storage = SelectedStorage!, PowerSupply = SelectedPowerSupply!, Case = SelectedCase! };
+        Content = new Computer { Name = "Custom Build", Price = calculatePrice(), Image = "/assets/cdn/computer-custom-build.png", MotherboardId = SelectedMotherboards.FirstOrDefault()?.PartId, ProcessorId = SelectedProcessors.FirstOrDefault()?.PartId, MemoryId = SelectedMemories.FirstOrDefault()?.PartId, GraphicsCardId = SelectedGraphicsCards.FirstOrDefault()?.PartId, StorageId = SelectedStorages.FirstOrDefault()?.PartId, PowerSupplyId = SelectedPowerSupplies.FirstOrDefault()?.PartId, CaseId = SelectedCases.FirstOrDefault()?.PartId, Motherboard = SelectedMotherboards.FirstOrDefault(), Processor = SelectedProcessors.FirstOrDefault(), Memory = SelectedMemories.FirstOrDefault(), GraphicsCard = SelectedGraphicsCards.FirstOrDefault(), Storage = SelectedStorages.FirstOrDefault(), PowerSupply = SelectedPowerSupplies.FirstOrDefault(), Case = SelectedCases.FirstOrDefault() };
         Console.WriteLine($"Motherboard: {Content.Motherboard?.Name}");
         Console.WriteLine($"Processor: {Content.Processor?.Name}");
         Console.WriteLine($"Memory: {Content.Memory?.Name}");
