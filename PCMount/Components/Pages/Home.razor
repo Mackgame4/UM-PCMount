@@ -94,20 +94,14 @@
 
 @code {
     private bool _visibleNotificationsPopover;
-    private static List<Computer>? computers = new List<Computer> {
-        new Computer { Name = "NZXT H5 Gaming Elite", Price = 1000, Image = "/assets/cdn/computer-nzxt-h5.png", Discount = 10, MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9 },
-        new Computer { Name = "Panorama Glass Gaming", Price = 2000, Image = "/assets/cdn/computer-panorama-gaming.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9 },
-        new Computer { Name = "Periphio Astral 5600G", Price = 1500, Image = "/assets/cdn/computer-periphio-astral-5600g.png", Discount = 25, MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9 },
-        new Computer { Name = "Elite AvaDirect 3687Y", Price = 1500, Image = "/assets/cdn/computer-elite-avadirect.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9 },
-        new Computer { Name = "CyberPower MultiColor", Price = 1000, Image = "/assets/cdn/computer-cyberpower-pc.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9 },
-        new Computer { Name = "Corsair Vengeance", Price = 1000, Image = "/assets/cdn/computer-vengeance-i5200.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9 },
-    };
+    private Computer[]? computers;
     private List<Computer>? filteredProducts = new List<Computer>();
     private List<Computer>? cart = new List<Computer>();
 
     protected override async Task OnInitializedAsync() {
         Part[] components = await DbContext.Componentes.ToArrayAsync() ?? Array.Empty<Part>();
-        computers!.ForEach(c => {
+        computers = await DbContext.Computers.ToArrayAsync() ?? Array.Empty<Computer>();
+        foreach (var c in computers!) {
             c.Motherboard = components.FirstOrDefault(p => p.PartId == c.MotherboardId);
             c.Processor = components.FirstOrDefault(p => p.PartId == c.ProcessorId);
             c.Memory = components.FirstOrDefault(p => p.PartId == c.MemoryId);
@@ -115,8 +109,8 @@
             c.Storage = components.FirstOrDefault(p => p.PartId == c.StorageId);
             c.PowerSupply = components.FirstOrDefault(p => p.PartId == c.PowerSupplyId);
             c.Case = components.FirstOrDefault(p => p.PartId == c.CaseId);
-        });
-        filteredProducts = computers;
+        }
+        DefaultSearchProducts();
     }
 
     private void AddToCart(Computer product) {
@@ -129,16 +123,34 @@
 
     private void OrderCart() {
         foreach (var product in cart!) {
-            DbContext.Orders.Add(product);
+            Order order = new() {
+                Status = OrderStatus.Pending,
+                Name = product.Name,
+                Price = product.Price,
+                Discount = product.Discount,
+                Image = product.Image,
+                MotherboardId = product.MotherboardId,
+                ProcessorId = product.ProcessorId,
+                MemoryId = product.MemoryId,
+                GraphicsCardId = product.GraphicsCardId,
+                StorageId = product.StorageId,
+                PowerSupplyId = product.PowerSupplyId,
+                CaseId = product.CaseId
+            };
+            DbContext.Orders.Add(order);
         }
         DbContext.SaveChanges();
         cart!.Clear();
     }
 
+    private void DefaultSearchProducts() {
+        filteredProducts = computers?.ToList();
+    }
+
     private string searchTerm = string.Empty;
     private void OnSearchInput() {
         if (string.IsNullOrWhiteSpace(searchTerm)) {
-            filteredProducts = computers;
+            DefaultSearchProducts();
             searchTerm = string.Empty;
         } else {
             filteredProducts = computers?.Where(p => p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();

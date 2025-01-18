@@ -19,9 +19,9 @@
         <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Motherboard" OnOptionsSearch="@(e => OnSearch(e, "Motherboard"))" Placeholder="Select Motherboard" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedMotherboards" />
         <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Processor" OnOptionsSearch="@(e => OnSearch(e, "Processor"))" Placeholder="Select Processor" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedProcessors" />
         <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Memory" OnOptionsSearch="@(e => OnSearch(e, "Memory"))" Placeholder="Select Memory" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedMemories" />
-        <FluentAutocomplete TOption="Part" AutoComplete="off" Label="GraphicsCard" OnOptionsSearch="@(e => OnSearch(e, "Graphics Card"))" Placeholder="Select Graphics Card" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedGraphicsCards" />
+        <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Graphics Card" OnOptionsSearch="@(e => OnSearch(e, "GraphicsCard"))" Placeholder="Select Graphics Card" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedGraphicsCards" />
         <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Storage" OnOptionsSearch="@(e => OnSearch(e, "Storage"))" Placeholder="Select Storage" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedStorages" />
-        <FluentAutocomplete TOption="Part" AutoComplete="off" Label="PowerSupply" OnOptionsSearch="@(e => OnSearch(e, "Power Supply"))" Placeholder="Select Power Supply" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedPowerSupplies" />
+        <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Power Supply" OnOptionsSearch="@(e => OnSearch(e, "PowerSupply"))" Placeholder="Select Power Supply" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedPowerSupplies" />
         <FluentAutocomplete TOption="Part" AutoComplete="off" Label="Case" OnOptionsSearch="@(e => OnSearch(e, "Case"))" Placeholder="Select Case" MaximumOptionsSearch="int.MaxValue" MaximumSelectedOptions="1" OptionText="@(item => item.Name)" @bind-SelectedOptions="SelectedCases" />
     </FluentStack>
 </FluentDialogBody>
@@ -70,7 +70,14 @@
     }
 
     private double calculatePrice() {
-        double price = (SelectedMotherboard?.Preco ?? 0) + (SelectedProcessor?.Preco ?? 0) + (SelectedMemory?.Preco ?? 0) + (SelectedGraphicsCard?.Preco ?? 0) + (SelectedStorage?.Preco ?? 0) + (SelectedPowerSupply?.Preco ?? 0) + (SelectedCase?.Preco ?? 0);
+        double price = 0;
+        price += SelectedMotherboard?.Preco ?? 0;
+        price += SelectedProcessor?.Preco ?? 0;
+        price += SelectedMemory?.Preco ?? 0;
+        price += SelectedGraphicsCard?.Preco ?? 0;
+        price += SelectedStorage?.Preco ?? 0;
+        price += SelectedPowerSupply?.Preco ?? 0;
+        price += SelectedCase?.Preco ?? 0;
         return price;
     }
 
