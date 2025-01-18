@@ -71,7 +71,7 @@
     <Header>@(new Emojis.Objects.Color.Default.ShoppingCart().ToMarkup("20px")) Cart</Header>
     <Body>
         @if (cart == null || cart.Count == 0) {
-            <span class="flex items-center gap-2 text-lg">@(new Microsoft.FluentUI.AspNetCore.Components.Emojis.Symbols.Color.Default.Warning().ToMarkup("20px")) Cart is empty</span>
+            <span class="flex items-center gap-2 text-lg">@(new Microsoft.FluentUI.AspNetCore.Components.Emojis.Symbols.Color.Default.Warning().ToMarkup("20px")) Cart is empty.</span>
         } else {
             <div class="flex flex-col gap-2 p-4">
             @foreach (var product in cart) {

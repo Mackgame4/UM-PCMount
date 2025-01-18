@@ -2,6 +2,11 @@
 
 @using Microsoft.FluentUI.AspNetCore.Components
 @inject NavigationManager Navigation
+@using Microsoft.EntityFrameworkCore
+@using PCMount.Data.Models
+@using PCMount.Data
+@inject ApplicationDbContext DbContext
+@attribute [StreamRendering]
 @rendermode InteractiveServer
 
 <div class="flex flex-col relative w-full">
@@ -70,10 +75,30 @@
 <FluentPopover class="rounded-md w-80" VerticalThreshold="170" AnchorId="notificationsPopover" @bind-Open="_visibleNotificationsPopover">
     <Header>@(new Emojis.Objects.Color.Default.OutboxTray().ToMarkup("20px")) Orders</Header>
     <Body>
-        <span>Popover</span>
+        @if (orders == null || orders.Length == 0) {
+            <span class="flex items-center gap-2 text-lg">@(new Microsoft.FluentUI.AspNetCore.Components.Emojis.Symbols.Color.Default.Warning().ToMarkup("20px")) No orders found.</span>
+        } else {
+            <div class="flex flex-col gap-2 p-4">
+                @foreach (var order in orders) {
+                    <div class="flex justify-between items-center gap-2">
+                        <div class="flex gap-2 items-center">
+                            <img src="@order.Image" class="w-12 h-12 rounded-md" />
+                            <div class="flex flex-col gap-1">
+                                <span>@order.OrderId - @order.Name</span>
+                                <div class="flex gap-1.5 items-center">
+                                    <FluentBadge Fill="highlight" BackgroundColor="#166534" Color="white" style="width: fit-content;">$@order.Price</FluentBadge>
+                                    <FluentBadge Fill="highlight" BackgroundColor="#166534" Color="white" style="width: fit-content;">@order.Status</FluentBadge>
+                                </div>
+                            </div>
+                        </div>
+                        <FluentButton IconStart="@(new Icons.Regular.Size20.ArrowRight())" Appearance="Appearance.Lightweight" @onclick="() => Navigation.NavigateTo(getOrderAssemblyPath(order.OrderId))"></FluentButton>
+                    </div>
+                }
+            </div>
+        }
     </Body>
     <Footer>
-        <FluentButton class="w-full" Appearance="Appearance.Lightweight">View all</FluentButton>
+        <!--<FluentButton class="w-full" Appearance="Appearance.Lightweight">View all</FluentButton>-->
     </Footer>
 </FluentPopover>
 
@@ -83,15 +108,13 @@
     public DesignThemeModes Mode { get; set; }
     public OfficeColor? OfficeColor { get; set; }
 
-    public class PageMetadata
-    {
+    public class PageMetadata {
         public required string Path { get; set; }
         public required string Title { get; set; }
         public required Microsoft.FluentUI.AspNetCore.Components.Icon Icon { get; set; }
     }
 
-    private List<PageMetadata> pagesmetadata = new List<PageMetadata>
-    {
+    private List<PageMetadata> pagesmetadata = new List<PageMetadata> {
         new PageMetadata { Path = "/dashboard", Title = "Dashboard", Icon = new Icons.Regular.Size20.Home() },
         new PageMetadata { Path = "/dashboard/shop", Title = "Parts Shop", Icon = new Icons.Regular.Size20.Cart() },
         new PageMetadata { Path = "/dashboard/inventory", Title = "Inventory", Icon = new Icons.Regular.Size20.Box() },
@@ -99,8 +122,7 @@
     };
 
     private RenderFragment RenderMenuOptions => @<FluentStack Orientation="Orientation.Horizontal" Width="100%">
-        @foreach (var pagemetadata in pagesmetadata)
-        {
+        @foreach (var pagemetadata in pagesmetadata) {
             <NavLink class="w-full" href="@pagemetadata.Path" Match="NavLinkMatch.All">
                 <FluentButton class="w-full hidden sm:inline-flex" IconStart="@pagemetadata.Icon" Appearance="Appearance.Lightweight">@pagemetadata.Title</FluentButton>
                 <FluentButton class="w-full inline-flex sm:hidden" IconStart="@pagemetadata.Icon" Appearance="Appearance.Lightweight"></FluentButton>
@@ -109,12 +131,15 @@
     </FluentStack>;
 
     private string? CurrentPageTitle { get; set; }
+    private Order[]? orders;
 
-    protected override void OnInitialized() // When component is loaded
-    {
+    // When component is loaded
+    protected override async void OnInitialized() {
         base.OnInitialized();
         SetPageTitle();
         Navigation.LocationChanged += (sender, args) => SetPageTitle();  // Listen for navigation changes
+        // Load orders
+        orders = await DbContext.Orders.ToArrayAsync() ?? null;
     }
 
     private void SetPageTitle() {
@@ -122,5 +147,9 @@
         var page = pagesmetadata.FirstOrDefault(p => uri.EndsWith(p.Path));
         CurrentPageTitle = page?.Title ?? pagesmetadata[0].Title; // Default to "Dashboard" if no match found
         StateHasChanged(); // Trigger UI update
+    }
+
+    private string getOrderAssemblyPath(int orderId) {
+        return $"/dashboard/assembly/{orderId}";
     }
 }
