@@ -14,7 +14,7 @@
 @rendermode InteractiveServer
 <PageTitle>PCMount - Shop</PageTitle>
 
-<main class="fixed z-10"
+<main class="fixed z-20"
     <FluentDialogProvider />
 </main>
 <FluentToolbar class="py-2 sticky top-0 z-10 px-8 shadow-lg rounded-md">
@@ -35,14 +35,18 @@
         <NotAuthorized>
             <NavLink href="/login" Match="NavLinkMatch.All">
                 <FluentButton IconStart="@(new Icons.Regular.Size20.Person())" Appearance="Appearance.Accent">
-                    Login
+                    <span class="text-lg pr-1">
+                        Login
+                    </span>
                 </FluentButton>
             </NavLink>
         </NotAuthorized>
         <Authorized>
             <NavLink href="/dashboard" Match="NavLinkMatch.All">
-                <FluentButton class="text-lg" IconStart="@(new Icons.Regular.Size24.Board())" Appearance="Appearance.Lightweight">
-                    Dashboard
+                <FluentButton IconStart="@(new Icons.Regular.Size24.Board())" Appearance="Appearance.Lightweight">
+                    <span class="text-lg">
+                        Dashboard
+                    </span>
                 </FluentButton>
             </NavLink>
         </Authorized>
