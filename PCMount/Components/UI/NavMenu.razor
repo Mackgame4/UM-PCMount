@@ -139,7 +139,6 @@
 
     private string? CurrentPageTitle { get; set; }
     private Order[]? orders;
-    private bool isOrdersLoaded = false;
 
     // When component is loaded
     protected override async void OnInitialized() {
@@ -152,7 +151,6 @@
 
     private async Task LoadOrdersAsync() {
         orders = await OrdersDb.GetArrayAsync(); // Fetch orders from database
-        isOrdersLoaded = true; // Mark orders as loaded
         StateHasChanged(); // Trigger UI update
     }
 
