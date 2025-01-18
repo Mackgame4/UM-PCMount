@@ -1,6 +1,5 @@
-namespace PCMount.Services;
+namespace PCMount.Services.Database;
 
-using System;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using PCMount.Data;

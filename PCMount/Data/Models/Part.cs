@@ -5,9 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 public enum PartTipo { Processor, Motherboard, GraphicsCard, Memory, Storage, PowerSupply, Case }
 
-[Table("Componentes")] // Explicitly map to the Componente table
-public class Part
-{
+[Table("Componentes")]
+public class Part {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Column("PartId")]

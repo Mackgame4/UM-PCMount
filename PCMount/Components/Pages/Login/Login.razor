@@ -1,15 +1,11 @@
 @page "/login"
 <PageTitle>PCMount - Login</PageTitle>
 
-@using PCMount.Data.Models
-
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
-@using Microsoft.FluentUI.AspNetCore.Components
+
 @inject NavigationManager NavigationManager
-@using PCMount.Data
-@using PCMount.Services
 @inject UsersService UsersDb
 
 <FluentDialog>

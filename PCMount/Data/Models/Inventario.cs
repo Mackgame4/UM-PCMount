@@ -4,12 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 [Table("Inventario")] // Explicitly map to the Inventario table
-public class Inventario
-{
+public class Inventario {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [ForeignKey("Part")] // Explicitly define the foreign key
-    [Column("PartId")]
+    [Column("PartId")] // Maps to PartId in the table
     public int PartId { get; set; } // Foreign and primary key to Componente
 
     [Required]

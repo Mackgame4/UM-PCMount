@@ -38,7 +38,7 @@ fluent-anchored-region {
 * {
     box-sizing: border-box;
     scrollbar-width: thin;
-    scrollbar-color: hsl(var(--neutral-fill-layer-rest)) transparent;
+    scrollbar-color: var(--accent-fill-rest) transparent;
 }
 
 *:focus {
@@ -50,7 +50,7 @@ fluent-anchored-region {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: hsl(var(--border));
+    background: var(--accent-fill-rest);
     border-radius: 5px;
 }
 

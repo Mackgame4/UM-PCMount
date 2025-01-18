@@ -1,6 +1,5 @@
-namespace PCMount.Services;
+namespace PCMount.Services.Database;
 
-using System;
 using System.Linq.Expressions;
 
 public interface IDbContextAcessor<T> where T : class {

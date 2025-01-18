@@ -2,8 +2,7 @@ namespace PCMount.Data.Models;
 
 using System.ComponentModel.DataAnnotations;
 
-public class LoginViewModel
-{
+public class LoginViewModel {
     [Required(AllowEmptyStrings = false, ErrorMessage = "Username is required!")]
     public string? UserName { get; set; }
 
