@@ -90,7 +90,7 @@
         }
     </Body>
     <Footer>
-        <span><b>Total:</b> $@(cart?.Sum(x => x.Price) - (cart?.Sum(x => x.Price) * cart?.Sum(x => x.Discount) / 100))</span>
+        <span><b>Total:</b> $@(calculateTotalPrice(cart))</span>
         <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.ShoppingBag())" Appearance="Appearance.Lightweight" @onclick="OrderCart">Confirm Order</FluentButton>
     </Footer>
 </FluentPopover>
@@ -122,6 +122,14 @@
 
     private void RemoveFromCart(Computer product) {
         cart!.Remove(product);
+    }
+
+    private double calculateTotalPrice(List<Computer> cart) {
+        double total = 0;
+        foreach (var product in cart) {
+            total += product.Price - (product.Price * (product.Discount ?? 0) / 100);
+        }
+        return total;
     }
 
     private async Task OrderCart() {

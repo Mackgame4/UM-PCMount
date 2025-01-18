@@ -3,7 +3,7 @@ namespace PCMount.Data.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public enum OrderStatus { Done, Pending, Canceled }
+public enum OrderStatus { Done, Started, Pending, Canceled }
 
 [Table("Orders")]
 public class Order : ComputerComponents {
