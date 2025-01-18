@@ -1,2 +1,2 @@
 - [ ] Add Mobile Support
-- [ ] Limit the number of orders in the list and show all in the page
+- [ ] Fix main page price with discount calculation
