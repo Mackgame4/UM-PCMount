@@ -62,14 +62,14 @@
 
     private async Task SaveAsync() {
         Content = new Computer { Name = "Custom Build", Price = calculatePrice(), Image = "/assets/cdn/computer-custom-build.png", MotherboardId = SelectedMotherboards.FirstOrDefault()?.PartId, ProcessorId = SelectedProcessors.FirstOrDefault()?.PartId, MemoryId = SelectedMemories.FirstOrDefault()?.PartId, GraphicsCardId = SelectedGraphicsCards.FirstOrDefault()?.PartId, StorageId = SelectedStorages.FirstOrDefault()?.PartId, PowerSupplyId = SelectedPowerSupplies.FirstOrDefault()?.PartId, CaseId = SelectedCases.FirstOrDefault()?.PartId, Motherboard = SelectedMotherboards.FirstOrDefault(), Processor = SelectedProcessors.FirstOrDefault(), Memory = SelectedMemories.FirstOrDefault(), GraphicsCard = SelectedGraphicsCards.FirstOrDefault(), Storage = SelectedStorages.FirstOrDefault(), PowerSupply = SelectedPowerSupplies.FirstOrDefault(), Case = SelectedCases.FirstOrDefault() };
-        Console.WriteLine($"Motherboard: {Content.Motherboard?.Name}");
+        /*Console.WriteLine($"Motherboard: {Content.Motherboard?.Name}");
         Console.WriteLine($"Processor: {Content.Processor?.Name}");
         Console.WriteLine($"Memory: {Content.Memory?.Name}");
         Console.WriteLine($"Graphics Card: {Content.GraphicsCard?.Name}");
         Console.WriteLine($"Storage: {Content.Storage?.Name}");
         Console.WriteLine($"Power Supply: {Content.PowerSupply?.Name}");
         Console.WriteLine($"Case: {Content.Case?.Name}");
-        Console.WriteLine($"Price: {Content.Price}");
+        Console.WriteLine($"Price: {Content.Price}");*/
         await Dialog!.CloseAsync(Content);
     }
 
