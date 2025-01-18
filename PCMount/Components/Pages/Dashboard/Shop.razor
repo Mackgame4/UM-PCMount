@@ -20,7 +20,23 @@
     </div>
     <div class="ml-4 w-1/3 flex gap-4">
         <FluentSearch class="w-full" Placeholder="Search for Parts" Value="@searchTerm" @oninput="OnSearchInput" />
-        <FluentMenuButton Text="Order by"></FluentMenuButton>
+        <div class="relative">
+            <FluentButton IconStart="@(new Icons.Regular.Size16.Filter())" slot="trigger" Appearance="Appearance.Neutral" text="Order by" @onclick="() => toggleOptions()">
+                    Order by 
+            </FluentButton>
+
+            @if (optionsDropDown) {
+                <div class="absolute z-30 posfilter flex flex-col justify-center items-center rounded-lg">
+                    <FluentButton class="w-32" @onclick="() => SortProducts(1)">
+                        Highest Price
+                    </FluentButton>
+                    <FluentButton class="w-32" @onclick="() => SortProducts(2)">
+                        Lowest Price
+                    </FluentButton>
+                </div>
+            }
+        </div>
+
     </div>
     <div class="flex w-1/3">
     </div>
@@ -55,7 +71,7 @@ else
                         Appearance="Appearance.Lightweight"
                         @onclick="() => ShowDescription(product)">
                     </FluentButton>
-                    <div class="w-36 rounded-md relative pb-6 mb-1">
+                    <div class="h-40 rounded-md relative pb-6 mb-1">
                         <img src="@product.ImageUrl" class="object-cover w-full h-full rounded-md" />
                         <div class="absolute pos z-40 tr transition duration-200 ease-in-out">
                             <FluentBadge Appearance="Appearance.Neutral">
@@ -65,7 +81,7 @@ else
                             </FluentBadge>
                         </div>
                     </div>
-                    <h3 class="-mb-2">
+                    <h3 class= "h-14">
                         @product.Name
                     </h3>
                     <span>
@@ -126,6 +142,7 @@ else
     private Product? selectedProduct;
     private List<Part>? existentComponents;
     private string searchTerm = string.Empty; // Search term
+    private bool optionsDropDown = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -263,6 +280,35 @@ else
         }
     }
 
+    private void toggleOptions() {
+        optionsDropDown = !optionsDropDown;
+    }
+
+    private void SortProducts(int sortDirection)
+    {
+        if (filteredProducts == null)
+            return;
+
+        switch (sortDirection)
+        {
+            case 1:
+                filteredProducts = filteredProducts.OrderByDescending(p => p.Price).ToList();
+                toggleOptions();
+                break;
+            case 2:
+                filteredProducts = filteredProducts.OrderBy(p => p.Price).ToList();
+                toggleOptions();
+                break;
+            default:
+                // Default sorting (e.g., by name or no sorting)
+                filteredProducts = filteredProducts.OrderBy(p => p.Name).ToList();
+                break;
+        }
+
+        // Explicitly tell Blazor to re-render the UI
+        StateHasChanged();
+    }
+
     public class Product
     {
         public required string Name { get; set; }
@@ -303,4 +349,8 @@ fluent-number-field::part(control) {
     text-align: center;
 }
 
+.posfilter {
+    top: 38px;
+    left: 15px;
+}
 </style>
