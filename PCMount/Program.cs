@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 using PCMount.Components;
 using PCMount.Data;
+using PCMount.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,8 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddLogging();
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Add Services
+builder.Services.AddOrdersService();
 // Add Fluent UI Config
 builder.Services.AddHttpClient();
 builder.Services.AddFluentUIComponents(options => {

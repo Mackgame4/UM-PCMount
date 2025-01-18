@@ -2,10 +2,9 @@
 
 @using Microsoft.FluentUI.AspNetCore.Components
 @inject NavigationManager Navigation
-@using Microsoft.EntityFrameworkCore
 @using PCMount.Data.Models
-@using PCMount.Data
-@inject ApplicationDbContext DbContext
+@using PCMount.Services
+@inject OrdersService OrdersService
 @attribute [StreamRendering]
 @rendermode InteractiveServer
 
@@ -18,9 +17,15 @@
             <FluentButton class="hidden sm:inline-flex" Appearance="Appearance.Accent">PCMount @(CurrentPageTitle != null ? "| " + CurrentPageTitle : "")</FluentButton>
         </NavLink>
         <FluentSpacer />
-        <FluentCounterBadge Dot="false" Appearance="Appearance.Accent">
-            <FluentButton id="notificationsPopover" IconStart="@(new Icons.Regular.Size20.BoxMultiple())" Appearance="Appearance.Outline" @onclick="() => _visibleNotificationsPopover = !_visibleNotificationsPopover"></FluentButton>
-        </FluentCounterBadge>
+        @if (orders != null) {
+            <FluentCounterBadge Dot="@orders!.Any()" Appearance="Appearance.Accent">
+                <FluentButton id="notificationsPopover" IconStart="@(new Icons.Regular.Size20.BoxMultiple())" Appearance="Appearance.Outline" @onclick="() => _visibleNotificationsPopover = !_visibleNotificationsPopover"></FluentButton>
+            </FluentCounterBadge>
+        } else {
+            <FluentCounterBadge Appearance="Appearance.Accent">
+                <FluentButton id="notificationsPopover" IconStart="@(new Icons.Regular.Size20.BoxMultiple())" Appearance="Appearance.Outline" @onclick="() => _visibleNotificationsPopover = !_visibleNotificationsPopover"></FluentButton>
+            </FluentCounterBadge>
+        }
         <AuthorizeView Roles="Admin, User">
             <Authorized>
                 <FluentProfileMenu Initials="@(context.User.Identity!.Name?.Substring(0, 1).ToUpper() ?? string.Empty)">
@@ -78,7 +83,7 @@
         @if (orders == null || orders.Length == 0) {
             <span class="flex items-center gap-2 text-lg">@(new Microsoft.FluentUI.AspNetCore.Components.Emojis.Symbols.Color.Default.Warning().ToMarkup("20px")) No orders found.</span>
         } else {
-            <div class="flex flex-col gap-2 p-4">
+            <div class="flex flex-col gap-2">
                 @foreach (var order in orders) {
                     <div class="flex justify-between items-center gap-2">
                         <div class="flex gap-2 items-center">
@@ -87,18 +92,20 @@
                                 <span>@order.OrderId - @order.Name</span>
                                 <div class="flex gap-1.5 items-center">
                                     <FluentBadge Fill="highlight" BackgroundColor="#166534" Color="white" style="width: fit-content;">$@order.Price</FluentBadge>
-                                    <FluentBadge Fill="highlight" BackgroundColor="#166534" Color="white" style="width: fit-content;">@order.Status</FluentBadge>
+                                    <FluentBadge style="width: fit-content;">@order.Status</FluentBadge>
                                 </div>
                             </div>
                         </div>
-                        <FluentButton IconStart="@(new Icons.Regular.Size20.ArrowRight())" Appearance="Appearance.Lightweight" @onclick="() => Navigation.NavigateTo(getOrderAssemblyPath(order.OrderId))"></FluentButton>
+                        <FluentButton IconStart="@(new Icons.Regular.Size16.Wrench())" Appearance="Appearance.Lightweight" @onclick="() => Navigation.NavigateTo(getOrderAssemblyPath(order.OrderId))"></FluentButton>
                     </div>
                 }
             </div>
         }
     </Body>
     <Footer>
-        <!--<FluentButton class="w-full" Appearance="Appearance.Lightweight">View all</FluentButton>-->
+        <NavLink href="/dashboard/orders" Match="NavLinkMatch.All">
+            <FluentButton class="w-full" Appearance="Appearance.Lightweight">View all</FluentButton>
+        </NavLink>
     </Footer>
 </FluentPopover>
 
@@ -132,6 +139,7 @@
 
     private string? CurrentPageTitle { get; set; }
     private Order[]? orders;
+    private bool isOrdersLoaded = false;
 
     // When component is loaded
     protected override async void OnInitialized() {
@@ -139,7 +147,13 @@
         SetPageTitle();
         Navigation.LocationChanged += (sender, args) => SetPageTitle();  // Listen for navigation changes
         // Load orders
-        orders = await DbContext.Orders.ToArrayAsync() ?? null;
+        await LoadOrdersAsync();
+    }
+
+    private async Task LoadOrdersAsync() {
+        orders = await OrdersService.GetOrdersAsync(); // Fetch orders from database
+        isOrdersLoaded = true; // Mark orders as loaded
+        StateHasChanged(); // Trigger UI update
     }
 
     private void SetPageTitle() {
