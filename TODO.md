@@ -1,2 +1,2 @@
 - [ ] Add Mobile Support
-- [ ] Add Oders To Dashboard
+- [ ] Limit the number of orders in the list and show all in the page

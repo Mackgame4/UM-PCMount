@@ -7,7 +7,7 @@ using PCMount.Data.Models;
 public class OrdersService(ApplicationDbContext dbContext)
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private static readonly SemaphoreSlim semaphore = new(1, 1); // Semaphore to ensure single access to DbContext
+    private static readonly SemaphoreSlim semaphore = new(1, int.MaxValue); // Semaphore to ensure single access to DbContext
 
     public async Task<Order[]> GetOrdersAsync() {
         await semaphore.WaitAsync(); // Wait for the lock to be available
