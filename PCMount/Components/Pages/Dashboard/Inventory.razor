@@ -14,11 +14,65 @@
 
 <div class="rounded-md py-2 mb-4 flex justify-between">
     <div class="flex gap-6 w-1/3">
-        <FluentMenuButton Text="Select model"></FluentMenuButton>
+        <div class="relative">
+            <FluentButton IconStart="@(new Icons.Regular.Size16.Filter())" slot="trigger" Appearance="Appearance.Neutral" text="Order by" @onclick="() => toggleOptionsCategory()">
+                    Select category
+            </FluentButton>
+
+            @if (optionsDropDownCategory) {
+                <div class="absolute z-30 posfilter flex flex-col justify-center items-center rounded-l">
+                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(1)">
+                        Processor
+                    </FluentButton>
+                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(2)">
+                        Motherboard
+                    </FluentButton>
+                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(3)">
+                        Graphics Card
+                    </FluentButton>
+                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(4)">
+                        Memory
+                    </FluentButton>
+                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(5)">
+                        Storage
+                    </FluentButton>
+                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(6)">
+                        Power Supply
+                    </FluentButton>
+                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(7)">
+                        Case
+                    </FluentButton>
+                </div>
+            }
+        </div>
+        <FluentButton IconStart="@(new Icons.Regular.Size16.FilterDismiss())" slot="trigger" Appearance="Appearance.Neutral" text="Order by" @onclick="() => resetFilters()">
+                    Reset filters
+        </FluentButton>
     </div>
     <div class="ml-4 w-1/3 flex gap-4">
         <FluentSearch class="w-full" Placeholder="Search for Parts" Value="@searchTerm" @oninput="OnSearchInput" />
-        <FluentMenuButton Text="Order by"></FluentMenuButton>
+        <div class="relative">
+            <FluentButton IconStart="@(new Icons.Regular.Size16.Filter())" slot="trigger" Appearance="Appearance.Neutral" text="Order by" @onclick="() => toggleOptions()">
+                    Order by 
+            </FluentButton>
+
+            @if (optionsDropDown) {
+                <div class="absolute z-30 posfilter flex flex-col justify-center items-center rounded-l">
+                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.ArrowSortUp())" @onclick="() => setFilterOption(1)">
+                        Highest Price
+                    </FluentButton>
+                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.ArrowSortDown())" @onclick="() => setFilterOption(2)">
+                        Lowest Price
+                    </FluentButton>
+                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.ArrowSortUp())" @onclick="() => setFilterOption(3)">
+                        Highest Quantity
+                    </FluentButton>
+                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.ArrowSortDown())" @onclick="() => setFilterOption(4)">
+                        Lowest Quantity
+                    </FluentButton>
+                </div>
+            }
+        </div>
     </div>
     <div class="flex w-1/3">
     </div>
@@ -119,6 +173,45 @@ else
     private List<Product>? filteredProducts; // Filtered list of products
     private Product? selectedProduct;
     private List<Inventario>? inventoryItems;
+    private bool optionsDropDownCategory = false;
+    private bool optionsDropDown = false;
+    private int filterOption = 0;
+    private string filterCategory = string.Empty;
+
+    private void resetFilters() {
+        filterCategory = string.Empty;
+        filterOption = 0;
+        optionsDropDown = false;
+        optionsDropDownCategory = false;
+        searchTerm = string.Empty;
+        SortProducts(filterOption, filterCategory);
+    }
+
+    private void setFilterOption (int value) {
+        filterOption =  value;
+        toggleOptions();
+        SortProducts(filterOption, filterCategory);
+    }
+
+    private void setFilterCategory (int category) {
+        if (category == 1) {
+            filterCategory = "Processor";
+        } else if (category == 2) {
+            filterCategory = "Motherboard";
+        } else if (category == 3) {
+            filterCategory = "Graphics Card";
+        } else if (category == 4) {
+            filterCategory = "Memory";
+        } else if (category == 5) {
+            filterCategory = "Storage";
+        } else if (category == 6) {
+            filterCategory = "Power Supply";
+        } else if (category == 7) {
+            filterCategory = "Case";
+        }
+        toggleOptionsCategory();
+        SortProducts(filterOption, filterCategory);
+    }
 
     private string searchTerm = string.Empty; // Search term
 
@@ -192,6 +285,57 @@ else
         public required string Description { get; set; }
         public required string ImageUrl { get; set; }
     }
+
+    private void toggleOptions() {
+        optionsDropDown = !optionsDropDown;
+        optionsDropDownCategory = false;
+    }
+    private void toggleOptionsCategory() {
+        optionsDropDownCategory = !optionsDropDownCategory;
+        optionsDropDown = false;
+    }
+
+    private void SortProducts(int filter, string category)
+    {
+        if (filteredProducts == null)
+            return;
+
+        // Apply category filter
+        if (!string.IsNullOrEmpty(category))
+        {
+            filteredProducts = products
+                .Where(p => p.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        else
+        {
+            // If no category is selected, show all products
+            filteredProducts = products;
+        }
+
+        // Apply sorting
+        switch (filter)
+        {
+            case 1: // Highest Price
+                filteredProducts = filteredProducts.OrderByDescending(p => p.Price).ToList();
+                break;
+            case 2: // Lowest Price
+                filteredProducts = filteredProducts.OrderBy(p => p.Price).ToList();
+                break;
+            case 3: // Highest Quantity
+                filteredProducts = filteredProducts.OrderByDescending(p => p.Quantity).ToList();
+                break;
+            case 4: // Lowest Quantity
+                filteredProducts = filteredProducts.OrderBy(p => p.Quantity).ToList();
+                break;
+            default: // Default sorting (e.g., by name or no sorting)
+                filteredProducts = filteredProducts;
+                break;
+        }
+
+        // Explicitly tell Blazor to re-render the UI
+        StateHasChanged();
+    }
 }
 
 <style scoped>
@@ -201,5 +345,8 @@ else
 .tr1 {
     box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
     overflow: hidden;
+}
+.posfilter {
+    top: 38px;
 }
 </style>
