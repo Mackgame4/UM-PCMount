@@ -5,9 +5,9 @@
 
 @using Microsoft.FluentUI.AspNetCore.Components
 @inject NavigationManager NavigationManager
-@using Microsoft.EntityFrameworkCore
 @using PCMount.Data
-@inject ApplicationDbContext DbContext
+@using PCMount.Services
+@inject UsersService UsersDb
 
 <FluentDialog>
     <FluentDialogHeader Visible="false" />
@@ -58,11 +58,10 @@
                 Password = PasswordHasher.HashPassword(LoginModel.Password!),
                 Role = "Admin" // Registered users are admins by default
             };
-            if (DbContext.Users.Any(u => u.UserName == user.UserName)) {
+            if (UsersDb.Any(u => u.UserName == user.UserName)) {
                 errorMessage = "Username already exists.";
             } else {
-                DbContext.Users.Add(user);
-                await DbContext.SaveChangesAsync();
+                await UsersDb.CreateAsync(user);
                 redirect = true;
             }
         } catch (Exception ex) {

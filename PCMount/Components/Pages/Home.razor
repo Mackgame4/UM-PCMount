@@ -8,9 +8,10 @@
 @attribute [AllowAnonymous]
 @attribute [StreamRendering]
 @inject IDialogService DialogService
-@using Microsoft.EntityFrameworkCore
-@using PCMount.Data
-@inject ApplicationDbContext DbContext
+@using PCMount.Services
+@inject ComponentesService ComponentesDb
+@inject ComputersService ComputersDb
+@inject OrdersService OrdersDb
 @rendermode InteractiveServer
 <PageTitle>PCMount - Shop</PageTitle>
 
@@ -24,7 +25,6 @@
     <FluentButton IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Lightweight" @onclick="@OpenDialogAsync">Order Custom Build</FluentButton>
     <FluentSpacer />
     <FluentSearch Placeholder="Search for Product" Class="w-1/3 hidden md:block" @bind-Value="@searchTerm" @bind-Value:after="@OnSearchInput" Immediate="true" />
-    <!--<FluentButton IconEnd="@(new Icons.Regular.Size16.Filter())">Filters</FluentButton>-->
     <FluentSpacer />
     <FluentCounterBadge Count="@cart?.Count" Appearance="Appearance.Accent">
         <FluentButton id="notificationsPopover" IconStart="@(new Icons.Regular.Size20.Cart())" @onclick="() => _visibleNotificationsPopover = !_visibleNotificationsPopover"></FluentButton>
@@ -107,9 +107,8 @@
     private List<Computer>? cart = new List<Computer>();
 
     protected override async Task OnInitializedAsync() {
-        Part[] components = await DbContext.Componentes.ToArrayAsync() ?? Array.Empty<Part>();
-        computers = await DbContext.Computers.ToArrayAsync() ?? Array.Empty<Computer>();
-        foreach (var c in computers!) {
+        Part[] components = await ComponentesDb.GetArrayAsync() ?? Array.Empty<Part>();
+        computers = (await ComputersDb.GetArrayAsync())?.Select(c => {
             c.Motherboard = components.FirstOrDefault(p => p.PartId == c.MotherboardId);
             c.Processor = components.FirstOrDefault(p => p.PartId == c.ProcessorId);
             c.Memory = components.FirstOrDefault(p => p.PartId == c.MemoryId);
@@ -117,7 +116,8 @@
             c.Storage = components.FirstOrDefault(p => p.PartId == c.StorageId);
             c.PowerSupply = components.FirstOrDefault(p => p.PartId == c.PowerSupplyId);
             c.Case = components.FirstOrDefault(p => p.PartId == c.CaseId);
-        }
+            return c;
+        }).ToArray() ?? Array.Empty<Computer>();
         DefaultSearchProducts();
     }
 
@@ -129,7 +129,7 @@
         cart!.Remove(product);
     }
 
-    private void OrderCart() {
+    private async Task OrderCart() {
         foreach (var product in cart!) {
             Order order = new() {
                 Status = OrderStatus.Pending,
@@ -145,9 +145,8 @@
                 PowerSupplyId = product.PowerSupplyId,
                 CaseId = product.CaseId
             };
-            DbContext.Orders.Add(order);
+            await OrdersDb.CreateAsync(order);
         }
-        DbContext.SaveChanges();
         cart!.Clear();
     }
 

@@ -7,7 +7,7 @@
 @inject NavigationManager Navigation
 @using PCMount.Data.Models
 @using PCMount.Services
-@inject OrdersService OrdersService
+@inject OrdersService OrdersDb
 @attribute [StreamRendering]
 @rendermode InteractiveServer
 <PageTitle>PCMount - Orders</PageTitle>
@@ -42,7 +42,7 @@
 
     protected override async Task OnInitializedAsync() {
         // Set the orders queryable
-        orders = await OrdersService.GetOrdersAsync();
+        orders = await OrdersDb.GetArrayAsync();
         foreach (Order order in orders) {
             ordersQueryable = ordersQueryable.Append(new OrderQuery(order.OrderId, order.Name, order.Status.ToString(), order.Price.ToString()));
         }
@@ -53,8 +53,8 @@
     }
 
     private async void deleteOrder(int orderId) {
-        await OrdersService.DeleteOrderAsync(orderId);
-        orders = await OrdersService.GetOrdersAsync();
+        await OrdersDb.DeleteAsync(orderId);
+        orders = await OrdersDb.GetArrayAsync();
         ordersQueryable = Array.Empty<OrderQuery>().AsQueryable();
         foreach (Order order in orders) {
             ordersQueryable = ordersQueryable.Append(new OrderQuery(order.OrderId, order.Name, order.Status.ToString(), order.Price.ToString()));

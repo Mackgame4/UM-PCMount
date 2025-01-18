@@ -8,9 +8,9 @@
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.FluentUI.AspNetCore.Components
 @inject NavigationManager NavigationManager
-@using Microsoft.EntityFrameworkCore
 @using PCMount.Data
-@inject ApplicationDbContext DbContext
+@using PCMount.Services
+@inject UsersService UsersDb
 
 <FluentDialog>
     <FluentDialogHeader Visible="false" />
@@ -59,7 +59,7 @@
     private async Task Authenticate() {
         bool redirect = false;
         try {
-            List<User> usersAccounts = await DbContext.Users.ToListAsync();
+            List<User> usersAccounts = await UsersDb.GetListAsync();
             if (usersAccounts == null || !usersAccounts.Any()) {
                 errorMessage = "No users found.";
                 return;

@@ -4,7 +4,7 @@
 @inject NavigationManager Navigation
 @using PCMount.Data.Models
 @using PCMount.Services
-@inject OrdersService OrdersService
+@inject OrdersService OrdersDb
 @attribute [StreamRendering]
 @rendermode InteractiveServer
 
@@ -151,7 +151,7 @@
     }
 
     private async Task LoadOrdersAsync() {
-        orders = await OrdersService.GetOrdersAsync(); // Fetch orders from database
+        orders = await OrdersDb.GetArrayAsync(); // Fetch orders from database
         isOrdersLoaded = true; // Mark orders as loaded
         StateHasChanged(); // Trigger UI update
     }

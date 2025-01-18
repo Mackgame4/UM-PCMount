@@ -30,7 +30,7 @@ builder.Services.AddLogging();
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Add Services
-builder.Services.AddOrdersService();
+builder.Services.AddLocalServices();
 // Add Fluent UI Config
 builder.Services.AddHttpClient();
 builder.Services.AddFluentUIComponents(options => {

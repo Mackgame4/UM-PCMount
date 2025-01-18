@@ -1,8 +1,12 @@
 namespace PCMount.Services;
 
 public static class ServiceCollectionExtensions {
-    public static IServiceCollection AddOrdersService(this IServiceCollection services) {
+    public static IServiceCollection AddLocalServices(this IServiceCollection services) {
         services.AddScoped<OrdersService>();
+        services.AddScoped<ComputersService>();
+        services.AddScoped<ComponentesService>();
+        services.AddScoped<UsersService>();
+        services.AddScoped<InventarioService>();
         return services;
     }
 }

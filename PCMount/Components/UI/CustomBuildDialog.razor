@@ -3,7 +3,8 @@
 @using PCMount.Data.Models
 @using Microsoft.EntityFrameworkCore
 @using PCMount.Data
-@inject ApplicationDbContext DbContext
+@using PCMount.Services
+@inject ComponentesService ComponentesDb
 @implements IDialogContentComponent<Computer>
 
 <FluentDialogHeader ShowDismiss="true">
@@ -48,7 +49,7 @@
     Part[] Components = Array.Empty<Part>();
 
     protected override async Task OnInitializedAsync() {
-        Components = await DbContext.Componentes.ToArrayAsync();
+        Components = await ComponentesDb.GetArrayAsync();
     }
 
     private void OnSearch(OptionsSearchEventArgs<Part> e, string partType) {
