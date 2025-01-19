@@ -13,7 +13,7 @@
 <main class="fixed z-20"
     <FluentDialogProvider />
 </main>
-<FluentToolbar class="py-4 sticky top-0 z-10 px-4 shadow-md">
+<FluentToolbar class="p-4 sticky top-0 z-10 shadow-md">
     <NavLink href="/" Match="NavLinkMatch.All" class="hidden md:flex">
         <img src="/assets/pcmountlogo.png" Slot="start" width="45px"/>
     </NavLink>
@@ -50,7 +50,7 @@
         </Authorized>
     </AuthorizeView>
 </FluentToolbar>
-<div class="p-2">
+<div class="p-5">
     @if (computers == null) {
         <LoadingDialog Title="Waiting page data request" />
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
@@ -64,7 +64,7 @@
                 <span class="text-2xl text-gray-400">No products found.</span>
             </div>
         } else {
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 px-2 py-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 @foreach (var product in filteredProducts!) {
                     <div class="relative custom-transition transition duration-300 ease-in-out">
                         <ProductCard Product="@product" OnAddToCart="AddToCart" />
