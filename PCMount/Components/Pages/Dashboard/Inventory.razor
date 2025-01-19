@@ -20,7 +20,7 @@
             </FluentButton>
 
             @if (optionsDropDownCategory) {
-                <div class="absolute z-30 posfilter flex flex-col justify-center items-center rounded-l">
+                <div class="absolute z-30 posfilter flex flex-col justify-center items-center rounded-l slide-down">
                     <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(1)">
                         Processor
                     </FluentButton>
@@ -57,7 +57,7 @@
             </FluentButton>
 
             @if (optionsDropDown) {
-                <div class="absolute z-30 posfilter flex flex-col justify-center items-center rounded-l">
+                <div class="absolute z-30 posfilter flex flex-col justify-center items-center rounded-l slide-down">
                     <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.ArrowSortUp())" @onclick="() => setFilterOption(1)">
                         Highest Price
                     </FluentButton>
@@ -328,7 +328,7 @@ else
             case 4: // Lowest Quantity
                 filteredProducts = filteredProducts.OrderBy(p => p.Quantity).ToList();
                 break;
-            default: // Default sorting (e.g., by name or no sorting)
+            default: 
                 filteredProducts = filteredProducts;
                 break;
         }
@@ -348,5 +348,20 @@ else
 }
 .posfilter {
     top: 38px;
+}
+
+.slide-down {
+    animation: slideDown 0.3s ease-in-out;
+}
+
+@@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 </style>
