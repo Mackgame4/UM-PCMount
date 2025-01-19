@@ -1,24 +1,18 @@
 ﻿@page "/dashboard/shop"
-@using Microsoft.FluentUI.AspNetCore.Components
-@using PCMount.Components.UI
-@using Microsoft.EntityFrameworkCore
-@using PCMount.Data
-@using PCMount.Data.Models
-@inject ApplicationDbContext DbContext
-@rendermode InteractiveServer
-@using Microsoft.AspNetCore.Authorization
-@attribute [Authorize(Roles = "Admin")]
-@using PCMount.Components.Layout
 @layout DashboardLayout
 @attribute [StreamRendering]
-
+@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveServer
 <PageTitle>PCMount - Parts Shop</PageTitle>
+
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext DbContext
 
 <div class="rounded-md py-2 mb-4 flex justify-between">
     <div class="flex gap-6 w-1/3">
         <div class="relative">
             <FluentButton IconStart="@(new Icons.Regular.Size16.Filter())" slot="trigger" Appearance="Appearance.Neutral" text="Order by" @onclick="() => toggleOptionsCategory()">
-                    Select category
+                Select category
             </FluentButton>
 
             @if (optionsDropDownCategory) {
@@ -48,7 +42,7 @@
             }
         </div>
         <FluentButton IconStart="@(new Icons.Regular.Size16.FilterDismiss())" slot="trigger" Appearance="Appearance.Neutral" text="Order by" @onclick="() => resetFilters()">
-                    Reset filters
+            Reset filters
         </FluentButton>
     </div>
     <div class="ml-4 w-1/3 flex gap-4">
@@ -148,21 +142,21 @@ else
     {
         <!-- FluentDialog for displaying product description -->
         <FluentDialog>
-            <DialogTitle>
+            <FluentDialogHeader>
                 <p class="font-bold text-xl text-center relative">
                     @selectedProduct?.Name
                 </p>
-            </DialogTitle>
-            <DialogContent>
+            </FluentDialogHeader>
+            <FluentDialogBody>
                 <p class="text-justify italic">
                     @selectedProduct?.Description
                 </p>
-            </DialogContent>
-            <DialogActions class=" absolute flex items-center justify-center top-5 right-5">
+            </FluentDialogBody>
+            <FluentDialogFooter class="absolute flex items-center justify-center top-5 right-5">
                 <FluentButton class="font-bold text-lg text-gray-300" @onclick="() => CloseDescription()">
-                    x
+                    Cancel
                 </FluentButton>
-            </DialogActions>
+            </FluentDialogFooter>
         </FluentDialog>
     }
 }
@@ -365,33 +359,24 @@ else
             return;
 
         // Apply category filter
-        if (!string.IsNullOrEmpty(category))
-        {
-            filteredProducts = products
-                .Where(p => p.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
-        else
-        {
+        if (!string.IsNullOrEmpty(category)) {
+            filteredProducts = products!.Where(p => p.Category.Equals(category, StringComparison.OrdinalIgnoreCase)).ToList();
+        } else {
             // If no category is selected, show all products
             filteredProducts = products;
         }
 
         // Apply sorting
-        switch (filter)
-        {
+        switch (filter) {
             case 1: // Highest Price
-                filteredProducts = filteredProducts.OrderByDescending(p => p.Price).ToList();
+                filteredProducts = filteredProducts!.OrderByDescending(p => p.Price).ToList();
                 break;
             case 2: // Lowest Price
-                filteredProducts = filteredProducts.OrderBy(p => p.Price).ToList();
+                filteredProducts = filteredProducts!.OrderBy(p => p.Price).ToList();
                 break;
             default: 
-                filteredProducts = filteredProducts;
                 break;
         }
-
-        // Explicitly tell Blazor to re-render the UI
         StateHasChanged();
     }
 
