@@ -1,69 +1,44 @@
 ﻿@page "/dashboard/assembly"
 @attribute [Authorize(Roles = "Admin")]
 @layout DashboardLayout
-@attribute [StreamRendering]
+@rendermode InteractiveServer
 <PageTitle>PCMount - Assembly</PageTitle>
 
-<FluentToolbar class="rounded-md py-2">
-    <FluentMenuButton Text="Select brand"></FluentMenuButton>
-    <FluentMenuButton Text="Select model"></FluentMenuButton>
-    <FluentSpacer />
-    <FluentButton IconEnd="@(new Icons.Regular.Size16.Filter())">Filters</FluentButton>
-    <FluentSearch Placeholder="Search for Parts" />
-</FluentToolbar>
-
-@if (forecasts == null)
-{
-<LoadingDialog Title="Waiting page data request" />
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<FluentWizard StepperPosition="StepperPosition.Top" StepSequence="WizardStepSequence.Any" DisplayStepNumber="@(WizardStepStatus.Current | WizardStepStatus.Next)" StepTitleHiddenWhen="@GridItemHidden.XsAndDown" OnFinish="@OnFinishedAsync">
+    <Steps>
+        <FluentWizardStep Label="Intro" OnChange="@OnStepChange">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ut nisi eget dolor semper
+            luctus vitae a nulla. Cras semper eros sed lacinia tincidunt. Mauris dignissim ullamcorper dolor,
+            ut blandit dui ullamcorper faucibus. Interdum et malesuada fames ac ante ipsum.
+        </FluentWizardStep>
+        <FluentWizardStep Label="Get started" Summary="Begin the tasks" OnChange="@OnStepChange">
+            Maecenas sed justo ac sapien venenatis ullamcorper. Sed maximus nunc non venenatis euismod.
+            Fusce vel porta ex, imperdiet molestie nisl. Vestibulum eu ultricies mauris, eget aliquam quam.
+        </FluentWizardStep>
+        <FluentWizardStep Disabled="true" Label="Disabled step" Summary="This step is disabled" OnChange="@OnStepChange">
+            Nunc dignissim tortor eget lacus porta tristique. Nunc in posuere dui. Cras ligula ex,
+            ullamcorper in gravida in, euismod vitae purus. Lorem ipsum dolor sit amet, consectetur
+            adipiscing elit. Aliquam at velit leo. Suspendisse potenti. Cras dictum eu augue in laoreet.
+        </FluentWizardStep>
+        <FluentWizardStep Label="Set budget" Summary="Identify the best price" IconPrevious="@(new Icons.Filled.Size24.Star())" IconCurrent="@(new Icons.Filled.Size24.StarEmphasis())" IconNext="@(new Icons.Regular.Size24.Star())" DisplayStepNumber="false" OnChange="@OnStepChange">
+            Phasellus quis augue convallis, congue velit ac, aliquam ex. In egestas porttitor massa
+            aliquet porttitor. Donec bibendum faucibus urna vitae elementum. Phasellus vitae efficitur
+            turpis, eget molestie ipsum.
+        </FluentWizardStep>
+        <FluentWizardStep Label="Summary" OnChange="@OnStepChange">
+            Ut iaculis sed magna efficitur tempor. Vestibulum est erat, imperdiet in diam ac,
+            aliquam tempus sapien. Nam rutrum mi at enim mattis, non mollis diam molestie.
+            Cras sodales dui libero, sit amet cursus sapien elementum ac. Nulla euismod nisi sem.
+        </FluentWizardStep>
+    </Steps>
+</FluentWizard>
 
 @code {
-    private WeatherForecast[]? forecasts;
-
-    protected override async Task OnInitializedAsync()
-    {
-        // Simulate asynchronous loading to demonstrate streaming rendering
-        await Task.Delay(500);
-
-        var startDate = DateOnly.FromDateTime(DateTime.Now);
-        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        {
-            Date = startDate.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = summaries[Random.Shared.Next(summaries.Length)]
-        }).ToArray();
+    private void OnStepChange(FluentWizardStepChangeEventArgs e) {
+        Console.WriteLine($"Go to step {e.TargetLabel} (#{e.TargetIndex})");
     }
 
-    private class WeatherForecast
-    {
-        public DateOnly Date { get; set; }
-        public int TemperatureC { get; set; }
-        public string? Summary { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    private void OnFinishedAsync() {
+        Console.WriteLine("Wizard finished");
     }
 }
