@@ -64,7 +64,7 @@
                 <span class="text-2xl text-gray-400">No products found.</span>
             </div>
         } else {
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-2 py-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 px-2 py-5">
                 @foreach (var product in filteredProducts!) {
                     <div class="relative custom-transition transition duration-300 ease-in-out">
                         <ProductCard Product="@product" OnAddToCart="AddToCart" />
