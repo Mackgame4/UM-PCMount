@@ -52,7 +52,7 @@ else
                                         </span>
                                     </FluentBadge>
                                 </div>
-                                <FluentButton IconStart="@(new Icons.Regular.Size24.PuzzlePiece())" Appearance="Appearance.Accent" class="mt-4 w-3/4"></FluentButton>
+                                <FluentButton IconStart="@(new Icons.Regular.Size24.PuzzlePiece())" Appearance="Appearance.Accent" class="mt-4 w-3/4" @onclick="() => getParts(order)"></FluentButton>
                                 <FluentButton IconStart="@(new Icons.Regular.Size24.Wrench())" Appearance="Appearance.Accent" class="w-3/4"></FluentButton>
                             </FluentCard>
                         }
