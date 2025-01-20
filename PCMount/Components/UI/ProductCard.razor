@@ -6,7 +6,7 @@
         <img src="@Product!.Image" class="object-cover w-full h-full rounded-md" />
         <div class="absolute pos bottom-0 z-10 custom-transition transition duration-200 ease-in-out">
             <FluentBadge Appearance="Appearance.Neutral">
-                <span class="text-green-500 font-bold text-xl">@getPriceDiscount(@Product!.Price, @Product!.Discount)€</span>
+                <span class="text-green-500 font-bold text-xl">@getPriceDiscount(@Product!.Price, @Product!.Discount).ToString("C")</span>
             </FluentBadge>
         </div>
     </div>
@@ -15,7 +15,7 @@
         <div class="absolute top-14 right-5">
             <div class="@((isHoveringDiscount ? "slide-down" : "slide-up"))">
                 <FluentBadge Fill="highlight" Appearance="Appearance.Neutral" BackgroundColor="#991b1b" Color="white" >
-                    <span class="font-medium line-through text-lg">@Product!.Price€</span>
+                    <span class="font-medium line-through text-lg">@Product!.Price.ToString("C")</span>
                 </FluentBadge>
             </div>
         </div>

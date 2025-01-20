@@ -101,7 +101,7 @@
         }
     </Body>
     <Footer>
-        <span><b>Total:</b> @(calculateTotalPrice(cart!))€</span>
+        <span><b>Total:</b> @(calculateTotalPrice(cart!).ToString("C"))</span>
         <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.ShoppingBag())" Appearance="Appearance.Lightweight" @onclick="OrderCart">Confirm Order</FluentButton>
     </Footer>
 </FluentPopover>

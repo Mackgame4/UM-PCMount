@@ -52,7 +52,7 @@
 
     private string calculateProfit(double price) {
         double profit = price + price * 0.10;
-        return $"{profit.ToString("F2")}€";
+        return profit.ToString("C");
     }
 
     private double calculatePrice() {
