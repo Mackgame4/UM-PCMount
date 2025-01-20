@@ -3,3 +3,5 @@
 - [x] Check if cart is doing price for each item inside or are all items going with the same price
 - [ ] Page to add new products (Computers) (split dashboard in two? one for products and one for users or profits)
 - [ ] Fix Gome's 90s styling
+- [ ] Remove computers description
+- [ ] Add confirmation notifications

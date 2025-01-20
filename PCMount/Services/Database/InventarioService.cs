@@ -137,4 +137,34 @@ public class InventarioService : IDbContextAcessor<Inventario> {
             semaphore.Release();
         }
     }
+
+    public async Task<Inventario?> TransactionStockItemAsync(int id, int quantity) {
+        await semaphore.WaitAsync();
+        try {
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try {
+                var inventoryItem = await _dbContext.Inventario.FirstOrDefaultAsync(i => i.PartId == id);
+                if (inventoryItem != null) {
+                    // Update the existing item's quantity
+                    inventoryItem.Quantidade += quantity;
+                } else {
+                    // Create a new inventory item
+                    inventoryItem = new Inventario {
+                        PartId = id,
+                        Quantidade = quantity
+                    };
+                    await _dbContext.Inventario.AddAsync(inventoryItem);
+                }
+                await _dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return inventoryItem;
+            } catch (Exception e) {
+                Console.WriteLine($"An error occurred: {e.Message}");
+                await transaction.RollbackAsync();
+                return null;
+            }
+        } finally {
+            semaphore.Release();
+        }
+    }
 }
