@@ -5,6 +5,7 @@
 @rendermode InteractiveServer
 <PageTitle>PCMount - Shop</PageTitle>
 <FluentDialogProvider />
+<FluentMenuProvider />
 
 @inject IDialogService DialogService
 @inject ComponentesService ComponentesDb
@@ -18,22 +19,13 @@
     <FluentButton class="text-lg" IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Lightweight" @onclick="@OpenDialogAsync">Order Custom Build</FluentButton>
     <FluentSpacer />
     <FluentSearch Placeholder="Search for Product" Class="w-1/3 hidden md:block text-lg" @bind-Value="@searchTerm" @bind-Value:after="@OnSearchInput" Immediate="true" />
-    <div class="relative">
-            <FluentButton class="text-lg" IconStart="@(new Icons.Regular.Size16.Filter())" slot="trigger" Appearance="Appearance.Neutral" text="Order by" @onclick="() => toggleOptions()">Order by</FluentButton>
-            @if (optionsDropDown) {
-                <div class="absolute z-30 posfilter flex flex-col justify-center items-center rounded-l slide-down">
-                    <FluentButton class="w-44 text-lg" IconStart="@(new Icons.Regular.Size16.ArrowSortUp())" @onclick="() => SortProducts(1)">
-                        Highest Price
-                    </FluentButton>
-                    <FluentButton class="w-44 text-lg" IconStart="@(new Icons.Regular.Size16.ArrowSortDown())" @onclick="() => SortProducts(2)">
-                        Lowest Price
-                    </FluentButton>
-                </div>
-            }
-        </div>
+    <FluentMenuButton IconStart="new Icons.Regular.Size16.Filter()" ButtonAppearance="@Appearance.Neutral" Text="Order by" OnMenuChanged="filterMenuChanged">
+        <FluentMenuItem Id="1"><FluentIcon Value="@(new Icons.Regular.Size16.ArrowSortUp())" /> Highest Price</FluentMenuItem>
+        <FluentMenuItem Id="2"><FluentIcon Value="@(new Icons.Regular.Size16.ArrowSortDown())" /> Lowest Price</FluentMenuItem>
+    </FluentMenuButton>
     <FluentSpacer />
     <FluentCounterBadge Count="@cart?.Count" Appearance="Appearance.Accent">
-        <FluentButton id="notificationsPopover" IconStart="@(new Icons.Regular.Size24.Cart())" @onclick="() => _visibleNotificationsPopover = !_visibleNotificationsPopover"></FluentButton>
+        <FluentButton id="cartPopover" IconStart="@(new Icons.Regular.Size24.Cart())" @onclick="() => _visibleNotificationsPopover = !_visibleNotificationsPopover"></FluentButton>
     </FluentCounterBadge>
     <AuthorizeView>
         <NotAuthorized>
@@ -73,7 +65,7 @@
     }
 </div>
 
-<FluentPopover class="rounded-md w-80" VerticalThreshold="170" AnchorId="notificationsPopover" @bind-Open="_visibleNotificationsPopover">
+<FluentPopover class="rounded-md w-80" AnchorId="cartPopover" @bind-Open="_visibleNotificationsPopover">
     <Header>@(new Emojis.Objects.Color.Default.ShoppingCart().ToMarkup("20px")) Cart</Header>
     <Body>
         @if (cart == null || cart.Count == 0) {
@@ -108,10 +100,16 @@
 
 @code {
     private bool _visibleNotificationsPopover;
-    private bool optionsDropDown = false;
     private Computer[]? computers;
     private List<Computer>? filteredProducts = new List<Computer>();
     private List<Computer>? cart = new List<Computer>();
+
+    private void filterMenuChanged(MenuChangeEventArgs args) {
+        if (!string.IsNullOrEmpty(args.Id)) {
+            int filterMenuOption = int.Parse(args.Id);
+            SortProducts(filterMenuOption);
+        }
+    }
 
     protected override async Task OnInitializedAsync() {
         Part[] components = await ComponentesDb.GetArrayAsync() ?? Array.Empty<Part>();
@@ -203,25 +201,17 @@
         return price - price * discount.Value * 0.01;
     }
 
-    private void toggleOptions() {
-        optionsDropDown = !optionsDropDown;
-    }
-
     private void SortProducts(int filter) {
         switch (filter) {
             case 1: // Highest Price
                 filteredProducts = filteredProducts!.OrderByDescending(p => getPriceDiscount(p.Price, p.Discount)).ToList();
-                toggleOptions();
                 break;
             case 2: // Lowest Price
                 filteredProducts = filteredProducts!.OrderBy(p => getPriceDiscount(p.Price, p.Discount)).ToList();
-                toggleOptions();
                 break;
             default: 
-                toggleOptions();
                 break;
         }
-        StateHasChanged();
     }
 }
 

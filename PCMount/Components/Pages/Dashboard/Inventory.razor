@@ -22,23 +22,19 @@
     <FluentButton IconStart="@(new Icons.Regular.Size16.FilterDismiss())" Appearance="Appearance.Neutral" @onclick="() => resetFilters()">Reset Filters</FluentButton>
 </FluentToolbar>
 
-@if (filteredProducts == null)
-{
+@if (filteredProducts == null) {
     <LoadingDialog Title="Loading Inventory..." />
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
-        @foreach (int element in Enumerable.Range(1, 14))
-        {
+        @foreach (int element in Enumerable.Range(1, 14)) {
             <FluentSkeleton Width="100%" Height="340px"></FluentSkeleton>
         }
     </div>
 } else {
-    @if (filteredProducts != null && !filteredProducts.Any())
-    {
+    @if (filteredProducts != null && !filteredProducts.Any()) {
         <span class="text-center text-xl text-gray-200 mt-8">No items found.</span>
     }
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
-        @foreach (Product product in filteredProducts!)
-        {
+        @foreach (Product product in filteredProducts!) {
             <div class="tr transition duration-300 ease-in-out">
                 <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2 hover:translate-y-2">
                     <FluentButton class="absolute top-2 left-2" IconStart="@(new Icons.Regular.Size16.Info())" Appearance="Appearance.Lightweight" @onclick="() => ShowDescription(product.Name, product.Descricao ?? string.Empty)"></FluentButton>
