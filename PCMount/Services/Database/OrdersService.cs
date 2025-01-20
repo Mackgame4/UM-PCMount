@@ -78,6 +78,15 @@ public class OrdersService : IDbContextAcessor<Order> {
         return _dbContext.Orders.AsNoTracking().Any(predicate);
     }
 
+    public async Task<List<Order>> IncludeListAsync<TProperty>(Expression<Func<Order, TProperty>> navigationPropertyPath) {
+        await semaphore.WaitAsync();
+        try {
+            return await _dbContext.Orders.Include(navigationPropertyPath).AsNoTracking().ToListAsync();
+        } finally {
+            semaphore.Release();
+        }
+    }
+
     public async Task<Order?> FindAsync(int id) {
         await semaphore.WaitAsync(); // Wait for the lock to be available
         try {

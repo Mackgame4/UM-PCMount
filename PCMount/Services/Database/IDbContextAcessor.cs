@@ -15,6 +15,8 @@ public interface IDbContextAcessor<T> where T : class {
 
     bool Any(Expression<Func<T, bool>> predicate);
 
+    Task<List<T>> IncludeListAsync<TProperty>(Expression<Func<T, TProperty>> navigationPropertyPath);
+
     Task<T?> FindAsync(int id);
 
     Task<T?> FindOneAsync(Expression<Func<T, bool>> predicate);

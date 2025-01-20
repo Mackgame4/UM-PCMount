@@ -96,6 +96,15 @@ public class UsersService : IDbContextAcessor<User> {
         return _dbContext.Users.AsNoTracking().Any(predicate);
     }
 
+    public async Task<List<User>> IncludeListAsync<TProperty>(Expression<Func<User, TProperty>> navigationPropertyPath) {
+        await semaphore.WaitAsync();
+        try {
+            return await _dbContext.Users.Include(navigationPropertyPath).AsNoTracking().ToListAsync();
+        } finally {
+            semaphore.Release();
+        }
+    }
+
     public async Task<User[]> FindAllAsync(Expression<Func<User, bool>> predicate) {
         await semaphore.WaitAsync();
         try {

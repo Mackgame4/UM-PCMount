@@ -83,6 +83,15 @@ public class ComponentesService : IDbContextAcessor<Part> {
         }
     }
 
+    public async Task<List<Part>> IncludeListAsync<TProperty>(Expression<Func<Part, TProperty>> navigationPropertyPath) {
+        await semaphore.WaitAsync();
+        try {
+            return await _dbContext.Componentes.Include(navigationPropertyPath).AsNoTracking().ToListAsync();
+        } finally {
+            semaphore.Release();
+        }
+    }
+
     public async Task<Part?> FindAsync(int id) {
         await semaphore.WaitAsync();
         try {

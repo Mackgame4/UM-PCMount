@@ -78,6 +78,15 @@ public class ComputersService : IDbContextAcessor<Computer> {
         return _dbContext.Computers.AsNoTracking().Any(predicate);
     }
 
+    public async Task<List<Computer>> IncludeListAsync<TProperty>(Expression<Func<Computer, TProperty>> navigationPropertyPath) {
+        await semaphore.WaitAsync();
+        try {
+            return await _dbContext.Computers.Include(navigationPropertyPath).AsNoTracking().ToListAsync();
+        } finally {
+            semaphore.Release();
+        }
+    }
+
     public async Task<Computer?> FindAsync(int id) {
         await semaphore.WaitAsync();
         try {

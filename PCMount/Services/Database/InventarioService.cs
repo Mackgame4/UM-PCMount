@@ -121,4 +121,20 @@ public class InventarioService : IDbContextAcessor<Inventario> {
             semaphore.Release();
         }
     }
+
+    // Custom queries
+    public async Task<Inventario?> UpdateItemQuantityAsync(int id, int quantity) {
+        await semaphore.WaitAsync();
+        try {
+            var inventario = await _dbContext.Inventario.FindAsync(id);
+            if (inventario == null) {
+                return null;
+            }
+            inventario.Quantidade = quantity;
+            await _dbContext.SaveChangesAsync();
+            return inventario;
+        } finally {
+            semaphore.Release();
+        }
+    }
 }

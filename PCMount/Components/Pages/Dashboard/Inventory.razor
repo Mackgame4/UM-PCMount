@@ -116,27 +116,15 @@
         DefaultSearchProducts();
     }
 
-    private void RemoveOneProduct(int partId) {
+    private async Task RemoveOneProduct(int partId) {
         Product? product = filteredProducts?.FirstOrDefault(p => p.PartId == partId);
         if (product != null) {
             product.Quantity--;
             if (product.Quantity == 0) {
                 filteredProducts!.Remove(product);
             }
+            await InventarioDb.UpdateItemQuantityAsync(partId, product.Quantity);
         }
-        /*
-        await InventarioDb.DeleteAsync(partId);
-        products = (await InventarioDb.IncludeListAsync(i => i.Part))?.Select(i => new Product {
-            Name = i.Part!.Name,
-            Tipo = i.Part.Tipo,
-            PartId = i.Part.PartId,
-            Preco = i.Part.Preco,
-            Quantity = i.Quantidade,
-            Descricao = i.Part.Descricao!,
-            Image = i.Part.Image!
-        }).ToList();
-        SortProducts();
-        */
     }
 
     private void FilterProducts() {
