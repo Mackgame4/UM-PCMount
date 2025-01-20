@@ -27,36 +27,37 @@ else
         <Steps>
             <FluentWizardStep Label="Select Order" OnChange="@OnStepChange">
             <div class="order-grid mx-auto">
-                <div class="grid grid-cols-5 gap-6">
-                    @foreach (var order in OrdersList)
-                    {
-                        <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2 hover:translate-y-2" @onclick="() => SelectOrder(order)">
-                            <FluentBadge>
-                                <span class="font-medium">
-                                    @order.Status.ToString() Order ID: @order.OrderId
-                                </span>
-                            </FluentBadge>
-                            <div class="h-40 rounded-md">
-                                <img src="@order.Image" class="object-cover w-full h-full rounded-md" />
-                            </div>
-                            <h3 class= "h-14">
-                                @order.Name
-                            </h3>
-                            <div class="flex flex-row gap-2 justify-center items-center text-center text-xl">
-                                <span>
-                                    Ordered for:
-                                </span>
-                                <FluentBadge Appearance="Appearance.Neutral" class="text-lg mt-1">
-                                    <span class="text-green-500">
-                                        @order.Price€
+                    <div class="grid grid-cols-5 gap-6">
+                        @foreach (var order in OrdersList)
+                        {
+                            <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2 hover:translate-y-2" @onclick="() => SelectOrder(order)">
+                                <FluentBadge>
+                                    <span class="font-medium">
+                                        @order.Status.ToString() Order ID: @order.OrderId
                                     </span>
                                 </FluentBadge>
-                            </div>
-                            <FluentButton IconStart="@(new Icons.Regular.Size24.PuzzlePiece())" Appearance="Appearance.Accent" class="mt-4 w-3/4" @onclick="() => getParts(order)"></FluentButton>
-                            <FluentButton IconStart="@(new Icons.Regular.Size24.Wrench())" Appearance="Appearance.Accent" class="w-3/4"></FluentButton>
-                        </FluentCard>
-                    }
-                </div>
+                                <div class="h-40 rounded-md">
+                                    <img src="@order.Image" class="object-cover w-full h-full rounded-md" />
+                                </div>
+                                <h3 class= "h-14">
+                                    @order.Name
+                                </h3>
+                                <div class="flex flex-row gap-2 justify-center items-center text-center text-xl">
+                                    <span>
+                                        Ordered for:
+                                    </span>
+                                    <FluentBadge Appearance="Appearance.Neutral" class="text-lg mt-1">
+                                        <span class="text-green-500">
+                                            @order.Price€
+                                        </span>
+                                    </FluentBadge>
+                                </div>
+                                <FluentButton IconStart="@(new Icons.Regular.Size24.PuzzlePiece())" Appearance="Appearance.Accent" class="mt-4 w-3/4"></FluentButton>
+                                <FluentButton IconStart="@(new Icons.Regular.Size24.Wrench())" Appearance="Appearance.Accent" class="w-3/4"></FluentButton>
+                            </FluentCard>
+                        }
+                    </div>
+                }
             </div>
 
             <div class="pagination w-full flex items-center justify-center py-4 gap-3">

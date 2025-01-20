@@ -3,74 +3,24 @@
 @attribute [Authorize(Roles = "Admin")]
 @rendermode InteractiveServer
 <PageTitle>PCMount - Inventory</PageTitle>
+<FluentDialogProvider />
+<FluentMenuProvider />
 
 @inject InventarioService InventarioDb
+@inject IDialogService DialogService
 
-<div class="rounded-md py-2 mb-4 flex justify-between">
-    <div class="flex gap-6 w-1/3">
-        <div class="relative">
-            <FluentButton IconStart="@(new Icons.Regular.Size16.Filter())" slot="trigger" Appearance="Appearance.Neutral" text="Order by" @onclick="() => toggleOptionsCategory()">
-                Select category
-            </FluentButton>
-
-            @if (optionsDropDownCategory) {
-                <div class="absolute z-30 posfilter flex flex-col justify-center items-center rounded-l slide-down">
-                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(1)">
-                        Processor
-                    </FluentButton>
-                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(2)">
-                        Motherboard
-                    </FluentButton>
-                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(3)">
-                        Graphics Card
-                    </FluentButton>
-                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(4)">
-                        Memory
-                    </FluentButton>
-                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(5)">
-                        Storage
-                    </FluentButton>
-                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(6)">
-                        Power Supply
-                    </FluentButton>
-                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.PuzzlePiece())" @onclick="() => setFilterCategory(7)">
-                        Case
-                    </FluentButton>
-                </div>
-            }
-        </div>
-        <FluentButton IconStart="@(new Icons.Regular.Size16.FilterDismiss())" slot="trigger" Appearance="Appearance.Neutral" text="Order by" @onclick="() => resetFilters()">
-            Reset filters
-        </FluentButton>
-    </div>
-    <div class="ml-4 w-1/3 flex gap-4">
-        <FluentSearch class="w-full" Placeholder="Search for Parts" Value="@searchTerm" @oninput="OnSearchInput" />
-        <div class="relative">
-            <FluentButton IconStart="@(new Icons.Regular.Size16.Filter())" slot="trigger" Appearance="Appearance.Neutral" text="Order by" @onclick="() => toggleOptions()">
-                Order by 
-            </FluentButton>
-
-            @if (optionsDropDown) {
-                <div class="absolute z-30 posfilter flex flex-col justify-center items-center rounded-l slide-down">
-                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.ArrowSortUp())" @onclick="() => setFilterOption(1)">
-                        Highest Price
-                    </FluentButton>
-                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.ArrowSortDown())" @onclick="() => setFilterOption(2)">
-                        Lowest Price
-                    </FluentButton>
-                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.ArrowSortUp())" @onclick="() => setFilterOption(3)">
-                        Highest Quantity
-                    </FluentButton>
-                    <FluentButton class="w-44" IconStart="@(new Icons.Regular.Size16.ArrowSortDown())" @onclick="() => setFilterOption(4)">
-                        Lowest Quantity
-                    </FluentButton>
-                </div>
-            }
-        </div>
-    </div>
-    <div class="flex w-1/3">
-    </div>
-</div>
+<FluentToolbar class="w-full py-2 rounded-md shadow-md mb-4 flex flex-row justify-between items-center">
+    <FluentSelect TOption="PartTipo" Items="Enum.GetValues(typeof(PartTipo)).Cast<PartTipo>().ToList()" Placeholder="Select a category" SelectedOptionChanged="filterCategoryChanged" />
+    <FluentMenuButton IconStart="new Icons.Regular.Size16.Filter()" ButtonAppearance="@Appearance.Neutral" Text="Order by" OnMenuChanged="filterMenuChanged">
+        <FluentMenuItem Id="1"><FluentIcon Value="@(new Icons.Regular.Size16.ArrowSortUp())" /> Highest Price</FluentMenuItem>
+        <FluentMenuItem Id="2"><FluentIcon Value="@(new Icons.Regular.Size16.ArrowSortDown())" /> Lowest Price</FluentMenuItem>
+        <FluentMenuItem Id="3"><FluentIcon Value="@(new Icons.Regular.Size16.ArrowSortUp())" /> Highest Quantity</FluentMenuItem>
+        <FluentMenuItem Id="4"><FluentIcon Value="@(new Icons.Regular.Size16.ArrowSortDown())" /> Lowest Quantity</FluentMenuItem>
+    </FluentMenuButton>
+    <FluentSpacer />
+    <FluentSearch class="w-1/5" Placeholder="Search for Parts" @bind-Value="@searchTerm" @bind-Value:after="@OnSearchInput" Immediate="true" />
+    <FluentButton IconStart="@(new Icons.Regular.Size16.FilterDismiss())" Appearance="Appearance.Neutral" @onclick="() => resetFilters()">Reset Filters</FluentButton>
+</FluentToolbar>
 
 @if (filteredProducts == null)
 {
@@ -81,231 +31,173 @@
             <FluentSkeleton Width="100%" Height="340px"></FluentSkeleton>
         }
     </div>
-}
-else
-{
+} else {
     @if (filteredProducts != null && !filteredProducts.Any())
     {
-        <div class="text-center text-xl text-gray-200 mt-8">
-            No products found.
-        </div>
+        <span class="text-center text-xl text-gray-200 mt-8">No items found.</span>
     }
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-5">
         @foreach (Product product in filteredProducts!)
         {
             <div class="tr transition duration-300 ease-in-out">
                 <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2 hover:translate-y-2">
-                    <FluentButton 
-                        class="absolute top-2 left-2" 
-                        IconStart="@(new Icons.Regular.Size16.Info())"
-                        Appearance="Appearance.Lightweight"
-                        @onclick="() => ShowDescription(product)">
-                    </FluentButton>
+                    <FluentButton class="absolute top-2 left-2" IconStart="@(new Icons.Regular.Size16.Info())" Appearance="Appearance.Lightweight" @onclick="() => ShowDescription(product.Name, product.Descricao ?? string.Empty)"></FluentButton>
+                    <FluentButton class="absolute top-2 right-2" IconStart="@(new Icons.Regular.Size16.Delete())" Appearance="Appearance.Lightweight" @onclick="() => RemoveOneProduct(product.PartId)"></FluentButton>
                     <div class="w-36 rounded-md">
-                        <img src="@product.ImageUrl" class="object-cover w-full h-full rounded-md" />
+                        <img src="@product.Image" class="object-cover w-full h-full rounded-md" />
                     </div>
-                    <h3 class="-mb-2">
-                        @product.Name
-                    </h3>
-                    <span>
-                        @product.Category
-                    </span>
-                    <FluentBadge Appearance="Appearance.Lightweight" class="font-bold">
-                        #LI4
-                        <span>
-                            @product.StockCode
-                        </span>
-                    </FluentBadge>
-                    <div class="flex flex-row gap-2 justify-center items-center text-center text-xl">
-                        <span>
-                            Price:
-                        </span>
-                        <FluentBadge Appearance="Appearance.Neutral" class="text-lg mt-1">
-                            <span class="text-green-500">
-                                @product.Price€
-                            </span>
+                    <h3 class="mb-0">@product.Name</h3>
+                    <FluentBadge class="flex flex-row justify-center items-center text-center font-bold" Appearance="Appearance.Lightweight">@product.Tipo #@product.PartId</FluentBadge>
+                    <div class="flex flex-col gap-2 justify-center items-center text-center">
+                        <FluentBadge Appearance="Appearance.Neutral">
+                            <div class="flex flex-row space-x-1">
+                                <span>Price:</span>
+                                <span class="text-green-500 font-bold">@product.Preco.ToString("C")</span>
+                            </div>
                         </FluentBadge>
-                        <FluentSpacer />
-                        <span class="text-xl">
-                            Quantity:
-                        </span>
-                        <FluentBadge Appearance="Appearance.Neutral" class="text-lg mt-1">
-                            <span class="text-green-500">
-                                @product.Quantity                            
-                            </span>
+                        <FluentBadge Appearance="Appearance.Neutral">
+                            <div class="flex flex-row space-x-1">
+                                <span>Quantity:</span>
+                                <span class="font-bold" style="color: var(--accent-fill-rest);">@product.Quantity</span>
+                            </div>
+                        </FluentBadge>
+                        <FluentBadge Appearance="Appearance.Neutral">
+                            <div class="flex flex-row space-x-1">
+                                <span>Cost:</span>
+                                <span class="text-red-500 font-bold">@((product.Preco * product.Quantity).ToString("C"))</span>
+                            </div>
                         </FluentBadge>
                     </div>
                 </FluentCard>
             </div>
         }
     </div>
-
-    @if (isDialogVisible == true)
-    {
-        <!-- FluentDialog for displaying product description -->
-        <FluentDialog>
-            <FluentDialogHeader>
-                <p class="font-bold text-xl text-center relative">@selectedProduct?.Name</p>
-            </FluentDialogHeader>
-            <FluentDialogBody>
-                <p class="text-justify italic">
-                    @selectedProduct?.Description
-                </p>
-            </FluentDialogBody>
-            <FluentDialogFooter class=" absolute flex items-center justify-center top-5 right-5">
-                <FluentButton class="font-bold text-lg text-gray-300" @onclick="() => CloseDescription()">
-                    Cancel
-                </FluentButton>
-            </FluentDialogFooter>
-        </FluentDialog>
-    }
 }
 
 @code {
+    // Intermediary class to store product information extended from Part
+    private class Product : Part {
+        public int Quantity { get; set; }
+    }
+
     private List<Product>? products;
-    private bool isDialogVisible = false;
-    private List<Product>? filteredProducts; // Filtered list of products
-    private Product? selectedProduct;
-    private List<Inventario>? inventoryItems;
-    private bool optionsDropDownCategory = false;
-    private bool optionsDropDown = false;
-    private int filterOption = 0;
+    private List<Product>? filteredProducts = new List<Product>();
+    private int filterMenuOption = 0;
     private string filterCategory = string.Empty;
+
+    private void filterCategoryChanged(PartTipo SelectedOption) {
+        string category = SelectedOption.ToString();
+        if (!string.IsNullOrEmpty(category)) {
+            filterCategory = category;
+            SortProducts();
+        }
+    }
+
+    private void filterMenuChanged(MenuChangeEventArgs args) {
+        if (!string.IsNullOrEmpty(args.Id)) {
+            filterMenuOption = int.Parse(args.Id);
+            SortProducts();
+        }
+    }
 
     private void resetFilters() {
         filterCategory = string.Empty;
-        filterOption = 0;
-        optionsDropDown = false;
-        optionsDropDownCategory = false;
+        filterMenuOption = 0;
         searchTerm = string.Empty;
-        SortProducts(filterOption, filterCategory);
+        SortProducts();
     }
-
-    private void setFilterOption (int value) {
-        filterOption =  value;
-        toggleOptions();
-        SortProducts(filterOption, filterCategory);
-    }
-
-    private void setFilterCategory (int category) {
-        if (category == 1) {
-            filterCategory = "Processor";
-        } else if (category == 2) {
-            filterCategory = "Motherboard";
-        } else if (category == 3) {
-            filterCategory = "Graphics Card";
-        } else if (category == 4) {
-            filterCategory = "Memory";
-        } else if (category == 5) {
-            filterCategory = "Storage";
-        } else if (category == 6) {
-            filterCategory = "Power Supply";
-        } else if (category == 7) {
-            filterCategory = "Case";
-        }
-        toggleOptionsCategory();
-        SortProducts(filterOption, filterCategory);
-    }
-
-    private string searchTerm = string.Empty; // Search term
 
     protected override async Task OnInitializedAsync() {
-        inventoryItems = await InventarioDb.IncludeListAsync(i => i.Part); // Query the database to fetch Inventario data related to Part
-
-        // Map Inventario data to the Product model
-        products = inventoryItems.Select(i => new Product
-        {
+        products = (await InventarioDb.IncludeListAsync(i => i.Part))?.Select(i => new Product {
             Name = i.Part!.Name,
-            Category = i.Part.Tipo.ToString() == "GraphicsCard" ? "Graphics Card" : i.Part.Tipo.ToString() == "PowerSupply" ? "Power Supply" : i.Part.Tipo.ToString(), // Assuming "Type" maps to "Category"
-            StockCode = i.Part.PartId.ToString(), // Use PartId as StockCode
-            Price = (decimal)i.Part.Preco, // Convert float to decimal
+            Tipo = i.Part.Tipo,
+            PartId = i.Part.PartId,
+            Preco = i.Part.Preco,
             Quantity = i.Quantidade,
-            Description = i.Part.Descricao!,
-            ImageUrl = i.Part.Image!
+            Descricao = i.Part.Descricao!,
+            Image = i.Part.Image!
         }).ToList();
-
-        // Initialize filteredProducts with all products
-        filteredProducts = products;
+        DefaultSearchProducts();
     }
 
-    private void ShowDescription(Product product)
-    {
-        selectedProduct = product;
-        isDialogVisible = true;
-    }
-
-    private void CloseDescription()
-    {
-        isDialogVisible = false;
-    }
-
-    private void FilterProducts()
-    {
-        if (string.IsNullOrWhiteSpace(searchTerm))
-        {
-            // If the search term is empty, show all products
-            filteredProducts = products;
+    private void RemoveOneProduct(int partId) {
+        Product? product = filteredProducts?.FirstOrDefault(p => p.PartId == partId);
+        if (product != null) {
+            product.Quantity--;
+            if (product.Quantity == 0) {
+                filteredProducts!.Remove(product);
+            }
         }
-        else
-        {
+        /*
+        await InventarioDb.DeleteAsync(partId);
+        products = (await InventarioDb.IncludeListAsync(i => i.Part))?.Select(i => new Product {
+            Name = i.Part!.Name,
+            Tipo = i.Part.Tipo,
+            PartId = i.Part.PartId,
+            Preco = i.Part.Preco,
+            Quantity = i.Quantidade,
+            Descricao = i.Part.Descricao!,
+            Image = i.Part.Image!
+        }).ToList();
+        SortProducts();
+        */
+    }
+
+    private void FilterProducts() {
+        if (string.IsNullOrWhiteSpace(searchTerm)) {
+            DefaultSearchProducts(); // If the search term is empty, show all products
+        } else {
             // Filter products whose names contain the search term (case-insensitive)
             filteredProducts = products?
                 .Where(p => p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
-
         // Explicitly tell Blazor to re-render the UI
         StateHasChanged();
     }
-    // This method is called whenever the user types in the search box
-    private void OnSearchInput(ChangeEventArgs e)
-    {
-        searchTerm = e.Value?.ToString() ?? string.Empty; // Update the search term
-        FilterProducts(); // Filter the products
+
+    private void DefaultSearchProducts() {
+        filteredProducts = products;
     }
 
-    public class Product
-    {
-        public required string Name { get; set; }
-        public required string Category { get; set; }
-        public required string StockCode { get; set; }
-        public required decimal Price { get; set; }
-        public required int Quantity { get; set; }
-        public required string Description { get; set; }
-        public required string ImageUrl { get; set; }
+    private string searchTerm = string.Empty;
+    private void OnSearchInput() {
+        if (string.IsNullOrWhiteSpace(searchTerm)) {
+            searchTerm = string.Empty;
+            DefaultSearchProducts(); // Show all products
+        } else {
+            FilterProducts(); // Filter the products
+        }
     }
 
-    private void toggleOptions() {
-        optionsDropDown = !optionsDropDown;
-        optionsDropDownCategory = false;
-    }
-    private void toggleOptionsCategory() {
-        optionsDropDownCategory = !optionsDropDownCategory;
-        optionsDropDown = false;
+    private async Task ShowDescription(String title, String content) {
+        DialogParameters parameters = new() {
+            Title = title,
+            TrapFocus = true,
+            Modal = true,
+            PreventScroll = true 
+        };
+        IDialogReference dialog = await DialogService.ShowDialogAsync<DescriptionDialog>(content, parameters);
     }
 
-    private void SortProducts(int filter, string category)
-    {
+    private void SortProducts() {
         if (filteredProducts == null)
             return;
-
         // Apply category filter
-        if (!string.IsNullOrEmpty(category)) {
+        if (!string.IsNullOrEmpty(filterCategory)) {
             filteredProducts = products!
-                .Where(p => p.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
+                .Where(p => string.Equals(p.Tipo.ToString(), filterCategory, StringComparison.OrdinalIgnoreCase))
                 .ToList();
         } else {
-            // If no category is selected, show all products
-            filteredProducts = products;
+            DefaultSearchProducts();
         }
-
         // Apply sorting
-        switch (filter) {
+        switch (filterMenuOption) {
             case 1: // Highest Price
-                filteredProducts = filteredProducts!.OrderByDescending(p => p.Price).ToList();
+                filteredProducts = filteredProducts!.OrderByDescending(p => p.Preco).ToList();
                 break;
             case 2: // Lowest Price
-                filteredProducts = filteredProducts!.OrderBy(p => p.Price).ToList();
+                filteredProducts = filteredProducts!.OrderBy(p => p.Preco).ToList();
                 break;
             case 3: // Highest Quantity
                 filteredProducts = filteredProducts!.OrderByDescending(p => p.Quantity).ToList();
@@ -316,36 +208,5 @@ else
             default: 
                 break;
         }
-
-        // Explicitly tell Blazor to re-render the UI
-        StateHasChanged();
     }
 }
-
-<style scoped>
-.tr:hover {
-  transform: scale(1.05); 
-}
-.tr1 {
-    box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-}
-.posfilter {
-    top: 38px;
-}
-
-.slide-down {
-    animation: slideDown 0.3s ease-in-out;
-}
-
-@@keyframes slideDown {
-    from {
-        transform: translateY(-20px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-</style>
