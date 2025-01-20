@@ -5,9 +5,15 @@ using Microsoft.EntityFrameworkCore;
 using PCMount.Data;
 using PCMount.Data.Models;
 
-public class ComputersService(ApplicationDbContext dbContext) : IDbContextAcessor<Computer> {
-    private readonly ApplicationDbContext _dbContext = dbContext;
-    private static readonly SemaphoreSlim semaphore = new(1, int.MaxValue);
+public class ComputersService : IDbContextAcessor<Computer> {
+    private readonly ApplicationDbContext _dbContext;
+    private static readonly SemaphoreSlim semaphore = new(1, 1);
+
+    public ComputersService() {
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+        _ = optionsBuilder.UseSqlServer(DbContextConfig.ConnectionString);
+        _dbContext = new ApplicationDbContext(optionsBuilder.Options);
+    }
 
     public async Task<Computer[]> GetArrayAsync() {
         await semaphore.WaitAsync();
@@ -69,7 +75,7 @@ public class ComputersService(ApplicationDbContext dbContext) : IDbContextAcesso
     }
 
     public bool Any(Expression<Func<Computer, bool>> predicate) {
-        return _dbContext.Computers.Any(predicate);
+        return _dbContext.Computers.AsNoTracking().Any(predicate);
     }
 
     public async Task<Computer?> FindAsync(int id) {
@@ -84,7 +90,7 @@ public class ComputersService(ApplicationDbContext dbContext) : IDbContextAcesso
     public async Task<Computer?> FindOneAsync(Expression<Func<Computer, bool>> predicate) {
         await semaphore.WaitAsync();
         try {
-            return await _dbContext.Computers.FirstOrDefaultAsync(predicate);
+            return await _dbContext.Computers.AsNoTracking().FirstOrDefaultAsync(predicate);
         } finally {
             semaphore.Release();
         }
@@ -93,7 +99,7 @@ public class ComputersService(ApplicationDbContext dbContext) : IDbContextAcesso
     public async Task<Computer[]> FindAllAsync(Expression<Func<Computer, bool>> predicate) {
         await semaphore.WaitAsync();
         try {
-            return await _dbContext.Computers.Where(predicate).ToArrayAsync();
+            return await _dbContext.Computers.Where(predicate).AsNoTracking().ToArrayAsync();
         } finally {
             semaphore.Release();
         }

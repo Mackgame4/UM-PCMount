@@ -5,9 +5,15 @@ using Microsoft.EntityFrameworkCore;
 using PCMount.Data;
 using PCMount.Data.Models;
 
-public class UsersService(ApplicationDbContext dbContext) : IDbContextAcessor<User> {
-    private readonly ApplicationDbContext _dbContext = dbContext;
-    private static readonly SemaphoreSlim semaphore = new(1, int.MaxValue);
+public class UsersService : IDbContextAcessor<User> {
+    private readonly ApplicationDbContext _dbContext;
+    private static readonly SemaphoreSlim semaphore = new(1, 1);
+
+    public UsersService() {
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+        _ = optionsBuilder.UseSqlServer(DbContextConfig.ConnectionString);
+        _dbContext = new ApplicationDbContext(optionsBuilder.Options);
+    }
 
     public async Task<User[]> GetArrayAsync() {
         await semaphore.WaitAsync();
@@ -80,7 +86,7 @@ public class UsersService(ApplicationDbContext dbContext) : IDbContextAcessor<Us
     public async Task<User?> FindOneAsync(Expression<Func<User, bool>> predicate) {
         await semaphore.WaitAsync();
         try {
-            return await _dbContext.Users.FirstOrDefaultAsync(predicate);
+            return await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(predicate);
         } finally {
             semaphore.Release();
         }
@@ -93,7 +99,7 @@ public class UsersService(ApplicationDbContext dbContext) : IDbContextAcessor<Us
     public async Task<User[]> FindAllAsync(Expression<Func<User, bool>> predicate) {
         await semaphore.WaitAsync();
         try {
-            return await _dbContext.Users.Where(predicate).ToArrayAsync();
+            return await _dbContext.Users.Where(predicate).AsNoTracking().ToArrayAsync();
         } finally {
             semaphore.Release();
         }

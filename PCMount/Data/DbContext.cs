@@ -1,7 +1,24 @@
 namespace PCMount.Data;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using PCMount.Data.Models;
+
+public static class DbContextConfig {
+    private static string? _connectionString;
+
+    public static void Initialize(IConfiguration configuration) {
+        _connectionString = configuration.GetConnectionString("DefaultConnection");
+    }
+
+    public static string ConnectionString {
+        get {
+            if (string.IsNullOrEmpty(_connectionString))
+                throw new InvalidOperationException("Connection string is not initialized. Call Initialize() first.");
+            return _connectionString;
+        }
+    }
+}
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options) {
     protected override void OnModelCreating(ModelBuilder modelBuilder) {

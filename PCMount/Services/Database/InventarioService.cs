@@ -5,9 +5,15 @@ using Microsoft.EntityFrameworkCore;
 using PCMount.Data;
 using PCMount.Data.Models;
 
-public class InventarioService(ApplicationDbContext dbContext) : IDbContextAcessor<Inventario> {
-    private readonly ApplicationDbContext _dbContext = dbContext;
-    private static readonly SemaphoreSlim semaphore = new(1, int.MaxValue);
+public class InventarioService : IDbContextAcessor<Inventario> {
+    private readonly ApplicationDbContext _dbContext;
+    private static readonly SemaphoreSlim semaphore = new(1, 1);
+
+    public InventarioService() {
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+        _ = optionsBuilder.UseSqlServer(DbContextConfig.ConnectionString);
+        _dbContext = new ApplicationDbContext(optionsBuilder.Options);
+    }
 
     public async Task<Inventario[]> GetArrayAsync() {
         await semaphore.WaitAsync();
@@ -77,6 +83,18 @@ public class InventarioService(ApplicationDbContext dbContext) : IDbContextAcess
         }
     }
 
+    public async Task<List<Inventario>> IncludeListAsync<TProperty>(Expression<Func<Inventario, TProperty>> navigationPropertyPath) {
+        await semaphore.WaitAsync();
+        try {
+            return await _dbContext.Inventario
+                .AsNoTracking()
+                .Include(navigationPropertyPath) // Dynamically include related entities
+                .ToListAsync();
+        } finally {
+            semaphore.Release();
+        }
+    }
+
     public async Task<Inventario?> FindAsync(int id) {
         await semaphore.WaitAsync();
         try {
@@ -89,7 +107,7 @@ public class InventarioService(ApplicationDbContext dbContext) : IDbContextAcess
     public async Task<Inventario?> FindOneAsync(Expression<Func<Inventario, bool>> predicate) {
         await semaphore.WaitAsync();
         try {
-            return await _dbContext.Inventario.FirstOrDefaultAsync(predicate);
+            return await _dbContext.Inventario.AsNoTracking().FirstOrDefaultAsync(predicate);
         } finally {
             semaphore.Release();
         }

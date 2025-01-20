@@ -4,8 +4,7 @@
 @rendermode InteractiveServer
 <PageTitle>PCMount - Inventory</PageTitle>
 
-@using Microsoft.EntityFrameworkCore
-@inject ApplicationDbContext DbContext
+@inject InventarioService InventarioDb
 
 <div class="rounded-md py-2 mb-4 flex justify-between">
     <div class="flex gap-6 w-1/3">
@@ -210,13 +209,8 @@ else
 
     private string searchTerm = string.Empty; // Search term
 
-    protected override async Task OnInitializedAsync()
-    {
-         await Task.Delay(500);
-        // Query the database to fetch Inventario data
-        inventoryItems = await DbContext.Inventario
-            .Include(i => i.Part) // Include the related Part data
-            .ToListAsync();
+    protected override async Task OnInitializedAsync() {
+        inventoryItems = await InventarioDb.IncludeListAsync(i => i.Part); // Query the database to fetch Inventario data related to Part
 
         // Map Inventario data to the Product model
         products = inventoryItems.Select(i => new Product

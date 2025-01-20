@@ -5,9 +5,15 @@ using Microsoft.EntityFrameworkCore;
 using PCMount.Data;
 using PCMount.Data.Models;
 
-public class ComponentesService(ApplicationDbContext dbContext) : IDbContextAcessor<Part> {
-    private readonly ApplicationDbContext _dbContext = dbContext;
-    private static readonly SemaphoreSlim semaphore = new(1, int.MaxValue);
+public class ComponentesService : IDbContextAcessor<Part> {
+    private readonly ApplicationDbContext _dbContext;
+    private static readonly SemaphoreSlim semaphore = new(1, 1);
+
+    public ComponentesService() {
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+        _ = optionsBuilder.UseSqlServer(DbContextConfig.ConnectionString);
+        _dbContext = new ApplicationDbContext(optionsBuilder.Options);
+    }
 
     public async Task<Part[]> GetArrayAsync() {
         await semaphore.WaitAsync();
@@ -71,7 +77,7 @@ public class ComponentesService(ApplicationDbContext dbContext) : IDbContextAces
     public bool Any(Expression<Func<Part, bool>> predicate) {
         semaphore.Wait();
         try {
-            return _dbContext.Componentes.Any(predicate);
+            return _dbContext.Componentes.AsNoTracking().Any(predicate);
         } finally {
             semaphore.Release();
         }
@@ -89,7 +95,7 @@ public class ComponentesService(ApplicationDbContext dbContext) : IDbContextAces
     public async Task<Part?> FindOneAsync(Expression<Func<Part, bool>> predicate) {
         await semaphore.WaitAsync();
         try {
-            return await _dbContext.Componentes.FirstOrDefaultAsync(predicate);
+            return await _dbContext.Componentes.AsNoTracking().FirstOrDefaultAsync(predicate);
         } finally {
             semaphore.Release();
         }
@@ -98,7 +104,7 @@ public class ComponentesService(ApplicationDbContext dbContext) : IDbContextAces
     public async Task<Part[]> FindAllAsync(Expression<Func<Part, bool>> predicate) {
         await semaphore.WaitAsync();
         try {
-            return await _dbContext.Componentes.Where(predicate).ToArrayAsync();
+            return await _dbContext.Componentes.Where(predicate).AsNoTracking().ToArrayAsync();
         } finally {
             semaphore.Release();
         }

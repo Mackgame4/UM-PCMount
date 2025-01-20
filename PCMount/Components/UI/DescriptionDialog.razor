@@ -1,0 +1,21 @@
+@namespace PCMount.Components.UI
+@implements IDialogContentComponent
+
+<FluentDialog>
+    <FluentDialogHeader ShowDismiss="true">
+        <p class="font-bold text-xl text-center relative">@Title</p>
+    </FluentDialogHeader>
+    <FluentDialogBody>
+        <p class="text-justify italic">
+            @Text
+        </p>
+    </FluentDialogBody>
+</FluentDialog>
+
+@code {
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Text { get; set; }
+}
