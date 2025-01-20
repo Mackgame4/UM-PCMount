@@ -104,4 +104,62 @@ public class OrdersService : IDbContextAcessor<Order> {
             semaphore.Release();
         }
     }
+
+    public async Task<List<Part>> GetPartsForOrderAsync(Order order)
+    {
+        await semaphore.WaitAsync(); 
+        try
+        {
+            var parts = new List<Part>();
+
+            if (order.MotherboardId.HasValue)
+            {
+                var motherboard = await _dbContext.Componentes.FindAsync(order.MotherboardId);
+                if (motherboard != null) parts.Add(motherboard);
+            }
+
+            if (order.ProcessorId.HasValue)
+            {
+                var processor = await _dbContext.Componentes.FindAsync(order.ProcessorId);
+                if (processor != null) parts.Add(processor);
+            }
+
+            if (order.MemoryId.HasValue)
+            {
+                var memory = await _dbContext.Componentes.FindAsync(order.MemoryId);
+                if (memory != null) parts.Add(memory);
+            }
+
+            if (order.StorageId.HasValue)
+            {
+                var storage = await _dbContext.Componentes.FindAsync(order.StorageId);
+                if (storage != null) parts.Add(storage);
+            }
+
+            if (order.GraphicsCardId.HasValue)
+            {
+                var graphicsCard = await _dbContext.Componentes.FindAsync(order.GraphicsCardId);
+                if (graphicsCard != null) parts.Add(graphicsCard);
+            }
+
+            if (order.PowerSupplyId.HasValue)
+            {
+                var powerSupply = await _dbContext.Componentes.FindAsync(order.PowerSupplyId);
+                if (powerSupply != null) parts.Add(powerSupply);
+            }
+
+            if (order.CaseId.HasValue)
+            {
+                var pcCase = await _dbContext.Componentes.FindAsync(order.CaseId);
+                if (pcCase != null) parts.Add(pcCase);
+            }
+
+            return parts.Where(p => p != null).ToList(); 
+        }
+        finally
+        {
+            semaphore.Release(); 
+        }
+    }
+
 }

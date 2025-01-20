@@ -27,37 +27,36 @@ else
         <Steps>
             <FluentWizardStep Label="Select Order" OnChange="@OnStepChange">
             <div class="order-grid mx-auto">
-                    <div class="grid grid-cols-5 gap-6">
-                        @foreach (var order in OrdersList)
-                        {
-                            <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2 hover:translate-y-2" @onclick="() => SelectOrder(order)">
-                                <FluentBadge>
-                                    <span class="font-medium">
-                                        @order.Status.ToString() Order ID: @order.OrderId
+                <div class="grid grid-cols-5 gap-6">
+                    @foreach (var order in OrdersList)
+                    {
+                        <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2 hover:translate-y-2" @onclick="() => SelectOrder(order)">
+                            <FluentBadge>
+                                <span class="font-medium">
+                                    @order.Status.ToString() Order ID: @order.OrderId
+                                </span>
+                            </FluentBadge>
+                            <div class="h-40 rounded-md">
+                                <img src="@order.Image" class="object-cover w-full h-full rounded-md" />
+                            </div>
+                            <h3 class= "h-14">
+                                @order.Name
+                            </h3>
+                            <div class="flex flex-row gap-2 justify-center items-center text-center text-xl">
+                                <span>
+                                    Ordered for:
+                                </span>
+                                <FluentBadge Appearance="Appearance.Neutral" class="text-lg mt-1">
+                                    <span class="text-green-500">
+                                        @order.Price€
                                     </span>
                                 </FluentBadge>
-                                <div class="h-40 rounded-md">
-                                    <img src="@order.Image" class="object-cover w-full h-full rounded-md" />
-                                </div>
-                                <h3 class= "h-14">
-                                    @order.Name
-                                </h3>
-                                <div class="flex flex-row gap-2 justify-center items-center text-center text-xl">
-                                    <span>
-                                        Ordered for:
-                                    </span>
-                                    <FluentBadge Appearance="Appearance.Neutral" class="text-lg mt-1">
-                                        <span class="text-green-500">
-                                            @order.Price€
-                                        </span>
-                                    </FluentBadge>
-                                </div>
-                                <FluentButton IconStart="@(new Icons.Regular.Size24.PuzzlePiece())" Appearance="Appearance.Accent" class="mt-4 w-3/4"></FluentButton>
-                                <FluentButton IconStart="@(new Icons.Regular.Size24.Wrench())" Appearance="Appearance.Accent" class="w-3/4"></FluentButton>
-                            </FluentCard>
-                        }
-                    </div>
-                }
+                            </div>
+                            <FluentButton IconStart="@(new Icons.Regular.Size24.PuzzlePiece())" Appearance="Appearance.Accent" class="mt-4 w-3/4" @onclick="() => getParts(order)"></FluentButton>
+                            <FluentButton IconStart="@(new Icons.Regular.Size24.Wrench())" Appearance="Appearance.Accent" class="w-3/4"></FluentButton>
+                        </FluentCard>
+                    }
+                </div>
             </div>
 
             <div class="pagination w-full flex items-center justify-center py-4 gap-3">
@@ -65,7 +64,7 @@ else
                     Previous
                 </FluentButton>
                 <span class="text-lg">
-                    Page @CurrentPage of @TotalPages
+                    @CurrentPage / @TotalPages
                 </span>
                 <FluentButton @onclick="@NextPage" disabled="@IsLastPage" class="text-lg font-medium">
                     Next
@@ -95,14 +94,52 @@ else
     </FluentWizard>
 }
 
+@if (checkingParts == true)
+    {
+        <FluentDialog>
+            <FluentDialogHeader>
+                <h1 class="font-bold text-xl text-center relative">
+                    @activeOrder.Name | Order ID: @activeOrder.OrderId
+                </h1>
+                <h1 class="font-bold text-xl text-center relative">
+                    Build Requirements
+                </h1>
+            </FluentDialogHeader>
+            <FluentDialogBody>
+                <div class="grid grid-cols-3 w-full gap-4">
+                    @foreach (Part part in activePartsList)
+                    {
+                        <div class="flex flex-col items-center justify-center  gap-2">
+                            <FluentBadge>
+                                @part?.Name
+                            </FluentBadge>
+                            <img src="@part?.Image" class="object-cover h-20" />
+                        </div>
+                    }
+                </div>
+            </FluentDialogBody>
+            <FluentDialogFooter class=" absolute flex items-center justify-center top-5 right-5">
+                <FluentButton class="font-bold text-lg text-gray-300" @onclick="() => togglePartsList()">
+                    Cancel
+                </FluentButton>
+            </FluentDialogFooter>
+        </FluentDialog>
+    }
+
 @code {
     private List<Order>? OrdersList { get; set; }
+    private List<Part>? activePartsList {get; set; }
+    private Order activeOrder {get; set; }
+    private bool checkingParts = false;
     private int CurrentPage { get; set; } = 1;
     private int PageSize { get; set; } = 5;
     private int TotalPages { get; set; }
     private bool IsFirstPage => CurrentPage == 1;
     private bool IsLastPage => CurrentPage == TotalPages;
 
+    private void togglePartsList() {
+        checkingParts = !checkingParts;
+    }
     protected override async Task OnInitializedAsync()
     {
         await LoadOrdersAsync();
@@ -113,6 +150,16 @@ else
         Order[]? orders = await OrdersDb.GetArrayAsync();
         TotalPages = (int)Math.Ceiling(orders.Length / (double)PageSize);
         OrdersList = orders.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
+    }
+
+    private async void getParts(Order order) {
+        activeOrder = order;
+        await LoadPartsOfOrder(order);
+        togglePartsList();
+    }
+
+    private async Task LoadPartsOfOrder(Order order) {
+        activePartsList = await OrdersDb.GetPartsForOrderAsync(order);
     }
 
     private async Task NextPage()
