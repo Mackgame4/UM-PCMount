@@ -114,61 +114,45 @@ public class OrdersService : IDbContextAcessor<Order> {
         }
     }
 
-    public async Task<List<Part>> GetPartsForOrderAsync(Order order)
+    public async Task<List<(Part Part, int Quantity)>> GetPartsForOrderAsync(Order order)
     {
-        await semaphore.WaitAsync(); 
+        await semaphore.WaitAsync();
         try
         {
-            var parts = new List<Part>();
+            var partsWithQuantities = new List<(Part Part, int Quantity)>();
 
-            if (order.MotherboardId.HasValue)
+            async Task AddPartWithQuantityAsync(int? partId)
             {
-                var motherboard = await _dbContext.Componentes.FindAsync(order.MotherboardId);
-                if (motherboard != null) parts.Add(motherboard);
+                if (!partId.HasValue) return;
+
+                // Fetch the part from the Componentes table
+                var part = await _dbContext.Componentes.FindAsync(partId);
+                if (part != null)
+                {
+                    // Check the quantity in the Inventario table
+                    var inventory = await _dbContext.Inventario.FindAsync(part.PartId);
+                    int quantity = inventory?.Quantidade ?? 0;
+
+                    partsWithQuantities.Add((part, quantity));
+                }
             }
 
-            if (order.ProcessorId.HasValue)
-            {
-                var processor = await _dbContext.Componentes.FindAsync(order.ProcessorId);
-                if (processor != null) parts.Add(processor);
-            }
+            // Add parts to the list
+            await AddPartWithQuantityAsync(order.MotherboardId);
+            await AddPartWithQuantityAsync(order.ProcessorId);
+            await AddPartWithQuantityAsync(order.MemoryId);
+            await AddPartWithQuantityAsync(order.StorageId);
+            await AddPartWithQuantityAsync(order.GraphicsCardId);
+            await AddPartWithQuantityAsync(order.PowerSupplyId);
+            await AddPartWithQuantityAsync(order.CaseId);
 
-            if (order.MemoryId.HasValue)
-            {
-                var memory = await _dbContext.Componentes.FindAsync(order.MemoryId);
-                if (memory != null) parts.Add(memory);
-            }
-
-            if (order.StorageId.HasValue)
-            {
-                var storage = await _dbContext.Componentes.FindAsync(order.StorageId);
-                if (storage != null) parts.Add(storage);
-            }
-
-            if (order.GraphicsCardId.HasValue)
-            {
-                var graphicsCard = await _dbContext.Componentes.FindAsync(order.GraphicsCardId);
-                if (graphicsCard != null) parts.Add(graphicsCard);
-            }
-
-            if (order.PowerSupplyId.HasValue)
-            {
-                var powerSupply = await _dbContext.Componentes.FindAsync(order.PowerSupplyId);
-                if (powerSupply != null) parts.Add(powerSupply);
-            }
-
-            if (order.CaseId.HasValue)
-            {
-                var pcCase = await _dbContext.Componentes.FindAsync(order.CaseId);
-                if (pcCase != null) parts.Add(pcCase);
-            }
-
-            return parts.Where(p => p != null).ToList(); 
+            return partsWithQuantities;
         }
         finally
         {
-            semaphore.Release(); 
+            semaphore.Release();
         }
     }
+
 
 }
