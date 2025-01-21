@@ -4,42 +4,28 @@
 <PageTitle>PCMount - Dashboard</PageTitle>
 
 <div class="grid grid-cols-12 gap-4 w-full h-screen-space">
-    <!-- Section 1: Wide header -->
-    <div class="col-span-12 bg-gray-400 rounded-lg p-4 shadow">
-        <h3 class="text-xl font-bold">Overview</h3>
-        <p class="text-sm text-gray-600">Quick stats and insights</p>
-    </div>
-
-    <!-- Section 2: Medium-sized stats -->
-    <div class="col-span-6 lg:col-span-4 bg-blue-400 rounded-lg p-4 shadow">
-        <h4 class="text-lg font-semibold">Active Users</h4>
-        <p class="text-2xl font-bold">1,245</p>
-    </div>
-    <div class="col-span-6 lg:col-span-4 bg-green-400 rounded-lg p-4 shadow">
-        <h4 class="text-lg font-semibold">Sales</h4>
-        <p class="text-2xl font-bold">$12,450</p>
-    </div>
-    <div class="col-span-6 lg:col-span-4 bg-yellow-400 rounded-lg p-4 shadow">
-        <h4 class="text-lg font-semibold">New Signups</h4>
-        <p class="text-2xl font-bold">320</p>
-    </div>
-
-    <!-- Section 3: Large chart -->
-    <div class="col-span-12 lg:col-span-8 bg-gray-400 rounded-lg p-4 shadow">
-        <h4 class="text-lg font-semibold">Sales Chart</h4>
-        <p class="text-sm text-gray-600">Last 30 days</p>
-        <!-- Add chart here -->
-        <div class="h-40 bg-white rounded-md"></div>
-    </div>
-
-    <!-- Section 4: Smaller widgets -->
-    <div class="col-span-12 lg:col-span-4 bg-red-400 rounded-lg p-4 shadow">
-        <h4 class="text-lg font-semibold">Notifications</h4>
-        <ul class="text-sm text-gray-600 list-disc list-inside">
-            <li>Order #1234 shipped</li>
-            <li>New signup: Jane Doe</li>
-            <li>Payment received for Order #5678</li>
-        </ul>
+    <!-- Main Vertical Section -->
+    <FluentCard MinimalStyle="true" Class="col-span-12 lg:col-span-4 p-4 shadow-md flex flex-col gap-4">
+        <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.DocumentBulletListCube())" /> Manage Store Products</h4>
+        <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.ReceiptBag())" /> Most Shopped Products</h4>
+    </FluentCard>
+    <!-- Main Side Content -->
+    <div class="col-span-12 lg:col-span-8 grid grid-cols-12 gap-4">
+        <!-- Section -->
+        <FluentCard MinimalStyle="true" Class="col-span-12 lg:col-span-6 p-4 shadow-md">
+            <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Color="Color.Success" Value="@(new Icons.Regular.Size20.MoneyCalculator())" /> Total Revenue</h4>
+        </FluentCard>
+        <FluentCard MinimalStyle="true" Class="col-span-12 lg:col-span-6 p-4 shadow-md">
+            <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Color="Color.Error" Value="@(new Icons.Regular.Size20.MoneyHand())" /> Total Expenses</h4>
+        </FluentCard>
+        <!-- Section -->
+        <FluentCard MinimalStyle="true" Class="col-span-12 p-4 shadow-md">
+            <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.VehicleTruckCube())" /> Most Ordered Parts</h4>
+        </FluentCard>
+        <!-- Section -->
+        <FluentCard MinimalStyle="true" Class="col-span-12 p-4 shadow-md">
+            <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.BoxCheckmark())" /> Completed Orders</h4>
+        </FluentCard>
     </div>
 </div>
 
