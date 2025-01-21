@@ -109,13 +109,13 @@
             Quantity = i.Quantidade,
             Descricao = i.Part.Descricao!,
             Image = i.Part.Image!
-        }).ToList();
+        }).Where(p => p.Quantity > 0).ToList();
         DefaultSearchProducts();
     }
 
     private async Task RemoveOneProduct(int partId) {
         Product? product = filteredProducts?.FirstOrDefault(p => p.PartId == partId);
-        if (product != null) {
+        if (product != null && product.Quantity > 0) {
             product.Quantity--;
             if (product.Quantity == 0) {
                 filteredProducts!.Remove(product);
