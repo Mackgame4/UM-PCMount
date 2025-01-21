@@ -4,6 +4,7 @@
 @rendermode InteractiveServer
 <PageTitle>PCMount - Assembly</PageTitle>
 
+@inject NavigationManager Navigation
 @inject OrdersService OrdersDb
 
 @if (OrdersList == null) {
@@ -140,6 +141,10 @@
         StateHasChanged(); // Notify Blazor to refresh UI
     }
 
+    private string getOrderAssemblyPath(int orderId) {
+        return $"/dashboard/assembly/{orderId}";
+    }
+    
     private async Task checkStartability(Order order, int index)
     {
         activeOrder = order;
@@ -154,6 +159,9 @@
         OrderStartability[index] = hasOutOfStockParts;
 
         StateHasChanged(); // Notify Blazor to refresh UI
+        if (!hasOutOfStockParts) {
+            Navigation.NavigateTo(getOrderAssemblyPath(order.OrderId));
+        }
     }
 
 
