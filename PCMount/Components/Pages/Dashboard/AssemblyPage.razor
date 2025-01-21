@@ -1,0 +1,17 @@
+@page "/dashboard/assembly/{Id:int}"
+<PageTitle>PCMount - Assembly</PageTitle>
+
+@if (Id <= 0) {
+    <p>Invalid Assembly ID.</p>
+} else {
+    <p>Assemblying Order with ID: @Id</p>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override void OnParametersSet() {
+        // TODO: Fetch the order with the given ID
+    }
+}
