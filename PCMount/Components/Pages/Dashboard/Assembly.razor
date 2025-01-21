@@ -7,100 +7,52 @@
 @inject OrdersService OrdersDb
 
 @if (OrdersList == null) {
-    <div class="w-full flex items-center justify-center">
-        <p class="text-xl">
-            Loading orders...
-        </p>
-    </div>
-}
-else if (!OrdersList.Any())
-{   
-    <div class="w-full flex items-center justify-center">
-        <p class="text-xl">
-            No orders found.
-        </p>
-    </div>
-}
-else
-{
-    <FluentWizard StepperPosition="StepperPosition.Top" StepSequence="WizardStepSequence.Any" DisplayStepNumber="@(WizardStepStatus.Current | WizardStepStatus.Next)" StepTitleHiddenWhen="@GridItemHidden.XsAndDown" OnFinish="@OnFinishedAsync">
-        <Steps>
-            <FluentWizardStep Label="Select Order" OnChange="@OnStepChange">
-            <div class="order-grid mx-auto">
-                    <div class="grid grid-cols-5 gap-6">
-                        @foreach (var order in OrdersList.Select((Order order, int index) => new { order, index }))
-                        {
-                            <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2 hover:translate-y-2" @onclick="() => SelectOrder(order.order)">
-                                <FluentBadge>
-                                    <span class="font-medium">
-                                        @order.order.Status.ToString() Order ID: @order.order.OrderId
-                                    </span>
-                                </FluentBadge>
-                                <div class="h-40 rounded-md">
-                                    <img src="@order.order.Image" class="object-cover w-full h-full rounded-md" />
-                                </div>
-                                <h3 class= "h-14">
-                                    @order.order.Name
-                                </h3>
-                                <div class="flex flex-row gap-2 justify-center items-center text-center text-xl">
-                                    <span>
-                                        Ordered for:
-                                    </span>
-                                    <FluentBadge Appearance="Appearance.Neutral" class="text-lg mt-1">
-                                        <span class="text-green-500">
-                                            @order.order.Price€
-                                        </span>
-                                    </FluentBadge>
-                                </div>
-                                <FluentButton IconStart="@(new Icons.Regular.Size24.PuzzlePiece())" Appearance="Appearance.Accent" class="mt-4 w-3/4" @onclick="() => getParts(order.order)"></FluentButton>
-                                <FluentButton IconStart="@(new Icons.Regular.Size24.Wrench())" Appearance="Appearance.Accent" class="w-3/4" @onclick="() => checkStartability(order.order, order.index)"></FluentButton>
-                                @if (OrderStartability.TryGetValue(order.index, out bool cannotStart) && cannotStart)
-                                {
-                                    <p class="text-red-500 text-sm h-6">
-                                        There is not enough parts to start Assemblying!
-                                    </p>
-                                } else {
-                                    <div class="h-6"></div>
-                                }
-                            </FluentCard>
-                        }
+    <LoadingDialog Title="Loading Orders..." />
+} else if (!OrdersList.Any()) {   
+    <span class="text-center text-xl text-gray-200 mt-8">No orders found.</span>
+} else {
+    <div class="order-grid mx-auto w-full h-screen-space">
+        <div class="grid grid-cols-5 gap-6">
+            @foreach (var order in OrdersList.Select((Order order, int index) => new { order, index })) {
+                <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2 hover:translate-y-2" @onclick="() => SelectOrder(order.order)">
+                    <FluentBadge>
+                        <span class="font-medium">
+                            @order.order.Status.ToString() Order ID: @order.order.OrderId
+                        </span>
+                    </FluentBadge>
+                    <div class="h-40 rounded-md">
+                        <img src="@order.order.Image" class="object-cover w-full h-full rounded-md" />
                     </div>
-                }
-            </div>
-
-            <div class="pagination w-full flex items-center justify-center py-4 gap-3">
-                <FluentButton @onclick="@PreviousPage" disabled="@IsFirstPage" class="text-lg font-medium">
-                    Previous
-                </FluentButton>
-                <span class="text-lg">
-                    @CurrentPage / @TotalPages
-                </span>
-                <FluentButton @onclick="@NextPage" disabled="@IsLastPage" class="text-lg font-medium">
-                    Next
-                </FluentButton>
-            </div>
-    </FluentWizardStep>
-            <FluentWizardStep Label="Get started" Summary="Begin the tasks" OnChange="@OnStepChange">
-                Maecenas sed justo ac sapien venenatis ullamcorper. Sed maximus nunc non venenatis euismod.
-                Fusce vel porta ex, imperdiet molestie nisl. Vestibulum eu ultricies mauris, eget aliquam quam.
-            </FluentWizardStep>
-            <FluentWizardStep Disabled="true" Label="Disabled step" Summary="This step is disabled" OnChange="@OnStepChange">
-                Nunc dignissim tortor eget lacus porta tristique. Nunc in posuere dui. Cras ligula ex,
-                ullamcorper in gravida in, euismod vitae purus. Lorem ipsum dolor sit amet, consectetur
-                adipiscing elit. Aliquam at velit leo. Suspendisse potenti. Cras dictum eu augue in laoreet.
-            </FluentWizardStep>
-            <FluentWizardStep Label="Set budget" Summary="Identify the best price" IconPrevious="@(new Icons.Filled.Size24.Star())" IconCurrent="@(new Icons.Filled.Size24.StarEmphasis())" IconNext="@(new Icons.Regular.Size24.Star())" DisplayStepNumber="false" OnChange="@OnStepChange">
-                Phasellus quis augue convallis, congue velit ac, aliquam ex. In egestas porttitor massa
-                aliquet porttitor. Donec bibendum faucibus urna vitae elementum. Phasellus vitae efficitur
-                turpis, eget molestie ipsum.
-            </FluentWizardStep>
-            <FluentWizardStep Label="Summary" OnChange="@OnStepChange">
-                Ut iaculis sed magna efficitur tempor. Vestibulum est erat, imperdiet in diam ac,
-                aliquam tempus sapien. Nam rutrum mi at enim mattis, non mollis diam molestie.
-                Cras sodales dui libero, sit amet cursus sapien elementum ac. Nulla euismod nisi sem.
-            </FluentWizardStep>
-        </Steps>
-    </FluentWizard>
+                    <h3 class= "h-14">
+                        @order.order.Name
+                    </h3>
+                    <div class="flex flex-row gap-2 justify-center items-center text-center text-xl">
+                        <span>
+                            Ordered for:
+                        </span>
+                        <FluentBadge Appearance="Appearance.Neutral" class="text-lg mt-1">
+                            <span class="text-green-500">
+                                @order.order.Price€
+                            </span>
+                        </FluentBadge>
+                    </div>
+                    <FluentButton IconStart="@(new Icons.Regular.Size24.PuzzlePiece())" Appearance="Appearance.Accent" class="mt-4 w-3/4" @onclick="() => getParts(order.order)"></FluentButton>
+                    <FluentButton IconStart="@(new Icons.Regular.Size24.Wrench())" Appearance="Appearance.Accent" Disabled="IsOrderStartable(order.index)" class="w-3/4" @onclick="() => checkStartability(order.order, order.index)"></FluentButton>
+                </FluentCard>
+            }
+        </div>
+        <div class="pagination w-full flex items-center justify-center py-4 gap-3">
+            <FluentButton @onclick="@PreviousPage" disabled="@IsFirstPage" class="text-lg font-medium">
+                Previous
+            </FluentButton>
+            <span class="text-lg">
+                @CurrentPage / @TotalPages
+            </span>
+            <FluentButton @onclick="@NextPage" disabled="@IsLastPage" class="text-lg font-medium">
+                Next
+            </FluentButton>
+        </div>
+    </div>
 }
 
 @if (checkingParts == true && activePartsList != null)
@@ -147,6 +99,10 @@ else
     private int TotalPages { get; set; }
     private bool IsFirstPage => CurrentPage == 1;
     private bool IsLastPage => CurrentPage == TotalPages;
+
+    private bool IsOrderStartable(int orderIndex) {
+        return OrderStartability.TryGetValue(orderIndex, out bool cannotStart) && cannotStart;
+    }
 
     private void togglePartsList() {
         checkingParts = !checkingParts;
@@ -233,12 +189,11 @@ else
         Console.WriteLine($"Selected order: {order.OrderId}");
         // Add logic to proceed to the next wizard step with the selected order
     }
-
-    private void OnStepChange(FluentWizardStepChangeEventArgs e) {
-        Console.WriteLine($"Go to step {e.TargetLabel} (#{e.TargetIndex})");
-    }
-
-    private void OnFinishedAsync() {
-        Console.WriteLine("Wizard finished");
-    }
 }
+
+<style scoped>
+    .h-screen-space {
+        /* Calculate the height of the screen without the height of the header */
+        height: calc(100vh - 10.8rem);
+    }
+</style>

@@ -3,11 +3,13 @@
 @layout DashboardLayout
 @rendermode InteractiveServer
 <PageTitle>PCMount - Dashboard</PageTitle>
+<FluentToastProvider Position="ToastPosition.BottomRight" />
 
 @inject NavigationManager Navigation
 @inject ComputersService ComputersDb
 @inject OrdersService OrdersDb
 @inject InventarioService InventarioDb
+@inject IToastService ToastService
 
 <div class="grid grid-cols-12 gap-4 w-full h-screen-space">
     <!-- Main Vertical Section -->
@@ -223,13 +225,18 @@
     }
 
     private async void deleteOrder(int orderId) {
-        await OrdersDb.DeleteAsync(orderId);
-        orders = await OrdersDb.GetArrayAsync();
-        ordersQueryable = Array.Empty<OrderQuery>().AsQueryable();
-        foreach (Order order in orders) {
-            ordersQueryable = ordersQueryable.Append(new OrderQuery(order.OrderId, order.Name, order.Status.ToString(), order.Price));
+        var result = await OrdersDb.DeleteAsync(orderId);
+        if (result != null) {
+            orders = await OrdersDb.GetArrayAsync();
+            ordersQueryable = Array.Empty<OrderQuery>().AsQueryable();
+            foreach (Order order in orders) {
+                ordersQueryable = ordersQueryable.Append(new OrderQuery(order.OrderId, order.Name, order.Status.ToString(), order.Price));
+            }
+            StateHasChanged();
+            ToastService.ShowSuccess("Order deleted successfully.");
+        } else {
+            ToastService.ShowError("An error occurred while deleting the order.");
         }
-        StateHasChanged();
     }
 }
 

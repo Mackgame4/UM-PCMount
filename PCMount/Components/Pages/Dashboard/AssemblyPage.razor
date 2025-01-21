@@ -7,11 +7,43 @@
     <p>Assemblying Order with ID: @Id</p>
 }
 
+<FluentWizard StepperPosition="StepperPosition.Top" StepSequence="WizardStepSequence.Any" DisplayStepNumber="@(WizardStepStatus.Current | WizardStepStatus.Next)" StepTitleHiddenWhen="@GridItemHidden.XsAndDown" OnFinish="@OnFinishedAsync">
+        <Steps>
+            <FluentWizardStep Label="Get started" Summary="Begin the tasks" OnChange="@OnStepChange">
+                Maecenas sed justo ac sapien venenatis ullamcorper. Sed maximus nunc non venenatis euismod.
+                Fusce vel porta ex, imperdiet molestie nisl. Vestibulum eu ultricies mauris, eget aliquam quam.
+            </FluentWizardStep>
+            <FluentWizardStep Disabled="true" Label="Disabled step" Summary="This step is disabled" OnChange="@OnStepChange">
+                Nunc dignissim tortor eget lacus porta tristique. Nunc in posuere dui. Cras ligula ex,
+                ullamcorper in gravida in, euismod vitae purus. Lorem ipsum dolor sit amet, consectetur
+                adipiscing elit. Aliquam at velit leo. Suspendisse potenti. Cras dictum eu augue in laoreet.
+            </FluentWizardStep>
+            <FluentWizardStep Label="Set budget" Summary="Identify the best price" IconPrevious="@(new Icons.Filled.Size24.Star())" IconCurrent="@(new Icons.Filled.Size24.StarEmphasis())" IconNext="@(new Icons.Regular.Size24.Star())" DisplayStepNumber="false" OnChange="@OnStepChange">
+                Phasellus quis augue convallis, congue velit ac, aliquam ex. In egestas porttitor massa
+                aliquet porttitor. Donec bibendum faucibus urna vitae elementum. Phasellus vitae efficitur
+                turpis, eget molestie ipsum.
+            </FluentWizardStep>
+            <FluentWizardStep Label="Summary" OnChange="@OnStepChange">
+                Ut iaculis sed magna efficitur tempor. Vestibulum est erat, imperdiet in diam ac,
+                aliquam tempus sapien. Nam rutrum mi at enim mattis, non mollis diam molestie.
+                Cras sodales dui libero, sit amet cursus sapien elementum ac. Nulla euismod nisi sem.
+            </FluentWizardStep>
+        </Steps>
+    </FluentWizard>
+
 @code {
     [Parameter]
     public int Id { get; set; }
 
     protected override void OnParametersSet() {
         // TODO: Fetch the order with the given ID
+    }
+
+    private void OnStepChange(FluentWizardStepChangeEventArgs e) {
+        Console.WriteLine($"Go to step {e.TargetLabel} (#{e.TargetIndex})");
+    }
+
+    private void OnFinishedAsync() {
+        Console.WriteLine("Wizard finished");
     }
 }
