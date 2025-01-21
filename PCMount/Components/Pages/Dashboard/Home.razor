@@ -1,13 +1,59 @@
 @page "/dashboard"
 @attribute [Authorize(Roles = "Admin")]
 @layout DashboardLayout
+@rendermode InteractiveServer
 <PageTitle>PCMount - Dashboard</PageTitle>
+
+@inject ComputersService ComputersDb
 
 <div class="grid grid-cols-12 gap-4 w-full h-screen-space">
     <!-- Main Vertical Section -->
-    <FluentCard MinimalStyle="true" Class="col-span-12 lg:col-span-4 p-4 shadow-md flex flex-col gap-4">
-        <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.DocumentBulletListCube())" /> Manage Store Products</h4>
+    <FluentCard MinimalStyle="true" Class="col-span-12 lg:col-span-4 p-4 shadow-md flex flex-col gap-4 max-h-screen-space">
+        <div class="flex sm:flex-row flex-col gap-1">
+            <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.DocumentBulletListCube())" /> Manage Store Products</h4>
+            <FluentButton class="sm:ml-auto" IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Lightweight">Add New Computer</FluentButton>
+        </div>
+        @if (computersQueryable != null) {
+            <FluentDataGrid Items="@computersQueryable" ShowHover="false" Pagination="@computersPagination" Class="h-1/2 overflow-y-auto overflow-x-hidden">
+                <PropertyColumn Property="@(o => o.Id)" Title="ID" InitialSortDirection=SortDirection.Ascending Sortable="true" IsDefaultSortColumn=true />
+                <PropertyColumn Property="@(o => o.Name)" Title="Name" />
+                <TemplateColumn Title="Price" Align="@Align.Center">
+                    <span class="text-sm text-green-500">@(context.Price.HasValue ? context.Price.Value.ToString("C") : "N/A")</span>
+                </TemplateColumn>
+                <TemplateColumn Title="Discount" Align="@Align.Center">
+                    <span class="text-sm text-red-500">@(context.Discount > 0 ? $"-{context.Discount}%" : "None")</span>
+                </TemplateColumn>
+                <TemplateColumn Title="Actions" Align="@Align.End">
+                    <FluentButton IconStart="@(new Icons.Regular.Size16.Edit())" Appearance="Appearance.Lightweight"></FluentButton>
+                    <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" Appearance="Appearance.Lightweight"></FluentButton>
+                </TemplateColumn>
+            </FluentDataGrid>
+        }
+        <FluentPaginator State="@computersPagination">
+            <SummaryTemplate>Total Products: <strong>@(computersPagination.TotalItemCount ?? 0)</strong></SummaryTemplate>
+            <PaginationTextTemplate>Page <strong>@(computersPagination.CurrentPageIndex + 1)</strong> of <strong>@(computersPagination.LastPageIndex + 1)</strong></PaginationTextTemplate>
+        </FluentPaginator>
         <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.ReceiptBag())" /> Most Shopped Products</h4>
+        @if (computersQueryable != null) {
+            <FluentDataGrid Items="@computersQueryable" ShowHover="false" Pagination="@computersPagination" Class="h-1/2 overflow-y-auto overflow-x-hidden">
+                <PropertyColumn Property="@(o => o.Id)" Title="ID" InitialSortDirection=SortDirection.Ascending Sortable="true" IsDefaultSortColumn=true />
+                <PropertyColumn Property="@(o => o.Name)" Title="Name" />
+                <TemplateColumn Title="Price" Align="@Align.Center">
+                    <span class="text-sm text-green-500">@(context.Price.HasValue ? context.Price.Value.ToString("C") : "N/A")</span>
+                </TemplateColumn>
+                <TemplateColumn Title="Discount" Align="@Align.Center">
+                    <span class="text-sm text-red-500">@(context.Discount > 0 ? $"-{context.Discount}%" : "None")</span>
+                </TemplateColumn>
+                <TemplateColumn Title="Actions" Align="@Align.End">
+                    <FluentButton IconStart="@(new Icons.Regular.Size16.Edit())" Appearance="Appearance.Lightweight"></FluentButton>
+                    <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" Appearance="Appearance.Lightweight"></FluentButton>
+                </TemplateColumn>
+            </FluentDataGrid>
+        }
+        <FluentPaginator State="@computersPagination">
+            <SummaryTemplate>Total Products: <strong>@(computersPagination.TotalItemCount ?? 0)</strong></SummaryTemplate>
+            <PaginationTextTemplate>Page <strong>@(computersPagination.CurrentPageIndex + 1)</strong> of <strong>@(computersPagination.LastPageIndex + 1)</strong></PaginationTextTemplate>
+        </FluentPaginator>
     </FluentCard>
     <!-- Main Side Content -->
     <div class="col-span-12 lg:col-span-8 grid grid-cols-12 gap-4">
@@ -20,7 +66,7 @@
         </FluentCard>
         <!-- Section -->
         <FluentCard MinimalStyle="true" Class="col-span-12 p-4 shadow-md">
-            <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.VehicleTruckCube())" /> Most Ordered Parts</h4>
+            <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.VehicleTruckCube())" /> Last Ordered Parts</h4>
         </FluentCard>
         <!-- Section -->
         <FluentCard MinimalStyle="true" Class="col-span-12 p-4 shadow-md">
@@ -29,9 +75,28 @@
     </div>
 </div>
 
+@code {
+    record ComputerQuery(int Id, string? Name, double? Price, double? Discount, string? Image);
+    PaginationState computersPagination = new PaginationState { ItemsPerPage = 5 };
+    IQueryable<ComputerQuery> computersQueryable = Array.Empty<ComputerQuery>().AsQueryable();
+    Computer[]? computers;
+    protected override async Task OnInitializedAsync() {
+        // Set the orders queryable
+        computers = await ComputersDb.GetArrayAsync();
+        foreach (Computer c in computers) {
+            computersQueryable = computersQueryable.Append(new ComputerQuery(c.Id, c.Name, c.Price, c.Discount, c.Image));
+        }
+    }
+}
+
 <style scoped>
     .h-screen-space {
         /* Calculate the height of the screen without the height of the header */
-        height: calc(100vh - 11.5rem);
+        height: calc(100vh - 10.8rem);
+    }
+
+    .max-h-screen-space {
+        /* Calculate the height of the screen without the height of the header */
+        max-height: calc(100vh - 10.8rem);
     }
 </style>
