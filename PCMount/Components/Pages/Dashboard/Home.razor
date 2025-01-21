@@ -62,29 +62,30 @@
             <div class="flex items-center justify-between">
                 <h4 class="text-xl font-semibold flex flex-row gap-1.5 items-center"><FluentIcon Color="Color.Success" Value="@(new Icons.Regular.Size20.MoneyCalculator())" /> Total Revenue</h4>
                 <div class="absolute flex items-center justify-center top-5 right-5">
-                    <FluentProgressRing Color="darkgreen" Stroke="ProgressStroke.Small" Min="0" Max="100" Value="75" Width="70px"></FluentProgressRing>
-                    <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg font-semibold">75%</span>
+                    <FluentProgressRing Color="darkgreen" Stroke="ProgressStroke.Small" Min="0" Max="100" Value="@calculateRevenuePercentage" Width="70px"></FluentProgressRing>
+                    <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg font-semibold">@calculateRevenuePercentage%</span>
                 </div>
             </div>
             <div class="flex flex-wrap gap-2 mt-2 w-3/4">
-                <FluentBadge Appearance="Appearance.Lightweight">Profit: +$1000</FluentBadge>
-                <FluentBadge Appearance="Appearance.Lightweight">Expenses: -$1000</FluentBadge>
-                <FluentBadge Appearance="Appearance.Lightweight">Discounts: -$1000</FluentBadge>
-                <FluentBadge Appearance="Appearance.Lightweight">Target: $1000</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Profit: @calculateProfit().ToString("C")</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Expenses: -@ExpensesValue.ToString("C")</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Discounts: -@DiscountsLossValue.ToString("C")</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Revenue: @RevenueValue.ToString("C")</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Target: @RevenueTarget.ToString("C")</FluentBadge>
             </div>
         </FluentCard>
         <FluentCard MinimalStyle="true" Class="col-span-12 lg:col-span-6 p-4 shadow-md">
             <div class="flex items-center justify-between">
                 <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Color="Color.Error" Value="@(new Icons.Regular.Size20.MoneyHand())" /> Total Expenses</h4>
                 <div class="absolute flex items-center justify-center top-5 right-5">
-                    <FluentProgressRing Color="red" Stroke="ProgressStroke.Small" Min="0" Max="100" Value="75" Width="70px"></FluentProgressRing>
-                    <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg font-semibold">75%</span>
+                    <FluentProgressRing Color="red" Stroke="ProgressStroke.Small" Min="0" Max="100" Value="@calculateExpensesPercentage" Width="70px"></FluentProgressRing>
+                    <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg font-semibold">@calculateExpensesPercentage%</span>
                 </div>
             </div>
             <div class="flex flex-wrap gap-2 mt-2 w-3/4">
-                <FluentBadge Appearance="Appearance.Lightweight">Expenses: -$1000</FluentBadge>
-                <FluentBadge Appearance="Appearance.Lightweight">Revenue: +$1000</FluentBadge>
-                <FluentBadge Appearance="Appearance.Lightweight">Limit: $1000</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Expenses: -@ExpensesValue.ToString("C")</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Revenue: @RevenueValue.ToString("C")</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Limit: @ExpensesLimit.ToString("C")</FluentBadge>
             </div>
         </FluentCard>
         <!-- Section -->
@@ -136,6 +137,16 @@
 </div>
 
 @code {
+    private double RevenueTarget = 80000;
+    private double ExpensesLimit = 75000;
+    private double ExpensesValue = 0;
+    private double DiscountsLossValue = 0;
+    private double RevenueValue = 0;
+    private double calculateProfit() {
+        return RevenueValue - ExpensesValue - DiscountsLossValue;
+    }
+    private int calculateRevenuePercentage => (int)((RevenueValue / RevenueTarget) * 100);
+    private int calculateExpensesPercentage => (int)((ExpensesValue / ExpensesLimit) * 100);
     private class Product : Part {
         public int Quantity { get; set; }
     }
@@ -165,6 +176,12 @@
         orders = await OrdersDb.GetArrayAsync();
         foreach (Order o in orders) {
             ordersQueryable = ordersQueryable.Append(new OrderQuery(o.OrderId, o.Name, o.Status.ToString(), o.Price));
+            //if (o.Status == OrderStatus.Done) { // TODO: Uncomment this line when the status is implemented
+                // Calculate Discounts Loss
+                DiscountsLossValue += o.Price * ((o.Discount ?? 0) / 100);
+                // Calculate Revenue
+                RevenueValue += o.Price - (o.Price * ((o.Discount ?? 0) / 100));
+            //}
         }
         // Parts Queryable
         List<Product>? products = (await InventarioDb.IncludeListAsync(i => i.Part))?.Select(i => new Product {
@@ -178,6 +195,8 @@
         }).ToList();
         foreach (Product p in products!) {
             partsQueryable = partsQueryable.Append(new PartQuery(p.PartId, p.Name, p.Preco, p.Tipo.ToString(), p.Image, p.Quantity));
+            // Calculate Expenses in Parts
+            ExpensesValue += p.Preco * p.Quantity;
         }
         // Computer Orders Queryable
         Dictionary<string, int> computerOrders = new();
