@@ -19,15 +19,16 @@
             <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" @onclick="() => deleteOrder(context.OrderId!)"></FluentButton>
         </TemplateColumn>
     </FluentDataGrid>
-    <FluentPaginator State="@pagination">
-        <SummaryTemplate>
-            Total Orders: <strong>@(pagination.TotalItemCount ?? 0)</strong>
-        </SummaryTemplate>
-        <PaginationTextTemplate>
-            Page <strong>@(pagination.CurrentPageIndex + 1)</strong> of <strong>@(pagination.LastPageIndex + 1)</strong>
-        </PaginationTextTemplate>
-    </FluentPaginator>
 }
+
+<FluentPaginator State="@pagination">
+    <SummaryTemplate>
+        Total Orders: <strong>@(pagination.TotalItemCount ?? 0)</strong>
+    </SummaryTemplate>
+    <PaginationTextTemplate>
+        Page <strong>@(pagination.CurrentPageIndex + 1)</strong> of <strong>@(pagination.LastPageIndex + 1)</strong>
+    </PaginationTextTemplate>
+</FluentPaginator>
 
 @code {
     record OrderQuery(int OrderId, string? Name, string? Status, string? Price);

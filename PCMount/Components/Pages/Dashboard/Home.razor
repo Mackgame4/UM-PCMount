@@ -56,28 +56,96 @@
         </FluentPaginator>
     </FluentCard>
     <!-- Main Side Content -->
-    <div class="col-span-12 lg:col-span-8 grid grid-cols-12 gap-4">
+    <div class="col-span-12 lg:col-span-8 grid grid-cols-12 gap-4 h-screen-space">
         <!-- Section -->
         <FluentCard MinimalStyle="true" Class="col-span-12 lg:col-span-6 p-4 shadow-md">
-            <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Color="Color.Success" Value="@(new Icons.Regular.Size20.MoneyCalculator())" /> Total Revenue</h4>
+            <div class="flex items-center justify-between">
+                <h4 class="text-xl font-semibold flex flex-row gap-1.5 items-center"><FluentIcon Color="Color.Success" Value="@(new Icons.Regular.Size20.MoneyCalculator())" /> Total Revenue</h4>
+                <div class="absolute flex items-center justify-center top-6 right-6">
+                    <FluentProgressRing Min="0" Max="100" Value="75" Width="70px"></FluentProgressRing>
+                    <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg">75%</span>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2 mt-2 w-3/4">
+                <FluentBadge Appearance="Appearance.Lightweight">Profit: $1000</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Expenses: $1000</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Discounts: $1000</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Target: $1000</FluentBadge>
+            </div>
         </FluentCard>
         <FluentCard MinimalStyle="true" Class="col-span-12 lg:col-span-6 p-4 shadow-md">
-            <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Color="Color.Error" Value="@(new Icons.Regular.Size20.MoneyHand())" /> Total Expenses</h4>
+            <div class="flex items-center justify-between">
+                <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Color="Color.Error" Value="@(new Icons.Regular.Size20.MoneyHand())" /> Total Expenses</h4>
+                <div class="absolute flex items-center justify-center top-6 right-6">
+                    <FluentProgressRing Min="0" Max="100" Value="75" Width="70px"></FluentProgressRing>
+                    <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg">75%</span>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2 mt-2 w-3/4">
+                <FluentBadge Appearance="Appearance.Lightweight">Profit: $1000</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Expenses: $1000</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Discounts: $1000</FluentBadge>
+                <FluentBadge Appearance="Appearance.Lightweight">Target: $1000</FluentBadge>
+            </div>
         </FluentCard>
         <!-- Section -->
-        <FluentCard MinimalStyle="true" Class="col-span-12 p-4 shadow-md">
+        <FluentCard MinimalStyle="true" Class="col-span-12 p-4 shadow-md overflow-y-hidden">
             <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.VehicleTruckCube())" /> Last Ordered Parts</h4>
+            <div class="h-full overflow-y-auto pb-7">
+                @if (computersQueryable != null) {
+                    <FluentDataGrid Items="@computersQueryable" ShowHover="false" Pagination="@computersPagination">
+                        <PropertyColumn Property="@(o => o.Id)" Title="ID" InitialSortDirection=SortDirection.Ascending Sortable="true" IsDefaultSortColumn=true />
+                        <PropertyColumn Property="@(o => o.Name)" Title="Name" />
+                        <TemplateColumn Title="Price" Align="@Align.Center">
+                            <span class="text-sm text-green-500">@(context.Price.HasValue ? context.Price.Value.ToString("C") : "N/A")</span>
+                        </TemplateColumn>
+                        <TemplateColumn Title="Discount" Align="@Align.Center">
+                            <span class="text-sm text-red-500">@(context.Discount > 0 ? $"-{context.Discount}%" : "None")</span>
+                        </TemplateColumn>
+                        <TemplateColumn Title="Actions" Align="@Align.End">
+                            <FluentButton IconStart="@(new Icons.Regular.Size16.Edit())" Appearance="Appearance.Lightweight"></FluentButton>
+                            <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" Appearance="Appearance.Lightweight"></FluentButton>
+                        </TemplateColumn>
+                    </FluentDataGrid>
+                }
+                <FluentPaginator State="@computersPagination">
+                    <SummaryTemplate>Total Products: <strong>@(computersPagination.TotalItemCount ?? 0)</strong></SummaryTemplate>
+                    <PaginationTextTemplate>Page <strong>@(computersPagination.CurrentPageIndex + 1)</strong> of <strong>@(computersPagination.LastPageIndex + 1)</strong></PaginationTextTemplate>
+                </FluentPaginator>
+            </div>
         </FluentCard>
         <!-- Section -->
-        <FluentCard MinimalStyle="true" Class="col-span-12 p-4 shadow-md">
+        <FluentCard MinimalStyle="true" Class="col-span-12 p-4 shadow-md overflow-y-hidden">
             <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.BoxCheckmark())" /> Completed Orders</h4>
+            <div class="h-full overflow-y-auto pb-7">
+                @if (computersQueryable != null) {
+                    <FluentDataGrid Items="@computersQueryable" ShowHover="false" Pagination="@computersPagination">
+                        <PropertyColumn Property="@(o => o.Id)" Title="ID" InitialSortDirection=SortDirection.Ascending Sortable="true" IsDefaultSortColumn=true />
+                        <PropertyColumn Property="@(o => o.Name)" Title="Name" />
+                        <TemplateColumn Title="Price" Align="@Align.Center">
+                            <span class="text-sm text-green-500">@(context.Price.HasValue ? context.Price.Value.ToString("C") : "N/A")</span>
+                        </TemplateColumn>
+                        <TemplateColumn Title="Discount" Align="@Align.Center">
+                            <span class="text-sm text-red-500">@(context.Discount > 0 ? $"-{context.Discount}%" : "None")</span>
+                        </TemplateColumn>
+                        <TemplateColumn Title="Actions" Align="@Align.End">
+                            <FluentButton IconStart="@(new Icons.Regular.Size16.Edit())" Appearance="Appearance.Lightweight"></FluentButton>
+                            <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" Appearance="Appearance.Lightweight"></FluentButton>
+                        </TemplateColumn>
+                    </FluentDataGrid>
+                }
+                <FluentPaginator State="@computersPagination">
+                    <SummaryTemplate>Total Products: <strong>@(computersPagination.TotalItemCount ?? 0)</strong></SummaryTemplate>
+                    <PaginationTextTemplate>Page <strong>@(computersPagination.CurrentPageIndex + 1)</strong> of <strong>@(computersPagination.LastPageIndex + 1)</strong></PaginationTextTemplate>
+                </FluentPaginator>
+            </div>
         </FluentCard>
     </div>
 </div>
 
 @code {
     record ComputerQuery(int Id, string? Name, double? Price, double? Discount, string? Image);
-    PaginationState computersPagination = new PaginationState { ItemsPerPage = 5 };
+    PaginationState computersPagination = new PaginationState { ItemsPerPage = 5 }; // TODO: On the side content, show 3 items per card
     IQueryable<ComputerQuery> computersQueryable = Array.Empty<ComputerQuery>().AsQueryable();
     Computer[]? computers;
     protected override async Task OnInitializedAsync() {
