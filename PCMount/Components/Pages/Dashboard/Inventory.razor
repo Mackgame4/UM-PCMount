@@ -163,6 +163,9 @@
             Modal = true,
             PreventScroll = true 
         };
+        if (string.IsNullOrEmpty(content)) {
+            content = "No description available.";
+        }
         IDialogReference dialog = await DialogService.ShowDialogAsync<DescriptionDialog>(content, parameters);
     }
 
