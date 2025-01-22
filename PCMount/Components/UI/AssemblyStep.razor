@@ -67,16 +67,17 @@
                 ALL CASES IN STOCK
             </p>
             <FluentCard class="grid grid-cols-2 gap-y-6 gap-x-4 overflow-y-scroll overflow-x-visible">
-                @foreach (Part icase in allTypeParts) 
-                {
-                    <FluentButton Appearance="Appearance.Accent" class="h-full text-lg font-bold" @onclick="() => setActiveCase(icase)">
-                        <div class="flex flex-col justify-center items-center py-2 gap-2">
-                            <span class="text-center break-words w-11/12">
-                                @icase.Name
-                            </span>
-                            <img class="h-24 font-extrabold" src="@icase.Image" alt="Part Case Image">
-                        </div>
-                    </FluentButton>
+                @if (PartsList != null)  {
+                    @foreach (Part part in PartsList!)  {
+                        <FluentButton Appearance="Appearance.Accent" class="h-full text-lg font-bold" @onclick="() => setActiveCase(part)">
+                            <div class="flex flex-col justify-center items-center py-2 gap-2">
+                                <span class="text-center break-words w-11/12">
+                                    @part.Name
+                                </span>
+                                <img class="h-24 font-extrabold" src="@part.Image" alt="Part Case Image">
+                            </div>
+                        </FluentButton>
+                    }
                 }
             </FluentCard>
         </FluentCard>
@@ -86,18 +87,27 @@
 @code {
     [Parameter]
     public Order? order { get; set; }
+    [Parameter]
+    public List<Part>? PartsList { get; set; }
+    [Parameter]
+    public Part? PartToAssemble { get; set; }
+    [Parameter]
+    public EventCallback<bool> OnComplete { get; set; }
     private List<(Part Part, int Quantity)> partsWithQuantities = new();
     private Part? activeCase;
     private Part? partInDisplay = null;
     private string animationClass = "";
-    private List<Part> allTypeParts = new();
+
+    private async Task CompleteStep() {
+        bool isCompleted = true;
+        await OnComplete.InvokeAsync(isCompleted);
+    }
 
     protected override async Task OnParametersSetAsync() {
         if (order != null)
         {
             // Fetch the parts with quantities
             partsWithQuantities = await OrdersDb.GetPartsForOrderAsync(order);
-            allTypeParts = await ComponentesDb.GetPartsByTypeAsync(PartTipo.Case);
         }
     }
 

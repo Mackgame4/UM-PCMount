@@ -5,6 +5,7 @@
 <PageTitle>PCMount - Assembly</PageTitle>
 
 @inject OrdersService OrdersDb
+@inject ComponentesService ComponentesDb
 
 @if (Id <= 0) {
     <span class="text-center text-xl text-gray-200 mt-8">Invalid Assembly ID.</span>
@@ -31,13 +32,14 @@
                                     <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(6))">Storage</div>
                                     <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(7))">Power Supply</div>
                                     <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(8))">Case</div>
+                                    <!-- TODO: Add check or error icon if the part is installed or not -->
                                 </div>
                             </div>
                         </div>
                     </FluentWizardStep>
-                    @foreach (var step in steps) {
+                    @foreach (var step in steps!) {
                         <FluentWizardStep Label="@step.Label" OnChange="@OnStepChange">
-                            <AssemblyStep order="order" />
+                            <AssemblyStep OnComplete="@(() => step.IsCompleted = true)" PartsList="@step.AvaliableParts" PartToAssemble="@step.PartToAssemble" />
                             <!-- TODO: pass only the part to Assemble and the step since the layout structure is always the same -->
                         </FluentWizardStep>
                     }
@@ -54,28 +56,34 @@
     private Order? order;
     public class Steps {
         public string? Label { get; set; }
+        public bool IsCompleted { get; set; }
+        public List<Part>? AvaliableParts { get; set; }
+        public Part? PartToAssemble { get; set; }
     }
 
-    private List<Steps> steps = new List<Steps> {
-        new Steps { Label = "Prepare Case" },
-        new Steps { Label = "Place Power Supply" },
-        new Steps { Label = "Install Motherboard" },
-        new Steps { Label = "Install CPU" },
-        new Steps { Label = "Install RAM" },
-        new Steps { Label = "Install GPU" },
-        new Steps { Label = "Install Storage" },
-        new Steps { Label = "Install Cooling" },
-        new Steps { Label = "Finalize" },
-    };
+    private List<Steps>? steps;
 
     protected override async Task OnParametersSetAsync() {
+        // Invalid ID
         if (Id <= 0) {
-            // Invalid ID
             order = null;
             return;
+        } else {
+            order = await OrdersDb.FindOneAsync(o => o.OrderId == Id); // Fetch the order using FindOneAsync
+            if (order != null) {
+                steps = new List<Steps> {
+                    new Steps { Label = "Prepare Case", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Case)), PartToAssemble = null },
+                    new Steps { Label = "Place Power Supply", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.PowerSupply)), PartToAssemble = null },
+                    new Steps { Label = "Install Motherboard" },
+                    new Steps { Label = "Install CPU" },
+                    new Steps { Label = "Install RAM" },
+                    new Steps { Label = "Install GPU" },
+                    new Steps { Label = "Install Storage" },
+                    new Steps { Label = "Install Cooling" },
+                    new Steps { Label = "Finalize" },
+                };
+            }
         }
-        // Fetch the order using FindOneAsync
-        order = await OrdersDb.FindOneAsync(o => o.OrderId == Id);
     }
 
     private void OnStepChange(FluentWizardStepChangeEventArgs e) {
