@@ -54,6 +54,7 @@
     public int Id { get; set; }
 
     private Order? order;
+    private List<(Part Part, int Quantity)>? partsWithQuantities;
     public class Steps {
         public string? Label { get; set; }
         public bool IsCompleted { get; set; }
@@ -71,19 +72,29 @@
         } else {
             order = await OrdersDb.FindOneAsync(o => o.OrderId == Id); // Fetch the order using FindOneAsync
             if (order != null) {
+                partsWithQuantities = await OrdersDb.GetPartsForOrderAsync(order);
                 steps = new List<Steps> {
-                    new Steps { Label = "Prepare Case", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Case)), PartToAssemble = null },
-                    new Steps { Label = "Place Power Supply", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.PowerSupply)), PartToAssemble = null },
-                    new Steps { Label = "Install Motherboard" },
-                    new Steps { Label = "Install CPU" },
-                    new Steps { Label = "Install RAM" },
-                    new Steps { Label = "Install GPU" },
-                    new Steps { Label = "Install Storage" },
-                    new Steps { Label = "Install Cooling" },
-                    new Steps { Label = "Finalize" },
+                    new Steps { Label = "Prepare Case", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Case)), PartToAssemble = getPartByType(PartTipo.Case) },
+                    new Steps { Label = "Place Power Supply", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.PowerSupply)), PartToAssemble = getPartByType(PartTipo.PowerSupply) },
+                    new Steps { Label = "Install Motherboard", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Motherboard)), PartToAssemble = getPartByType(PartTipo.Motherboard) },
+                    new Steps { Label = "Install CPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Processor)), PartToAssemble = getPartByType(PartTipo.Processor) },
+                    new Steps { Label = "Install RAM", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Memory)), PartToAssemble = getPartByType(PartTipo.Memory) },
+                    new Steps { Label = "Install GPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.GraphicsCard)), PartToAssemble = getPartByType(PartTipo.GraphicsCard) },
+                    new Steps { Label = "Install Storage", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
+                    new Steps { Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
+                    new Steps { Label = "Finalize", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
                 };
             }
         }
+    }
+
+    private Part? getPartByType(PartTipo type)
+    {
+        if (partsWithQuantities == null) {
+            return null; 
+        }
+        var match = partsWithQuantities.FirstOrDefault(p => p.Part.Tipo == type);
+        return match.Part;
     }
 
     private void OnStepChange(FluentWizardStepChangeEventArgs e) {

@@ -18,7 +18,7 @@
             <p>
                 - Check for pre-installed case fans and ensure they are properly connected to the fan controller (if present).
             </p>
-            <p class="m-0 not-italic font-bold underline">Correspondent Order's Case is @getPartNameByType(PartTipo.Case)</p>
+            <p class="m-0 not-italic font-bold underline">Correspondent Order's Case is @PartToAssemble?.Name</p>
         </div>
         <div class="w-full flex gap-8 items-center">
             <div class="w-3/5">
@@ -45,7 +45,7 @@
             <div class="w-2/5 pq">
                 <FluentCard MinimalStyle="true" class="relative nopad flex flex-col items-center text-center gap-2">
                     <h1 class="pb-6">
-                        Case selected
+                        Part selected
                     </h1>
                     <div class="h-48 flex flex-col justify-center items-center">
                     @if (activeCase != null && partInDisplay == null) 
@@ -64,17 +64,17 @@
     <div class="w-1/3 partsContainer">
         <FluentCard MinimalStyle="true" class="relative flex flex-col text-center">
             <p class="text-2xl font-medium">
-                ALL CASES IN STOCK
+                All @getTitle() IN STOCK
             </p>
             <FluentCard class="grid grid-cols-2 gap-y-6 gap-x-4 overflow-y-scroll overflow-x-visible">
                 @if (PartsList != null)  {
                     @foreach (Part part in PartsList!)  {
-                        <FluentButton Appearance="Appearance.Accent" class="h-full text-lg font-bold" @onclick="() => setActiveCase(part)">
+                        <FluentButton Appearance="Appearance.Accent" class="h-56 text-lg font-bold" @onclick="() => setActiveCase(part)">
                             <div class="flex flex-col justify-center items-center py-2 gap-2">
                                 <span class="text-center break-words w-11/12">
                                     @part.Name
                                 </span>
-                                <img class="h-24 font-extrabold" src="@part.Image" alt="Part Case Image">
+                                <img class="h-24 font-extrabold" src="@part.Image" alt="Part Image">
                             </div>
                         </FluentButton>
                     }
@@ -86,31 +86,43 @@
 
 @code {
     [Parameter]
-    public Order? order { get; set; }
-    [Parameter]
     public List<Part>? PartsList { get; set; }
     [Parameter]
     public Part? PartToAssemble { get; set; }
     [Parameter]
     public EventCallback<bool> OnComplete { get; set; }
-    private List<(Part Part, int Quantity)> partsWithQuantities = new();
     private Part? activeCase;
     private Part? partInDisplay = null;
     private string animationClass = "";
 
     private async Task CompleteStep() {
-        bool isCompleted = true;
-        await OnComplete.InvokeAsync(isCompleted);
-    }
-
-    protected override async Task OnParametersSetAsync() {
-        if (order != null)
-        {
-            // Fetch the parts with quantities
-            partsWithQuantities = await OrdersDb.GetPartsForOrderAsync(order);
+        if (partInDisplay != null) {
+        if (partInDisplay == PartToAssemble) {
+            bool isCompleted = true;
+            await OnComplete.InvokeAsync(isCompleted);
+        }
         }
     }
 
+    private string getTitle() {
+        if (PartToAssemble?.Tipo == PartTipo.Case) {
+            return "CASES";
+        } else if (PartToAssemble?.Tipo == PartTipo.PowerSupply) {
+            return "POWER SUPPLIES";
+        } else if (PartToAssemble?.Tipo == PartTipo.Motherboard) {
+            return "MOTHERBOARDS";
+        } else if (PartToAssemble?.Tipo == PartTipo.Processor) {
+            return "CPUs";
+        } else if (PartToAssemble?.Tipo == PartTipo.Memory) {
+            return "RAMs";
+        } else if (PartToAssemble?.Tipo == PartTipo.GraphicsCard) {
+            return "GPUs";
+        } else if (PartToAssemble?.Tipo == PartTipo.Storage) {
+            return "STORAGES";
+        } else {
+            return "COOLINGS";
+        }
+    }
     private async Task setActiveCase(Part iCase)
     {
         if (activeCase != iCase) {
@@ -145,12 +157,6 @@
         partInDisplay = iCase; 
         animationClass = "slideIn"; // Trigger the entry animation
         StateHasChanged();
-    }
-
-    private string? getPartNameByType(PartTipo type)
-    {
-        var match = partsWithQuantities.FirstOrDefault(p => p.Part.Tipo == type);
-        return match.Part?.Name;
     }
 }
 
