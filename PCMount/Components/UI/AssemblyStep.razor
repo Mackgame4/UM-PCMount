@@ -1,0 +1,208 @@
+@rendermode InteractiveServer
+@inject OrdersService OrdersDb
+@inject ComponentesService ComponentesDb
+
+<div class="w-full flex justify-center items-center gap-16 pt-6">
+    <div class="w-1/2 flex flex-col gap-8">
+        <div class="pl-4 italic m-0 font-bold">
+            <p class="m-0 font-bold">
+                Prepare the Case:
+            </p>
+            <p class="m-0">
+                - Open the side panels of the case;
+            </p>
+            <p class="m-0">
+                - Remove any included screws, cable ties, or packaging materials;
+            </p>
+            <p>
+                - Check for pre-installed case fans and ensure they are properly connected to the fan controller (if present).
+            </p>
+            <p class="m-0 not-italic font-bold underline">Correspondent Order's Case is @getPartNameByType(PartTipo.Case)</p>
+        </div>
+        <div class="w-full flex gap-8 items-center">
+            <div class="w-3/5">
+                <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2">
+                    <h1>
+                        Order
+                    </h1>
+                    <div class="h-60 flex flex-col justify-center items-center">
+                        @if (partInDisplay != null) 
+                        {
+                            <img class="h-5/6 @animationClass" src=@partInDisplay.Image alt="Part in Display">
+                        }
+                    </div>
+                    <div class="h-20"></div>
+                    <div class="absolute timepos">
+                        <FluentCard class="flex flex-col items-center nopad">
+                            <FluentIcon Value="@(new Icons.Regular.Size24.Clock())" />
+                            <span class="font-bold">First step takes 5-8 minutes</span>
+                        </FluentCard>
+                    </div>
+                </FluentCard>
+            </div>
+            
+            <div class="w-2/5 pq">
+                <FluentCard MinimalStyle="true" class="relative nopad flex flex-col items-center text-center gap-2">
+                    <h1 class="pb-6">
+                        Case selected
+                    </h1>
+                    <div class="h-48 flex flex-col justify-center items-center">
+                    @if (activeCase != null && partInDisplay == null) 
+                    {
+                        <p class="font-bold @animationClass">
+                            @activeCase.Name
+                        </p>
+                        <img class="h-5/6 @animationClass" src=@activeCase.Image alt="Part in Selection">
+                        <FluentButton class="mt-6 w-3/4" IconStart="@(new Icons.Filled.Size24.Wrench())" Appearance="Appearance.Accent" @onclick="() => setPartInDisplay(activeCase)"></FluentButton>
+                    }
+                    </div>
+                </FluentCard>
+            </div>
+        </div>
+    </div>
+    <div class="w-1/3 partsContainer">
+        <FluentCard MinimalStyle="true" class="relative flex flex-col text-center">
+            <p class="text-2xl font-medium">
+                ALL CASES IN STOCK
+            </p>
+            <FluentCard class="grid grid-cols-2 gap-y-6 gap-x-4 overflow-y-scroll overflow-x-visible">
+                @foreach (Part icase in allTypeParts) 
+                {
+                    <FluentButton Appearance="Appearance.Accent" class="h-full text-lg font-bold" @onclick="() => setActiveCase(icase)">
+                        <div class="flex flex-col justify-center items-center py-2 gap-2">
+                            <span class="text-center break-words w-11/12">
+                                @icase.Name
+                            </span>
+                            <img class="h-24 font-extrabold" src="@icase.Image" alt="Part Case Image">
+                        </div>
+                    </FluentButton>
+                }
+            </FluentCard>
+        </FluentCard>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Order? order { get; set; }
+    private List<(Part Part, int Quantity)> partsWithQuantities = new();
+    private Part? activeCase;
+    private Part? partInDisplay = null;
+    private string animationClass = "";
+    private List<Part> allTypeParts = new();
+
+    protected override async Task OnParametersSetAsync() {
+        if (order != null)
+        {
+            // Fetch the parts with quantities
+            partsWithQuantities = await OrdersDb.GetPartsForOrderAsync(order);
+            allTypeParts = await ComponentesDb.GetPartsByTypeAsync(PartTipo.Case);
+        }
+    }
+
+    private async Task setActiveCase(Part iCase)
+    {
+        if (activeCase != iCase) {
+            if (activeCase != null)
+            {
+                animationClass = "slideOutChange"; // Trigger the exit animation
+                partInDisplay = null;
+                StateHasChanged(); 
+                await Task.Delay(500); 
+            }
+
+            animationClass = ""; 
+            activeCase = null; 
+            StateHasChanged(); 
+
+            activeCase = iCase; 
+            animationClass = "slideIn"; // Trigger the entry animation
+            StateHasChanged();
+        }
+    }
+
+    private async Task setPartInDisplay(Part iCase)
+    {
+        animationClass = "slideOutAssembly"; // Trigger the exit animation
+        StateHasChanged(); 
+        await Task.Delay(4800);
+
+        animationClass = ""; 
+        partInDisplay = null; 
+        StateHasChanged(); 
+
+        partInDisplay = iCase; 
+        animationClass = "slideIn"; // Trigger the entry animation
+        StateHasChanged();
+    }
+
+    private string? getPartNameByType(PartTipo type)
+    {
+        var match = partsWithQuantities.FirstOrDefault(p => p.Part.Tipo == type);
+        return match.Part?.Name;
+    }
+}
+
+<style scoped>
+.partsContainer {
+    height: 530px;
+}
+
+.partsContainer span {
+    white-space: normal; 
+    word-wrap: break-word;
+    overflow-wrap: break-word; 
+}
+
+@@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@@keyframes slideOutToLeftChange {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@@keyframes slideOutToLeftAssembly {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+.slideOutAssembly {
+  animation: slideOutToLeftAssembly 5s ease-in-out;
+}
+.slideOutChange {
+  animation: slideOutToLeftChange 0.5s ease-in-out;
+}
+.slideIn {
+  animation: slideInFromRight 0.5s ease-in-out;
+}
+.nopad {
+    padding: 8px !important;
+}
+.timepos {
+    bottom: 20px;
+}
+.pq {
+    height: 300px;
+}
+</style>

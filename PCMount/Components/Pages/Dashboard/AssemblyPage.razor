@@ -5,145 +5,45 @@
 <PageTitle>PCMount - Assembly</PageTitle>
 
 @inject OrdersService OrdersDb
-@inject ComponentesService ComponentesDb
 
 @if (Id <= 0) {
     <span class="text-center text-xl text-gray-200 mt-8">Invalid Assembly ID.</span>
 } else {
-    if (order == null || !partsWithQuantities.Any()) {
-        <LoadingDialog Title="Loading Order..." />
-    }
-    else {
-        <div class="w-full flex flex-col justify-center items-center pt-4 pb-2 gap-2">
-            <FluentBadge class="text-2xl">
-                Assemblying Order with ID:<span class="font-bold">@Id</span>
-            </FluentBadge>
-            <h1>@order?.Name</h1>
+    if (order == null) {
+        <span class="text-center text-xl text-gray-200 mt-8">No order found with the ID @Id to be assembled.</span>
+    } else {
+        <div class="relative w-full h-screen-space -mt-4">
+            <FluentBadge Appearance="Appearance.Accent" Class="text-md md:text-xl p-2"><span class="flex flex-row justify-center items-center gap-1"><FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Wrench())" />You're Assemblying An <b>@order?.Name</b> In Order Id:<b>@Id</b></span></FluentBadge>
+            <FluentWizard Class="min-h-full h-full" StepperPosition="StepperPosition.Left" StepSequence="WizardStepSequence.Any" DisplayStepNumber="@(WizardStepStatus.Current | WizardStepStatus.Next)" StepTitleHiddenWhen="@GridItemHidden.XsAndDown" OnFinish="@OnFinishedAsync">
+                <Steps>
+                    <FluentWizardStep Label="Overview">
+                        <div class="flex flex-row justify-center items-center gap-4 p-8">
+                            <div class="w-1/3 flex flex-col justify-center items-center">
+                                <img src="@imageUrl" alt="PC Mounting Step" class="w-full object-cover" />
+                            </div>
+                            <div class="w-2/3 flex flex-col justify-center items-center gap-4">
+                                <div class="grid grid-cols-3 grid-rows-6 gap-4 p-8" style="border: 1px solid transparent;">
+                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(1))" @onclick="@(e => goToStep(1))">CPU</div>
+                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(2))">CPU Cooler</div>
+                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(3))">Motherboard</div>
+                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(4))">Memory</div>
+                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(5))">Graphics Card</div>
+                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(6))">Storage</div>
+                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(7))">Power Supply</div>
+                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(8))">Case</div>
+                                </div>
+                            </div>
+                        </div>
+                    </FluentWizardStep>
+                    @foreach (var step in steps) {
+                        <FluentWizardStep Label="@step.Label" OnChange="@OnStepChange">
+                            <AssemblyStep order="order" />
+                            <!-- TODO: pass only the part to Assemble and the step since the layout structure is always the same -->
+                        </FluentWizardStep>
+                    }
+                </Steps>
+            </FluentWizard>
         </div>
-
-        <FluentWizard StepperPosition="StepperPosition.Top" StepSequence="WizardStepSequence.Any" DisplayStepNumber="@(WizardStepStatus.Current | WizardStepStatus.Next)" StepTitleHiddenWhen="@GridItemHidden.XsAndDown" OnFinish="@OnFinishedAsync">
-            <Steps>
-                <FluentWizardStep Label="Prepare Case" OnChange="@OnStepChange">
-                    <div class="w-full flex justify-center items-center gap-16 pt-6">
-                        
-                        <div class="w-1/2 flex flex-col gap-8">
-                            <div class="pl-4 italic m-0 font-bold">
-                                <p class="m-0 font-bold">
-                                    Prepare the Case:
-                                </p>
-                                <p class="m-0">
-                                    - Open the side panels of the case;
-                                </p>
-                                <p class="m-0">
-                                    - Remove any included screws, cable ties, or packaging materials;
-                                </p>
-                                <p>
-                                    - Check for pre-installed case fans and ensure they are properly connected to the fan controller (if present).
-                                </p>
-                                <p class="m-0 not-italic font-bold underline">Correspondent Order's Case is @getPartNameByType(PartTipo.Case)</p>
-                            </div>
-                            <div class="w-full flex gap-8 items-center">
-                                <div class="w-3/5">
-                                    <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2">
-                                        <h1>
-                                            Order
-                                        </h1>
-                                        <div class="h-60 flex flex-col justify-center items-center">
-                                            @if (partInDisplay != null) 
-                                            {
-                                                <img class="h-5/6 @animationClass" src=@partInDisplay.Image alt="Part in Display">
-                                            }
-                                        </div>
-                                        <div class="h-20"></div>
-                                        <div class="absolute timepos">
-                                            <FluentCard class="flex flex-col items-center nopad">
-                                                <FluentIcon Value="@(new Icons.Regular.Size24.Clock())" />
-                                                <span class="font-bold">First step takes 5-8 minutes</span>
-                                            </FluentCard>
-                                        </div>
-                                    </FluentCard>
-                                </div>
-                                
-                                <div class="w-2/5 pq">
-                                    <FluentCard MinimalStyle="true" class="relative nopad flex flex-col items-center text-center gap-2">
-                                        <h1 class="pb-6">
-                                            Case selected
-                                        </h1>
-                                        <div class="h-48 flex flex-col justify-center items-center">
-                                        @if (activeCase != null && partInDisplay == null) 
-                                        {
-                                            <p class="font-bold @animationClass">
-                                                @activeCase.Name
-                                            </p>
-                                            <img class="h-5/6 @animationClass" src=@activeCase.Image alt="Part in Selection">
-                                            <FluentButton class="mt-6 w-3/4" IconStart="@(new Icons.Filled.Size24.Wrench())" Appearance="Appearance.Accent" @onclick="() => setPartInDisplay(activeCase)"></FluentButton>
-                                        }
-                                        </div>
-                                    </FluentCard>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="w-1/3 partsContainer">
-                            <FluentCard MinimalStyle="true" class="relative flex flex-col text-center">
-                                <p class="text-2xl font-medium">
-                                    ALL CASES IN STOCK
-                                </p>
-                                <FluentCard class="grid grid-cols-2 gap-y-6 gap-x-4 overflow-y-scroll overflow-x-visible">
-                                    @foreach (Part icase in allTypeParts) 
-                                    {
-                                        <FluentButton Appearance="Appearance.Accent" class="h-full text-lg font-bold" @onclick="() => setActiveCase(icase)">
-                                            <div class="flex flex-col justify-center items-center py-2 gap-2">
-                                                <span class="text-center break-words w-11/12">
-                                                    @icase.Name
-                                                </span>
-                                                <img class="h-24 font-extrabold" src="@icase.Image" alt="Part Case Image">
-                                            </div>
-                                        </FluentButton>
-                                    }
-                                </FluentCard>
-                            </FluentCard>
-                        </div>
-                    
-                    </div>
-                </FluentWizardStep>
-                <FluentWizardStep Label="Place Power Supply" OnChange="@OnStepChange">
-                    Maecenas sed justo ac sapien venenatis ullamcorper. Sed maximus nunc non venenatis euismod.
-                    Fusce vel porta ex, imperdiet molestie nisl. Vestibulum eu ultricies mauris, eget aliquam quam.
-                </FluentWizardStep>
-                <FluentWizardStep Label="Select Motherboard" OnChange="@OnStepChange">
-                    Maecenas sed justo ac sapien venenatis ullamcorper. Sed maximus nunc non venenatis euismod.
-                    Fusce vel porta ex, imperdiet molestie nisl. Vestibulum eu ultricies mauris, eget aliquam quam.
-                </FluentWizardStep>
-                <FluentWizardStep Label="Install Processor on Motherboard" OnChange="@OnStepChange">
-                    Maecenas sed justo ac sapien venenatis ullamcorper. Sed maximus nunc non venenatis euismod.
-                    Fusce vel porta ex, imperdiet molestie nisl. Vestibulum eu ultricies mauris, eget aliquam quam.
-                </FluentWizardStep>
-                <FluentWizardStep Label="Install Memory on Motherboard" OnChange="@OnStepChange">
-                    Maecenas sed justo ac sapien venenatis ullamcorper. Sed maximus nunc non venenatis euismod.
-                    Fusce vel porta ex, imperdiet molestie nisl. Vestibulum eu ultricies mauris, eget aliquam quam.
-                </FluentWizardStep>
-                <FluentWizardStep Label="Install Storage in Motherboard" OnChange="@OnStepChange">
-                    Nunc dignissim tortor eget lacus porta tristique. Nunc in posuere dui. Cras ligula ex,
-                    ullamcorper in gravida in, euismod vitae purus. Lorem ipsum dolor sit amet, consectetur
-                    adipiscing elit. Aliquam at velit leo. Suspendisse potenti. Cras dictum eu augue in laoreet.
-                </FluentWizardStep>
-                <FluentWizardStep Label="Mount Motherboard in the Case" OnChange="@OnStepChange">
-                    Phasellus quis augue convallis, congue velit ac, aliquam ex. In egestas porttitor massa
-                    aliquet porttitor. Donec bibendum faucibus urna vitae elementum. Phasellus vitae efficitur
-                    turpis, eget molestie ipsum.
-                </FluentWizardStep>
-                <FluentWizardStep Label="Install Graphics Card" OnChange="@OnStepChange">
-                    Ut iaculis sed magna efficitur tempor. Vestibulum est erat, imperdiet in diam ac,
-                    aliquam tempus sapien. Nam rutrum mi at enim mattis, non mollis diam molestie.
-                    Cras sodales dui libero, sit amet cursus sapien elementum ac. Nulla euismod nisi sem.
-                </FluentWizardStep>
-                <FluentWizardStep Label="Mark Order as done" IconPrevious="@(new Icons.Filled.Size24.Star())" IconCurrent="@(new Icons.Filled.Size24.StarEmphasis())" IconNext="@(new Icons.Regular.Size24.Star())" DisplayStepNumber="false" OnChange="@OnStepChange">
-                    Phasellus quis augue convallis, congue velit ac, aliquam ex. In egestas porttitor massa
-                    aliquet porttitor. Donec bibendum faucibus urna vitae elementum. Phasellus vitae efficitur
-                    turpis, eget molestie ipsum.
-                </FluentWizardStep>
-            </Steps>
-        </FluentWizard>
     }
 }
 
@@ -152,74 +52,30 @@
     public int Id { get; set; }
 
     private Order? order;
-    private List<(Part Part, int Quantity)> partsWithQuantities = new();
-    private Part? activeCase;
-    private Part? partInDisplay = null;
-    private string animationClass = "";
-    private List<Part> allTypeParts = new();
+    public class Steps {
+        public string? Label { get; set; }
+    }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        if (Id <= 0)
-        {
+    private List<Steps> steps = new List<Steps> {
+        new Steps { Label = "Prepare Case" },
+        new Steps { Label = "Place Power Supply" },
+        new Steps { Label = "Install Motherboard" },
+        new Steps { Label = "Install CPU" },
+        new Steps { Label = "Install RAM" },
+        new Steps { Label = "Install GPU" },
+        new Steps { Label = "Install Storage" },
+        new Steps { Label = "Install Cooling" },
+        new Steps { Label = "Finalize" },
+    };
+
+    protected override async Task OnParametersSetAsync() {
+        if (Id <= 0) {
             // Invalid ID
             order = null;
-            partsWithQuantities.Clear();
             return;
         }
-
         // Fetch the order using FindOneAsync
         order = await OrdersDb.FindOneAsync(o => o.OrderId == Id);
-
-        if (order != null)
-        {
-            // Fetch the parts with quantities
-            partsWithQuantities = await OrdersDb.GetPartsForOrderAsync(order);
-        }
-
-        allTypeParts = await ComponentesDb.GetPartsByTypeAsync(PartTipo.Case);
-    }
-
-    private async Task setActiveCase(Part iCase)
-    {
-        if (activeCase != iCase) {
-            if (activeCase != null)
-            {
-                animationClass = "slideOutChange"; // Trigger the exit animation
-                partInDisplay = null;
-                StateHasChanged(); 
-                await Task.Delay(500); 
-            }
-
-            animationClass = ""; 
-            activeCase = null; 
-            StateHasChanged(); 
-
-            activeCase = iCase; 
-            animationClass = "slideIn"; // Trigger the entry animation
-            StateHasChanged();
-        }
-    }
-
-    private async Task setPartInDisplay(Part iCase)
-    {
-        animationClass = "slideOutAssembly"; // Trigger the exit animation
-        StateHasChanged(); 
-        await Task.Delay(4800);
-
-        animationClass = ""; 
-        partInDisplay = null; 
-        StateHasChanged(); 
-
-        partInDisplay = iCase; 
-        animationClass = "slideIn"; // Trigger the entry animation
-        StateHasChanged();
-    }
-
-    private string? getPartNameByType(PartTipo type)
-    {
-        var match = partsWithQuantities.FirstOrDefault(p => p.Part.Tipo == type);
-        return match.Part?.Name;
     }
 
     private void OnStepChange(FluentWizardStepChangeEventArgs e) {
@@ -229,68 +85,49 @@
     private void OnFinishedAsync() {
         Console.WriteLine("Wizard finished");
     }
+
+    private string imageUrl { get; set; } = "/assets/pcbuild-step-0.png";
+
+    private void hoveringItem(int item) {
+        switch (item) {
+            case 1:
+                imageUrl = "/assets/pcbuild-step-1.png";
+                break;
+            case 2:
+                imageUrl = "/assets/pcbuild-step-2.png";
+                break;
+            case 3:
+                imageUrl = "/assets/pcbuild-step-3.png";
+                break;
+            case 4:
+                imageUrl = "/assets/pcbuild-step-4.png";
+                break;
+            case 5:
+                imageUrl = "/assets/pcbuild-step-5.png";
+                break;
+            case 6:
+                imageUrl = "/assets/pcbuild-step-6.png";
+                break;
+            case 7:
+                imageUrl = "/assets/pcbuild-step-7.png";
+                break;
+            case 8:
+                imageUrl = "/assets/pcbuild-step-8.png";
+                break;
+            default:
+                imageUrl = "/assets/pcbuild-step-0.png";
+                break;
+        }
+    }
+
+    private void goToStep(int step) {
+        Console.WriteLine($"Go to step {step}");
+    }
 }
 
 <style scoped>
-.partsContainer {
-    height: 530px;
-}
-
-.partsContainer span {
-    white-space: normal; 
-    word-wrap: break-word;
-    overflow-wrap: break-word; 
-}
-
-@@keyframes slideInFromRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@@keyframes slideOutToLeftChange {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-}
-
-@@keyframes slideOutToLeftAssembly {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-}
-
-.slideOutAssembly {
-  animation: slideOutToLeftAssembly 5s ease-in-out;
-}
-.slideOutChange {
-  animation: slideOutToLeftChange 0.5s ease-in-out;
-}
-.slideIn {
-  animation: slideInFromRight 0.5s ease-in-out;
-}
-.nopad {
-    padding: 8px !important;
-}
-.timepos {
-    bottom: 20px;
-}
-.pq {
-    height: 300px;
-}
+    .h-screen-space {
+        /* Calculate the height of the screen without the height of the header */
+        height: calc(100vh - 12.0rem);
+    }
 </style>

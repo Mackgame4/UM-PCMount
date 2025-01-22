@@ -178,12 +178,12 @@
         orders = await OrdersDb.GetArrayAsync();
         foreach (Order o in orders) {
             ordersQueryable = ordersQueryable.Append(new OrderQuery(o.OrderId, o.Name, o.Status.ToString(), o.Price));
-            //if (o.Status == OrderStatus.Done) { // TODO: Uncomment this line when the status is implemented
+            if (o.Status == OrderStatus.Done) {
                 // Calculate Discounts Loss
                 DiscountsLossValue += o.Price * ((o.Discount ?? 0) / 100);
                 // Calculate Revenue
                 RevenueValue += o.Price - (o.Price * ((o.Discount ?? 0) / 100));
-            //}
+            }
         }
         // Parts Queryable
         List<Product>? products = (await InventarioDb.IncludeListAsync(i => i.Part))?.Select(i => new Product {
