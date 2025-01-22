@@ -1,17 +1,17 @@
 @page "/dashboard/assembly/{Id:int}"
+@attribute [Authorize(Roles = "Admin")]
+@layout DashboardLayout
+@rendermode InteractiveServer
+<PageTitle>PCMount - Assembly</PageTitle>
+
 @inject OrdersService OrdersDb
 @inject ComponentesService ComponentesDb
 
-@rendermode InteractiveServer
-@attribute [Authorize(Roles = "Admin")]
-
-<PageTitle>PCMount - Assembly</PageTitle>
-
 @if (Id <= 0) {
-    <p>Invalid Assembly ID.</p>
+    <span class="text-center text-xl text-gray-200 mt-8">Invalid Assembly ID.</span>
 } else {
     if (order == null || !partsWithQuantities.Any()) {
-        <p>Loading ...</p>
+        <LoadingDialog Title="Loading Order..." />
     }
     else {
         <div class="w-full flex flex-col justify-center items-center pt-4 pb-2 gap-2">
