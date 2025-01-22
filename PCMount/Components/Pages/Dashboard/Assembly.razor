@@ -41,7 +41,14 @@
                                 </span>
                             </FluentBadge>
                         </div>
-                        <FluentButton IconStart="@(new Icons.Regular.Size20.PuzzlePiece())" Appearance="Appearance.Lightweight" class="w-4/5" @onclick="() => ShowNeededParts(order.order)">Parts Needed <FluentBadge Appearance="Appearance.Accent" Circular="true" slot="end">@MissingPartsCount(order.order.OrderId)</FluentBadge></FluentButton>
+                        <FluentButton IconStart="@(new Icons.Regular.Size20.PuzzlePiece())" Appearance="Appearance.Lightweight" class="w-4/5" @onclick="() => ShowNeededParts(order.order)">Parts Needed
+                        @{
+                            int count = MissingPartsCount(order.order.OrderId);
+                        }
+                        @if (count > 0) {
+                            <FluentBadge Appearance="Appearance.Accent" Circular="true" slot="end">@count</FluentBadge>
+                        }
+                        </FluentButton>
                         <FluentButton IconStart="@(new Icons.Regular.Size20.Wrench())" Appearance="Appearance.Accent" Disabled="!orderStartability[order.index]" class="w-4/5" @onclick="() => StartOrderAssembly(order.order, order.index)">Assemble</FluentButton>
                     </FluentCard>
                 }
@@ -110,7 +117,7 @@
             StateHasChanged();
         }
         if (!hasOutOfStockParts) {
-            Navigation.NavigateTo(getOrderAssemblyPath(order.OrderId));
+            Navigation.NavigateTo(getOrderAssemblyPath(order.OrderId), true);
         }
     }
 
