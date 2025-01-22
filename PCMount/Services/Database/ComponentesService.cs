@@ -118,4 +118,25 @@ public class ComponentesService : IDbContextAcessor<Part> {
             semaphore.Release();
         }
     }
+
+    public async Task<List<Part>> GetPartsByTypeAsync(PartTipo tipo)
+    {
+        await semaphore.WaitAsync();
+        try
+        {
+            return await (from part in _dbContext.Componentes
+                        join inv in _dbContext.Inventario
+                        on part.PartId equals inv.PartId
+                        where part.Tipo == tipo && inv.Quantidade > 0
+                        select part)
+                        .AsNoTracking()
+                        .ToListAsync();
+        }
+        finally
+        {
+            semaphore.Release();
+        }
+    }
+
+
 }

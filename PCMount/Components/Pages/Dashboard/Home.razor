@@ -124,7 +124,7 @@
                             <span class="text-sm text-green-500">@(context.Price.HasValue ? context.Price.Value.ToString("C") : "N/A")</span>
                         </TemplateColumn>
                         <TemplateColumn Title="Actions" Align="@Align.End">
-                            <FluentButton IconEnd="@(new Icons.Regular.Size16.Wrench())" @onclick="() => Navigation.NavigateTo(getOrderAssemblyPath(context.OrderId!))"></FluentButton>
+                            <FluentButton IconEnd="@(new Icons.Regular.Size16.Wrench())" @onclick="() => Navigation.NavigateTo(getOrderAssemblyPath(context.OrderId!), true)"></FluentButton>
                             <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" @onclick="() => deleteOrder(context.OrderId!)"></FluentButton>
                         </TemplateColumn>
                     </FluentDataGrid>

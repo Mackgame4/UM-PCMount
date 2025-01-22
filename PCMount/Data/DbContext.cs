@@ -36,7 +36,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             new Part { PartId = 6, Name = "Corsair Vengeance RGB Pro", Preco = 200, Tipo = PartTipo.Memory, Descricao = "", Image = "/assets/cdn/part-nvidia-rtx-3080.png", PortId = 5 },
             new Part { PartId = 7, Name = "Samsung 970 EVO Plus", Preco = 200, Tipo = PartTipo.Storage, Descricao = "", Image = "/assets/cdn/part-samsung-970-ssd.png", PortId = 6 },
             new Part { PartId = 8, Name = "Corsair RM850x", Preco = 150, Tipo = PartTipo.PowerSupply, Descricao = "", Image = "/assets/cdn/part-nvidia-rtx-3080.png", PortId = 7 },
-            new Part { PartId = 9, Name = "NZXT H510", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/part-nvidia-rtx-3080.png", PortId = 8 }
+            new Part { PartId = 9, Name = "NZXT H510", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/part-nvidia-rtx-3080.png", PortId = 8 },
+            new Part { PartId = 10, Name = "Panorama Glass", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 9 },
+            new Part { PartId = 11, Name = "Corsair 4000D Airflow", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 10 },
+            new Part { PartId = 12, Name = "Lian Li PC-O11 Dynamic", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 11 },
+            new Part { PartId = 13, Name = "Fractal Design Meshify", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 12 },
+            new Part { PartId = 14, Name = "Phanteks Eclipse P500A", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 13 },
+            new Part { PartId = 15, Name = "ASUS TUF Gaming GT501", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 14 }
         );
         modelBuilder.Entity<Inventario>().HasData(
             new Inventario { PartId = 1, Quantidade = 10 },
