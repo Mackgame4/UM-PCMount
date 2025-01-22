@@ -93,7 +93,7 @@
                                 </div>
                             </div>
                         </div>
-                        <FluentButton IconStart="@(new Icons.Regular.Size16.Wrench())" Appearance="Appearance.Lightweight" @onclick="() => Navigation.NavigateTo(getOrderAssemblyPath(order.OrderId))"></FluentButton>
+                        <FluentButton IconStart="@(new Icons.Regular.Size16.Wrench())" Appearance="Appearance.Lightweight" @onclick="() => Navigation.NavigateTo(getOrderAssemblyPath(order.OrderId), true)"></FluentButton>
                     </div>
                 }
             </div>
@@ -127,10 +127,8 @@
 
     private RenderFragment RenderMenuOptions => @<FluentStack Orientation="Orientation.Horizontal" Width="100%">
         @foreach (var pagemetadata in pagesmetadata) {
-            <NavLink class="w-full" href="@pagemetadata.Path" Match="NavLinkMatch.All">
-                <FluentButton class="w-full hidden sm:inline-flex" IconStart="@pagemetadata.Icon" Appearance="Appearance.Lightweight">@pagemetadata.Title</FluentButton>
-                <FluentButton class="w-full inline-flex sm:hidden" IconStart="@pagemetadata.Icon" Appearance="Appearance.Lightweight"></FluentButton>
-            </NavLink>
+            <FluentButton class="w-full hidden sm:inline-flex" IconStart="@pagemetadata.Icon" Appearance="Appearance.Lightweight" @onclick="() => Navigation.NavigateTo(pagemetadata.Path, true)">@pagemetadata.Title</FluentButton>
+            <FluentButton class="w-full inline-flex sm:hidden" IconStart="@pagemetadata.Icon" Appearance="Appearance.Lightweight" @onclick="() => Navigation.NavigateTo(pagemetadata.Path, true)"></FluentButton>
         }
     </FluentStack>;
 

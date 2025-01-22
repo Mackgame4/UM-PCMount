@@ -114,29 +114,22 @@ public class OrdersService : IDbContextAcessor<Order> {
         }
     }
 
-    public async Task<List<(Part Part, int Quantity)>> GetPartsForOrderAsync(Order order)
-    {
+    // Custom queries
+    public async Task<List<(Part Part, int Quantity)>> GetPartsForOrderAsync(Order order) {
         await semaphore.WaitAsync();
-        try
-        {
+        try {
             var partsWithQuantities = new List<(Part Part, int Quantity)>();
-
-            async Task AddPartWithQuantityAsync(int? partId)
-            {
+            async Task AddPartWithQuantityAsync(int? partId) {
                 if (!partId.HasValue) return;
-
                 // Fetch the part from the Componentes table
                 var part = await _dbContext.Componentes.FindAsync(partId);
-                if (part != null)
-                {
+                if (part != null) {
                     // Check the quantity in the Inventario table
                     var inventory = await _dbContext.Inventario.FindAsync(part.PartId);
                     int quantity = inventory?.Quantidade ?? 0;
-
                     partsWithQuantities.Add((part, quantity));
                 }
             }
-
             // Add parts to the list
             await AddPartWithQuantityAsync(order.MotherboardId);
             await AddPartWithQuantityAsync(order.ProcessorId);
@@ -145,14 +138,9 @@ public class OrdersService : IDbContextAcessor<Order> {
             await AddPartWithQuantityAsync(order.GraphicsCardId);
             await AddPartWithQuantityAsync(order.PowerSupplyId);
             await AddPartWithQuantityAsync(order.CaseId);
-
             return partsWithQuantities;
-        }
-        finally
-        {
+        } finally {
             semaphore.Release();
         }
     }
-
-
 }

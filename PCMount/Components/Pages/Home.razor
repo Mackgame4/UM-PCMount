@@ -43,22 +43,20 @@
     </AuthorizeView>
 </FluentToolbar>
 <div class="p-5">
-    @if (computers == null) {
+    @if (computers == null || filteredProducts == null) {
         <LoadingPageCards Title="Waiting Page Data Request..." />
-    } else {
-        @if (filteredProducts != null && !filteredProducts.Any()) {
+    } else if (filteredProducts != null && !filteredProducts.Any()) {
             <div class="flex items-center justify-center h-96">
                 <span class="text-2xl text-gray-400">No products found.</span>
             </div>
-        } else {
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                @foreach (var product in filteredProducts!) {
-                    <div class="relative custom-transition transition duration-300 ease-in-out">
-                        <ProductCard Product="@product" OnAddToCart="AddToCart" />
-                    </div>
-                }
-            </div>
-        }
+    } else {
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            @foreach (var product in filteredProducts!) {
+                <div class="relative custom-transition transition duration-300 ease-in-out">
+                    <ProductCard Product="@product" OnAddToCart="AddToCart" />
+                </div>
+            }
+        </div>
     }
 </div>
 
