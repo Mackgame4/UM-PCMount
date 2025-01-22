@@ -119,11 +119,10 @@ public class ComponentesService : IDbContextAcessor<Part> {
         }
     }
 
-    public async Task<List<Part>> GetPartsByTypeAsync(PartTipo tipo)
-    {
+    // Custom queries
+    public async Task<List<Part>> GetPartsByTypeAsync(PartTipo tipo) {
         await semaphore.WaitAsync();
-        try
-        {
+        try {
             return await (from part in _dbContext.Componentes
                         join inv in _dbContext.Inventario
                         on part.PartId equals inv.PartId
@@ -131,12 +130,8 @@ public class ComponentesService : IDbContextAcessor<Part> {
                         select part)
                         .AsNoTracking()
                         .ToListAsync();
-        }
-        finally
-        {
+        } finally {
             semaphore.Release();
         }
     }
-
-
 }
