@@ -95,13 +95,9 @@
     private Part? partInDisplay = null;
     private string animationClass = "";
 
-    private async Task CompleteStep() {
-        if (partInDisplay != null) {
-        if (partInDisplay == PartToAssemble) {
-            bool isCompleted = true;
-            await OnComplete.InvokeAsync(isCompleted);
-        }
-        }
+    private async Task CompleteStep() {    
+        bool isCompleted = true;
+        await OnComplete.InvokeAsync(isCompleted);
     }
 
     private string getTitle() {
@@ -155,6 +151,10 @@
         StateHasChanged(); 
 
         partInDisplay = iCase; 
+        if (partInDisplay?.PartId == PartToAssemble?.PartId) {
+            await CompleteStep();
+            Console.WriteLine("pode avancar");
+        }
         animationClass = "slideIn"; // Trigger the entry animation
         StateHasChanged();
     }
