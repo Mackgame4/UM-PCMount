@@ -25,7 +25,7 @@
 </FluentToolbar>
 
 @if (products == null || filteredProducts == null) {
-    <LoadingPageCards Title="Loading Parts Shop..." />
+    <LoadingDialog Title="Loading Parts Shop..." />
 } else if (!filteredProducts.Any()) {
     <span class="text-center text-xl text-gray-200 mt-8">No products found.</span>
 } else {
