@@ -91,13 +91,22 @@
     public Part? PartToAssemble { get; set; }
     [Parameter]
     public EventCallback<bool> OnComplete { get; set; }
+    [Parameter]
+    public EventCallback<bool> OnUncomplete { get; set; }
+    
+    private bool IsCompleted = false;
     private Part? activeCase;
     private Part? partInDisplay = null;
     private string animationClass = "";
 
-    private async Task CompleteStep() {    
-        bool isCompleted = true;
-        await OnComplete.InvokeAsync(isCompleted);
+    private async Task CompleteStep() {
+        IsCompleted = true;
+        await OnComplete.InvokeAsync(true);
+    }
+
+    private async Task unCompleteStep() {  
+        IsCompleted = false;  
+        await OnUncomplete.InvokeAsync(true);
     }
 
     private string getTitle() {
@@ -126,6 +135,10 @@
             {
                 animationClass = "slideOutChange"; // Trigger the exit animation
                 partInDisplay = null;
+                if (IsCompleted) {
+                    await unCompleteStep();
+                }
+                Console.WriteLine("Nao pode avancar");
                 StateHasChanged(); 
                 await Task.Delay(500); 
             }
