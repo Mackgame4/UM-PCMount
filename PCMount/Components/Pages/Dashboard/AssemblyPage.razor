@@ -6,6 +6,8 @@
 
 @inject OrdersService OrdersDb
 @inject ComponentesService ComponentesDb
+@inject InventarioService InventarioDb
+@inject NavigationManager Navigation
 
 @if (Id <= 0) {
     <span class="text-center text-xl text-gray-200 mt-8">Invalid Assembly ID.</span>
@@ -24,15 +26,17 @@
                             </div>
                             <div class="w-2/3 flex flex-col justify-center items-center gap-4">
                                 <div class="grid grid-cols-3 grid-rows-6 gap-4 p-8" style="border: 1px solid transparent;">
-                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(1))" @onclick="@(e => goToStep(1))">CPU</div>
-                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(2))">CPU Cooler</div>
-                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(3))">Motherboard</div>
-                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(4))">Memory</div>
-                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(5))">Graphics Card</div>
-                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(6))">Storage</div>
-                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(7))">Power Supply</div>
-                                    <div class="p-4 flex justify-center items-center" style="border: 1px solid red;" @onmouseover="@(e => hoveringItem(8))">Case</div>
-                                    <!-- TODO: Add check or error icon if the part is installed or not -->
+                                    @for (int i = 0; i <= 7; i++) {
+                                        int currentStep = i; 
+                                        <div class="p-4 flex justify-center items-center relative" 
+                                            style="border: 1px solid @(IsStepCompleted(i) ? "green" : "red");" 
+                                            @onmouseover="@(e => hoveringItem(currentStep))">
+                                            @GetStepLabel(i)
+                                            @if (IsStepCompleted(i)) {
+                                                <span class="absolute top-0 right-1 text-green-500">✔️</span>
+                                            }
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -40,9 +44,27 @@
                     @foreach (var step in steps!) {
                         <FluentWizardStep Label="@step.Label" Disabled="!step.IsCompleted" OnChange="@OnStepChange">
                             <AssemblyStep OnComplete="@stepDone" OnUncomplete="@stepUnDone" OnStepNumberChanged="@stepStarted" StepNumber="@step.StepNumber" PartsList="@step.AvaliableParts" PartToAssemble="@step.PartToAssemble" />
-                            <!-- TODO: pass only the part to Assemble and the step since the layout structure is always the same -->
                         </FluentWizardStep>
                     }
+                    <FluentWizardStep Label="Finalize" Disabled=@(!Finalize) OnChange="@OnStepChange">
+                        <div class="flex flex-row justify-center items-center gap-4 p-8">
+                            <div class="w-4/5 flex flex-col justify-center items-center relative">
+                            <div class="flex">
+                                <div class="flex flex-col w-1/2 gap-2 justify-center">
+                                    @if (partsWithQuantities != null) {
+                                        @foreach (var (part, quantity) in partsWithQuantities) {
+                                            <p class="text-lg">@part.Tipo: <FluentBadge class="text-lg font-medium">@part.Name</FluentBadge> ✔️</p>
+                                        }
+                                    }
+                                </div>
+                                <img class="w-1/2" src=@order?.Image alt="Final Order Image">
+                            </div>
+                                <FluentButton IconStart="@(new Icons.Regular.Size24.Box())" Appearance="Appearance.Accent" @onclick="() => OrderDone()" class="text-2xl font-light mt-8">
+                                    MARK ORDER ID: <span class="font-medium">@order?.OrderId</span> AS DONE
+                                </FluentButton>
+                            </div>
+                        </div>
+                    </FluentWizardStep>
                 </Steps>
             </FluentWizard>
         </div>
@@ -55,6 +77,7 @@
 
     private Order? order;
     private List<(Part Part, int Quantity)>? partsWithQuantities;
+    private bool Finalize = false;
     public class Steps {
         public int StepNumber {get; set; }
         public string? Label { get; set; }
@@ -82,13 +105,43 @@
                     new Steps { StepNumber = 4, Label = "Install RAM", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Memory)), PartToAssemble = getPartByType(PartTipo.Memory) },
                     new Steps { StepNumber = 5, Label = "Install GPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.GraphicsCard)), PartToAssemble = getPartByType(PartTipo.GraphicsCard) },
                     new Steps { StepNumber = 6, Label = "Install Storage", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
-                    new Steps { StepNumber = 7, Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
-                    new Steps { StepNumber = 8, Label = "Finalize", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
+                    //new Steps { StepNumber = 7, Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
                 };
             }
         }
     }
 
+    private async void OrderDone() {
+        if (partsWithQuantities == null) {
+            Console.WriteLine("No parts found to update.");
+            return;
+        }
+
+        foreach (var (part, quantity) in partsWithQuantities) {
+            try {
+                int newQuantidade = quantity - 1;
+
+                if (newQuantidade < 0) {
+                    Console.WriteLine($"Cannot update PartId: {part.PartId}. Quantity would become negative.");
+                    continue;
+                }
+                var updatedInventario = await InventarioDb.UpdateAsync2(part.PartId, newQuantidade);
+
+                if (updatedInventario == null) {
+                    Console.WriteLine($"Failed to update PartId: {part.PartId}");
+                } else {
+                    Console.WriteLine($"Updated PartId: {part.PartId}. New Quantity: {updatedInventario.Quantidade}");
+                }
+            } catch (Exception ex) {
+                Console.WriteLine($"An error occurred while updating PartId: {part.PartId}. Error: {ex.Message}");
+            }
+        }
+
+        if (order != null) {
+            await OrdersDb.UpdateOrderStatusToDoneAsync(order.OrderId);
+        }
+        Navigation.NavigateTo("/dashboard/assembly", true);
+    }
     private Part? getPartByType(PartTipo type)
     {
         if (partsWithQuantities == null) {
@@ -107,43 +160,85 @@
     }
     private void stepDone(int StepNumber) {
         Console.WriteLine("can advance to the next step");
-        if (StepNumber < steps.Count - 1) {
-            steps[StepNumber+1].IsCompleted = true;
+        if (steps != null && StepNumber < steps.Count - 1) {
+            steps[StepNumber + 1].IsCompleted = true;
+        }
+
+
+        if (steps != null && StepNumber == steps.Count - 1) {
+            Finalize = true;
         }
 
         StateHasChanged(); // Refresh the UI
     }
-    private void stepUnDone(int StepNumber)
-    {
+
+    private void stepUnDone(int StepNumber) {
         Console.WriteLine("Reverting the last completed step");
-        if (StepNumber < steps.Count - 1) {
-            steps[StepNumber+1].IsCompleted = false;
-        }
-
-        StateHasChanged(); // Refresh the UI
-    }
-    private void stepStarted(int StepNumber)
-    {   
-        if (StepNumber != 0) {
-            steps[StepNumber-1].IsCompleted = false;
-            Console.WriteLine($"Step '{steps[StepNumber-1].Label}' marked as not completed.");
+        if (steps != null && StepNumber < steps.Count - 1) {
+            steps[StepNumber + 1].IsCompleted = false;
+            if (StepNumber == steps.Count - 1) {
+                Finalize = false;
+            }
         }
 
         StateHasChanged(); // Refresh the UI
     }
 
+    private void stepStarted(int StepNumber) {
+        if (steps != null && StepNumber != 0) {
+            steps[StepNumber - 1].IsCompleted = false;
+            Console.WriteLine($"Step '{steps[StepNumber - 1].Label}' marked as not completed.");
+        }
+
+        StateHasChanged(); // Refresh the UI
+    }
+
+    private int trulyCompletedIndex() {
+    if (steps == null) {
+        return -1; // Return -1 if the steps list is null
+    }
+
+    for (int i = steps.Count - 1; i >= 0; i--) {
+        if (steps[i].IsCompleted) {
+            return i; // Return the highest index where IsCompleted is true
+        }
+    }
+
+    return -1;
+    }
+
+    private bool IsStepCompleted(int stepNumber) {
+        int completedIndex = trulyCompletedIndex();
+        if (Finalize) return true;
+        return completedIndex > stepNumber;
+    }
+
+    private string GetStepLabel(int stepNumber) {
+        return stepNumber switch {
+            3 => "CPU",
+            7 => "CPU Cooler",
+            2 => "Motherboard",
+            4 => "Memory",
+            5 => "Graphics Card",
+            6 => "Storage",
+            1 => "Power Supply",
+            0 => "Case",
+            _ => "Unknown"
+        };
+    }
 
     private string imageUrl { get; set; } = "/assets/pcbuild-step-0.png";
 
     private void hoveringItem(int item) {
+         Console.WriteLine($"Hovering over item: {item}"); // Debugging
         switch (item) {
-            case 1:
+            case 3:
                 imageUrl = "/assets/pcbuild-step-1.png";
                 break;
-            case 2:
+            case 7:
                 imageUrl = "/assets/pcbuild-step-2.png";
                 break;
-            case 3:
+            case 2:
                 imageUrl = "/assets/pcbuild-step-3.png";
                 break;
             case 4:
@@ -155,20 +250,16 @@
             case 6:
                 imageUrl = "/assets/pcbuild-step-6.png";
                 break;
-            case 7:
+            case 1:
                 imageUrl = "/assets/pcbuild-step-7.png";
                 break;
-            case 8:
+            case 0:
                 imageUrl = "/assets/pcbuild-step-8.png";
                 break;
             default:
                 imageUrl = "/assets/pcbuild-step-0.png";
                 break;
         }
-    }
-
-    private void goToStep(int step) {
-        Console.WriteLine($"Go to step {step}");
     }
 }
 

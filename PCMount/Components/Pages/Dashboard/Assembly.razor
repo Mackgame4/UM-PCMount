@@ -81,7 +81,7 @@
     }
 
     protected override async Task OnParametersSetAsync() {
-        orders = await OrdersDb.GetArrayAsync();
+        orders = await OrdersDb.GetPendingOrdersAsync();
         // Initialize the dictionary with the size of the orders array
         if (orders != null) {
             for (int i = 0; i < orders.Length; i++) {
