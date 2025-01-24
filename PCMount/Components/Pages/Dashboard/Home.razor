@@ -96,7 +96,9 @@
                     <FluentDataGrid Items="@partsQueryable" ShowHover="true" Pagination="@partsPagination">
                         <PropertyColumn Property="@(o => o.PartId)" Title="ID" Sortable="true" />
                         <PropertyColumn Property="@(o => o.Name)" Title="Name" />
-                        <PropertyColumn Property="@(o => o.Preco)" Title="Price" />
+                        <TemplateColumn Title="Price" Align="@Align.Center">
+                            <span class="text-sm">@(context.Preco.HasValue ? context.Preco.Value.ToString("C") : "N/A")</span>
+                        </TemplateColumn>
                         <PropertyColumn Property="@(o => o.Tipo)" Title="Type" />
                         <PropertyColumn Property="@(o => o.Quantidade)" Title="Quantity" Sortable="true" InitialSortDirection=SortDirection.Descending IsDefaultSortColumn=true />
                     </FluentDataGrid>
