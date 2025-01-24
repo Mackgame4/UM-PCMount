@@ -178,7 +178,9 @@
                 Console.WriteLine($"Step '{step.Label}' is completed: {step.IsCompleted}");
                 if (!step.IsCompleted) {
                     Finalize = false;
-                    //return;
+                    return;
+                } else {
+                    Finalize = true;
                 }
             }
         }
