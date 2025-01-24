@@ -51,7 +51,7 @@
             var user = new User {
                 UserName = LoginModel.UserName!,
                 Password = PasswordHasher.HashPassword(LoginModel.Password!),
-                Role = "Admin" // Registered users are admins by default
+                Role = "Client"
             };
             if (UsersDb.Any(u => u.UserName == user.UserName)) {
                 errorMessage = "Username already exists.";
