@@ -50,6 +50,10 @@ public class ComputerComponents {
     [ForeignKey("Case")]
     public int? CaseId { get; set; }
 
+    [Column("CoolingId")]
+    [ForeignKey("Cooling")]
+    public int? CoolingId { get; set; }
+
     // Navigation properties
     public Part? Motherboard { get; set; }
     public Part? Processor { get; set; }
@@ -58,4 +62,5 @@ public class ComputerComponents {
     public Part? GraphicsCard { get; set; }
     public Part? PowerSupply { get; set; }
     public Part? Case { get; set; }
+    public Part? Cooling { get; set; }
 }

@@ -116,6 +116,7 @@
             c.Storage = components.FirstOrDefault(p => p.PartId == c.StorageId);
             c.PowerSupply = components.FirstOrDefault(p => p.PartId == c.PowerSupplyId);
             c.Case = components.FirstOrDefault(p => p.PartId == c.CaseId);
+            c.Cooling = components.FirstOrDefault(p => p.PartId == c.CoolingId);
             return c;
         }).ToArray() ?? Array.Empty<Computer>();
         DefaultSearchProducts();
@@ -156,7 +157,8 @@
                         GraphicsCardId = product.GraphicsCardId,
                         StorageId = product.StorageId,
                         PowerSupplyId = product.PowerSupplyId,
-                        CaseId = product.CaseId
+                        CaseId = product.CaseId,
+                        CoolingId = product.CoolingId
                     };
                     await OrdersDb.CreateAsync(order);
                 }

@@ -42,7 +42,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             new Part { PartId = 12, Name = "Lian Li PC-O11 Dynamic", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 11 },
             new Part { PartId = 13, Name = "Fractal Design Meshify", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 12 },
             new Part { PartId = 14, Name = "Phanteks Eclipse P500A", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 13 },
-            new Part { PartId = 15, Name = "ASUS TUF Gaming GT501", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 14 }
+            new Part { PartId = 15, Name = "ASUS TUF Gaming GT501", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 14 },
+            new Part { PartId = 16, Name = "Cooler Master", Preco = 100, Tipo = PartTipo.Cooling, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 14 }
         );
         modelBuilder.Entity<Inventario>().HasData(
             new Inventario { PartId = 1, Quantidade = 10 },
@@ -55,12 +56,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             new Inventario { PartId = 8, Quantidade = 10 }
         );
         modelBuilder.Entity<Computer>().HasData(
-            new Computer { Id = 1, Name = "NZXT H5 Gaming Elite", Price = 1000, Image = "/assets/cdn/computer-nzxt-h5.png", Discount = 10, MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9 },
-            new Computer { Id = 2, Name = "Panorama Glass Gaming", Price = 2000, Image = "/assets/cdn/computer-panorama-gaming.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9 },
-            new Computer { Id = 3, Name = "Periphio Astral 5600G", Price = 1500, Image = "/assets/cdn/computer-periphio-astral-5600g.png", Discount = 25, MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9 },
-            new Computer { Id = 4, Name = "Elite AvaDirect 3687Y", Price = 1500, Image = "/assets/cdn/computer-elite-avadirect.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9 },
-            new Computer { Id = 5, Name = "CyberPower MultiColor", Price = 1000, Image = "/assets/cdn/computer-cyberpower-pc.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9 },
-            new Computer { Id = 6, Name = "Corsair Vengeance", Price = 1000, Image = "/assets/cdn/computer-vengeance-i5200.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9 }
+            new Computer { Id = 1, Name = "NZXT H5 Gaming Elite", Price = 1000, Image = "/assets/cdn/computer-nzxt-h5.png", Discount = 10, MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
+            new Computer { Id = 2, Name = "Panorama Glass Gaming", Price = 2000, Image = "/assets/cdn/computer-panorama-gaming.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
+            new Computer { Id = 3, Name = "Periphio Astral 5600G", Price = 1500, Image = "/assets/cdn/computer-periphio-astral-5600g.png", Discount = 25, MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
+            new Computer { Id = 4, Name = "Elite AvaDirect 3687Y", Price = 1500, Image = "/assets/cdn/computer-elite-avadirect.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
+            new Computer { Id = 5, Name = "CyberPower MultiColor", Price = 1000, Image = "/assets/cdn/computer-cyberpower-pc.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
+            new Computer { Id = 6, Name = "Corsair Vengeance", Price = 1000, Image = "/assets/cdn/computer-vengeance-i5200.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 }
         );
     }
 

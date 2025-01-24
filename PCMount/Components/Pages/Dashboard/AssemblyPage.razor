@@ -16,10 +16,10 @@
         <span class="text-center text-xl text-gray-200 mt-8">No order found with the ID @Id to be assembled.</span>
     } else {
         @if (order.Status == OrderStatus.Done) {
-            <span class="text-center text-xl text-gray-200 mt-8">Order ID: @Id has already been assembled.</span>
+            <span class="text-center text-xl text-gray-200 mt-8">Order ID @Id has already been assembled.</span>
         } else {
             <div class="relative w-full h-screen-space -mt-4">
-                <FluentBadge Appearance="Appearance.Accent" Class="text-md md:text-xl p-2"><span class="flex flex-row justify-center items-center gap-1"><FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Wrench())" />You're Assemblying An <b>@order?.Name</b> In Order Id:<b>@Id</b></span></FluentBadge>
+                <FluentBadge Appearance="Appearance.Accent" Class="text-md md:text-xl p-2"><span class="flex flex-row justify-center items-center gap-1"><FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Wrench())" />You're Assemblying An <b>@order?.Name</b> For Order Id:<b>@Id</b></span></FluentBadge>
                 <FluentWizard @ref="wizardInstance" Class="min-h-full" StepperPosition="StepperPosition.Left" StepSequence="WizardStepSequence.Any" DisplayStepNumber="@(WizardStepStatus.Current | WizardStepStatus.Next)" StepTitleHiddenWhen="@GridItemHidden.XsAndDown" OnFinish="@OnFinishedAsync">
                     <Steps>
                         <FluentWizardStep Label="Overview" OnChange="@OnStepChange">
@@ -117,7 +117,7 @@
                     new Steps { StepNumber = 4, Name = "Memory", Label = "Install RAM", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Memory)), PartToAssemble = getPartByType(PartTipo.Memory), ETA = 7 },
                     new Steps { StepNumber = 5, Name = "Graphics Card", Label = "Install GPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.GraphicsCard)), PartToAssemble = getPartByType(PartTipo.GraphicsCard), ETA = 4 },
                     new Steps { StepNumber = 6, Name = "Storage", Label = "Install Storage", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage), ETA = 8 },
-                    new Steps { StepNumber = 7, Name = "Cooling", Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage), ETA = 15 },
+                    new Steps { StepNumber = 7, Name = "Cooling", Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Cooling)), PartToAssemble = getPartByType(PartTipo.Cooling), ETA = 15 },
                 };
             }
         }

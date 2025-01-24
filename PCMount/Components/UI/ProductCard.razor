@@ -46,6 +46,9 @@
             @if (Product!.Case != null) {
                 <span><FluentBadge Appearance="Appearance.Neutral">Case:</FluentBadge> @Product!.Case?.Name</span>
             }
+            @if (Product!.Cooling != null) {
+                <span><FluentBadge Appearance="Appearance.Neutral">Cooling:</FluentBadge> @Product!.Cooling?.Name</span>
+            }
         </div>
         <div class="mt-2 w-full">
             <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.Cart())" Appearance="Appearance.Accent" OnClick="@(() => AddToCart(Product))">Add to Cart</FluentButton>

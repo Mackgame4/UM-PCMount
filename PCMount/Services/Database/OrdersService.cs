@@ -138,6 +138,7 @@ public class OrdersService : IDbContextAcessor<Order> {
             await AddPartWithQuantityAsync(order.GraphicsCardId);
             await AddPartWithQuantityAsync(order.PowerSupplyId);
             await AddPartWithQuantityAsync(order.CaseId);
+            await AddPartWithQuantityAsync(order.CoolingId);
             return partsWithQuantities;
         } finally {
             semaphore.Release();

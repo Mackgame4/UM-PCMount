@@ -1,5 +1,5 @@
 - [ ] Add Mobile Support
 - [ ] Fix Gome's 90s styling
 - [ ] Option in dashboard to add new products (Computers)
-- [ ] No incomplete custom builds?
+- [x] No incomplete custom builds?
 - [ ] Check parts before assembly page loads (because we can bypass the button writing the url manually)
