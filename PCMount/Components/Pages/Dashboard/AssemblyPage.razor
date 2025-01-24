@@ -39,7 +39,7 @@
                     </FluentWizardStep>
                     @foreach (var step in steps!) {
                         <FluentWizardStep Label="@step.Label" Disabled="!step.IsCompleted" OnChange="@OnStepChange">
-                            <AssemblyStep OnComplete="@stepDone" OnUncomplete="@stepUnDone" PartsList="@step.AvaliableParts" PartToAssemble="@step.PartToAssemble" />
+                            <AssemblyStep OnComplete="@stepDone" OnUncomplete="@stepUnDone" OnStepNumberChanged="@stepStarted" StepNumber="@step.StepNumber" PartsList="@step.AvaliableParts" PartToAssemble="@step.PartToAssemble" />
                             <!-- TODO: pass only the part to Assemble and the step since the layout structure is always the same -->
                         </FluentWizardStep>
                     }
@@ -56,6 +56,7 @@
     private Order? order;
     private List<(Part Part, int Quantity)>? partsWithQuantities;
     public class Steps {
+        public int StepNumber {get; set; }
         public string? Label { get; set; }
         public bool IsCompleted { get; set; }
         public List<Part>? AvaliableParts { get; set; }
@@ -74,15 +75,15 @@
             if (order != null) {
                 partsWithQuantities = await OrdersDb.GetPartsForOrderAsync(order);
                 steps = new List<Steps> {
-                    new Steps { Label = "Prepare Case", IsCompleted = true, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Case)), PartToAssemble = getPartByType(PartTipo.Case) },
-                    new Steps { Label = "Place Power Supply", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.PowerSupply)), PartToAssemble = getPartByType(PartTipo.PowerSupply) },
-                    new Steps { Label = "Install Motherboard", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Motherboard)), PartToAssemble = getPartByType(PartTipo.Motherboard) },
-                    new Steps { Label = "Install CPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Processor)), PartToAssemble = getPartByType(PartTipo.Processor) },
-                    new Steps { Label = "Install RAM", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Memory)), PartToAssemble = getPartByType(PartTipo.Memory) },
-                    new Steps { Label = "Install GPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.GraphicsCard)), PartToAssemble = getPartByType(PartTipo.GraphicsCard) },
-                    new Steps { Label = "Install Storage", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
-                    new Steps { Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
-                    new Steps { Label = "Finalize", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
+                    new Steps { StepNumber = 0, Label = "Prepare Case", IsCompleted = true, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Case)), PartToAssemble = getPartByType(PartTipo.Case) },
+                    new Steps { StepNumber = 1, Label = "Place Power Supply", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.PowerSupply)), PartToAssemble = getPartByType(PartTipo.PowerSupply) },
+                    new Steps { StepNumber = 2, Label = "Install Motherboard", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Motherboard)), PartToAssemble = getPartByType(PartTipo.Motherboard) },
+                    new Steps { StepNumber = 3, Label = "Install CPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Processor)), PartToAssemble = getPartByType(PartTipo.Processor) },
+                    new Steps { StepNumber = 4, Label = "Install RAM", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Memory)), PartToAssemble = getPartByType(PartTipo.Memory) },
+                    new Steps { StepNumber = 5, Label = "Install GPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.GraphicsCard)), PartToAssemble = getPartByType(PartTipo.GraphicsCard) },
+                    new Steps { StepNumber = 6, Label = "Install Storage", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
+                    new Steps { StepNumber = 7, Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
+                    new Steps { StepNumber = 8, Label = "Finalize", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
                 };
             }
         }
@@ -104,35 +105,33 @@
     private void OnFinishedAsync() {
         Console.WriteLine("Finished wizard");
     }
-    private void stepDone() {
+    private void stepDone(int StepNumber) {
         Console.WriteLine("can advance to the next step");
-
-        var currentStep = steps?.FirstOrDefault(s => !s.IsCompleted);
-        if (currentStep != null)
-        {
-            currentStep.IsCompleted = true;
-            Console.WriteLine($"Step '{currentStep.Label}' marked as completed.");
+        if (StepNumber < steps.Count - 1) {
+            steps[StepNumber+1].IsCompleted = true;
         }
 
         StateHasChanged(); // Refresh the UI
     }
-    private void stepUnDone()
+    private void stepUnDone(int StepNumber)
     {
-        Console.WriteLine("Reverting the last completed step.");
-
-        // Find the last completed step in reverse order
-        for (int i = steps!.Count - 1; i >= 0; i--)
-        {
-            if (steps[i].IsCompleted)
-            {
-                steps[i].IsCompleted = false;
-                Console.WriteLine($"Step '{steps[i].Label}' marked as not completed.");
-                break; // Exit the loop after marking the last completed step
-            }
+        Console.WriteLine("Reverting the last completed step");
+        if (StepNumber < steps.Count - 1) {
+            steps[StepNumber+1].IsCompleted = false;
         }
 
         StateHasChanged(); // Refresh the UI
     }
+    private void stepStarted(int StepNumber)
+    {   
+        if (StepNumber != 0) {
+            steps[StepNumber-1].IsCompleted = false;
+            Console.WriteLine($"Step '{steps[StepNumber-1].Label}' marked as not completed.");
+        }
+
+        StateHasChanged(); // Refresh the UI
+    }
+
 
     private string imageUrl { get; set; } = "/assets/pcbuild-step-0.png";
 

@@ -90,9 +90,13 @@
     [Parameter]
     public Part? PartToAssemble { get; set; }
     [Parameter]
-    public EventCallback<bool> OnComplete { get; set; }
+    public int StepNumber { get; set; }
     [Parameter]
-    public EventCallback<bool> OnUncomplete { get; set; }
+    public EventCallback<int> OnComplete { get; set; }
+    [Parameter]
+    public EventCallback<int> OnUncomplete { get; set; }
+    [Parameter]
+    public EventCallback<int> OnStepNumberChanged { get; set; }
     
     private bool IsCompleted = false;
     private Part? activeCase;
@@ -100,13 +104,29 @@
     private string animationClass = "";
 
     private async Task CompleteStep() {
-        IsCompleted = true;
-        await OnComplete.InvokeAsync(true);
+        if (OnComplete.HasDelegate)
+        {
+            IsCompleted = true;
+            await OnComplete.InvokeAsync(StepNumber);
+        }
     }
 
     private async Task unCompleteStep() {  
-        IsCompleted = false;  
-        await OnUncomplete.InvokeAsync(true);
+        if (OnUncomplete.HasDelegate)
+        {
+            IsCompleted = false;  
+            await OnUncomplete.InvokeAsync(StepNumber);
+        }
+    }
+
+    
+    private async Task NotifyParentStepNumber()
+    {
+        if (OnStepNumberChanged.HasDelegate)
+        {
+            Console.WriteLine($"Sending step number {StepNumber} to parent...");
+            await OnStepNumberChanged.InvokeAsync(StepNumber);
+        }
     }
 
     private string getTitle() {
@@ -130,6 +150,7 @@
     }
     private async Task setActiveCase(Part iCase)
     {
+        await NotifyParentStepNumber();
         if (activeCase != iCase) {
             if (activeCase != null)
             {
