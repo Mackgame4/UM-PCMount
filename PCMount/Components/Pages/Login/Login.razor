@@ -53,7 +53,7 @@
     private string? errorMessage;
 
     private async Task Authenticate() {
-        bool redirect = false;
+        int redirect = 0;
         try {
             List<User> usersAccounts = await UsersDb.GetListAsync();
             if (usersAccounts == null || !usersAccounts.Any()) {
@@ -72,19 +72,22 @@
 
             var claims = new List<Claim> {
                 new Claim(ClaimTypes.Name, userAccount.UserName!),
-                new Claim(ClaimTypes.Role, userAccount.Role!)
+                new Claim(ClaimTypes.Role, userAccount.Role!),
+                new Claim(ClaimTypes.NameIdentifier, userAccount.Id!.ToString())
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
             await HttpContext!.SignInAsync(principal);
-            redirect = true;
+            if (userAccount.Role == "Admin") {
+                redirect = 1;
+            } else redirect = 2;
         } catch (Exception ex) {
             errorMessage = $"Authentication failed: {ex.Message}";
         } finally {
-            if (redirect) {
+            if (redirect == 1) {
                 NavigationManager.NavigateTo("/dashboard", true);
-            }
+            } else NavigationManager.NavigateTo("/", true);
         }
     }
 }
