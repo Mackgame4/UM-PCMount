@@ -3,11 +3,13 @@
 @layout DashboardLayout
 @rendermode InteractiveServer
 <PageTitle>PCMount - Assembly</PageTitle>
+<FluentToastProvider Position="ToastPosition.BottomRight" />
 
 @inject OrdersService OrdersDb
 @inject ComponentesService ComponentesDb
 @inject InventarioService InventarioDb
 @inject NavigationManager Navigation
+@inject IToastService ToastService
 
 @if (Id <= 0) {
     <span class="text-center text-xl text-gray-200 mt-8">Invalid Assembly ID.</span>
@@ -22,7 +24,7 @@
                 <FluentBadge Appearance="Appearance.Accent" Class="text-md md:text-xl p-2"><span class="flex flex-row justify-center items-center gap-1"><FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Wrench())" />You're Assemblying An <b>@order?.Name</b> For Order Id:<b>@Id</b></span></FluentBadge>
                 <FluentWizard @ref="wizardInstance" Class="min-h-full" StepperPosition="StepperPosition.Left" StepSequence="WizardStepSequence.Any" DisplayStepNumber="@(WizardStepStatus.Current | WizardStepStatus.Next)" StepTitleHiddenWhen="@GridItemHidden.XsAndDown" OnFinish="@OnFinishedAsync">
                     <Steps>
-                        <FluentWizardStep Label="Overview" OnChange="@OnStepChange">
+                        <FluentWizardStep Label="Overview">
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
                                 <ColorImage imageUrl="@imageUrl" Class="w-full h-step-screen" />
                                 <div class="flex flex-col justify-center items-center relative">
@@ -52,28 +54,21 @@
                             </div>
                         </FluentWizardStep>
                         @foreach (var step in steps!) {
-                            <FluentWizardStep Label="@step.Label" OnChange="@OnStepChange">
-                                <AssemblyStep OnComplete="@stepDone" OnUncomplete="@stepUnDone" OnStepNumberChanged="@stepStarted" StepNumber="@step.StepNumber" PartsList="@step.AvaliableParts" PartToAssemble="@step.PartToAssemble" />
+                            <FluentWizardStep Label="@step.Label">
+                                <AssemblyStep OnComplete="@stepDone" OnUncomplete="@stepUnDone" StepEta="@step.ETA" StepNumber="@step.StepNumber" PartsList="@step.AvaliableParts" PartToAssemble="@step.PartToAssemble" />
                             </FluentWizardStep>
                         }
-                        <FluentWizardStep Label="Finalize" Disabled=@(!Finalize) OnChange="@OnStepChange">
-                            <div class="flex flex-row justify-center items-center gap-4 p-8">
-                                <div class="w-4/5 flex flex-col justify-center items-center relative">
-                                <div class="flex">
-                                    <div class="flex flex-col w-1/2 gap-2 justify-center">
-                                        @if (partsWithQuantities != null) {
-                                            @foreach (var (part, quantity) in partsWithQuantities) {
-                                                <p class="text-lg">@part.Tipo: <FluentBadge class="text-lg font-medium">@part.Name</FluentBadge> ✔️</p>
+                        <FluentWizardStep Label="Finalize" Disabled=@(!OrderFinalized)>
+                                <div class="w-full flex flex-row justify-center items-center relative h-step-screen">
+                                    <div class="flex flex-col gap-2 justify-center">
+                                        @if (OrderedParts != null) {
+                                            @foreach (var (part, quantity) in OrderedParts) {
+                                                <FluentBadge Circular="true"><span class="text-lg flex flex-row gap-2 p-3">@part.Tipo: <b>@part.Name</b><FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" /></span></FluentBadge>
                                             }
                                         }
                                     </div>
                                     <img class="w-1/2" src=@order?.Image alt="Final Order Image">
                                 </div>
-                                    <FluentButton IconStart="@(new Icons.Regular.Size24.Box())" Appearance="Appearance.Accent" @onclick="() => OrderDone()" class="text-2xl font-light mt-8">
-                                        MARK ORDER ID: <span class="font-medium">@order?.OrderId</span> AS DONE
-                                    </FluentButton>
-                                </div>
-                            </div>
                         </FluentWizardStep>
                     </Steps>
                 </FluentWizard>
@@ -87,8 +82,8 @@
     public int Id { get; set; }
 
     private Order? order;
-    private List<(Part Part, int Quantity)>? partsWithQuantities;
-    private bool Finalize = false;
+    private List<(Part Part, int Quantity)>? OrderedParts;
+    private bool OrderFinalized = false;
     public class Steps {
         public int StepNumber {get; set; }
         public string? Name { get; set; }
@@ -108,84 +103,67 @@
         } else {
             order = await OrdersDb.FindOneAsync(o => o.OrderId == Id); // Fetch the order using FindOneAsync
             if (order != null) {
-                partsWithQuantities = await OrdersDb.GetPartsForOrderAsync(order);
+                OrderedParts = await OrdersDb.GetPartsForOrderAsync(order);
                 steps = new List<Steps> {
-                    new Steps { StepNumber = 0, Name = "Case", Label = "Prepare Case", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Case)), PartToAssemble = getPartByType(PartTipo.Case), ETA = 2 },
-                    new Steps { StepNumber = 1, Name = "Power Supply", Label = "Install PSU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.PowerSupply)), PartToAssemble = getPartByType(PartTipo.PowerSupply), ETA = 3 },
-                    new Steps { StepNumber = 2, Name = "Motherboard", Label = "Install Motherboard", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Motherboard)), PartToAssemble = getPartByType(PartTipo.Motherboard), ETA = 5 },
-                    new Steps { StepNumber = 3, Name = "Processor", Label = "Install CPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Processor)), PartToAssemble = getPartByType(PartTipo.Processor), ETA = 8 },
-                    new Steps { StepNumber = 4, Name = "Memory", Label = "Install RAM", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Memory)), PartToAssemble = getPartByType(PartTipo.Memory), ETA = 7 },
-                    new Steps { StepNumber = 5, Name = "Graphics Card", Label = "Install GPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.GraphicsCard)), PartToAssemble = getPartByType(PartTipo.GraphicsCard), ETA = 4 },
-                    new Steps { StepNumber = 6, Name = "Storage", Label = "Install Storage", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage), ETA = 8 },
-                    //new Steps { StepNumber = 7, Name = "Cooling", Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Cooling)), PartToAssemble = getPartByType(PartTipo.Cooling), ETA = 15 },
+                    new Steps { StepNumber = 0, Name = "Case", Label = "Prepare Case", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Case)), PartToAssemble = GetOrderedPart(PartTipo.Case), ETA = 2 },
+                    new Steps { StepNumber = 1, Name = "Power Supply", Label = "Install PSU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.PowerSupply)), PartToAssemble = GetOrderedPart(PartTipo.PowerSupply), ETA = 3 },
+                    new Steps { StepNumber = 2, Name = "Motherboard", Label = "Install Motherboard", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Motherboard)), PartToAssemble = GetOrderedPart(PartTipo.Motherboard), ETA = 5 },
+                    new Steps { StepNumber = 3, Name = "Processor", Label = "Install CPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Processor)), PartToAssemble = GetOrderedPart(PartTipo.Processor), ETA = 8 },
+                    new Steps { StepNumber = 4, Name = "Memory", Label = "Install RAM", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Memory)), PartToAssemble = GetOrderedPart(PartTipo.Memory), ETA = 7 },
+                    new Steps { StepNumber = 5, Name = "Graphics Card", Label = "Install GPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.GraphicsCard)), PartToAssemble = GetOrderedPart(PartTipo.GraphicsCard), ETA = 4 },
+                    new Steps { StepNumber = 6, Name = "Storage", Label = "Install Storage", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = GetOrderedPart(PartTipo.Storage), ETA = 8 },
+                    new Steps { StepNumber = 7, Name = "Cooling", Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Cooling)), PartToAssemble = GetOrderedPart(PartTipo.Cooling), ETA = 15 },
                 };
             }
         }
     }
 
-    private async void OrderDone() {
-        if (partsWithQuantities == null) {
-            Console.WriteLine("No parts found to update.");
+    private Part? GetOrderedPart(PartTipo type) {
+        if (OrderedParts == null) {
+            return null; 
+        }
+        var match = OrderedParts.FirstOrDefault(p => p.Part.Tipo == type);
+        return match.Part;
+    }
+
+    private async void OnFinishedAsync() {
+        if (OrderedParts == null) {
+            ToastService.ShowError("No parts found to update.");
             return;
         }
-
-        foreach (var (part, quantity) in partsWithQuantities) {
+        foreach (var (part, quantity) in OrderedParts) {
             try {
                 int newQuantidade = quantity - 1;
-
                 if (newQuantidade < 0) {
-                    Console.WriteLine($"Cannot update PartId: {part.PartId}. Quantity would become negative.");
+                    ToastService.ShowError($"Cannot update PartId: {part.PartId}. Quantity would become negative.");
                     continue;
                 }
                 var updatedInventario = await InventarioDb.UpdateFirstOrDefaultAsync(part.PartId, newQuantidade);
-
                 if (updatedInventario == null) {
-                    Console.WriteLine($"Failed to update PartId: {part.PartId}");
-                } else {
-                    Console.WriteLine($"Updated PartId: {part.PartId}. New Quantity: {updatedInventario.Quantidade}");
+                    ToastService.ShowError($"Failed to update PartId: {part.PartId}");
                 }
             } catch (Exception ex) {
                 Console.WriteLine($"An error occurred while updating PartId: {part.PartId}. Error: {ex.Message}");
             }
         }
-
         if (order != null) {
             await OrdersDb.UpdateOrderStatusToDoneAsync(order.OrderId);
         }
         Navigation.NavigateTo("/dashboard/assembly", true);
     }
-    private Part? getPartByType(PartTipo type)
-    {
-        if (partsWithQuantities == null) {
-            return null; 
-        }
-        var match = partsWithQuantities.FirstOrDefault(p => p.Part.Tipo == type);
-        return match.Part;
-    }
-
-    private void OnStepChange(FluentWizardStepChangeEventArgs e) {
-        Console.WriteLine($"Go to step {e.TargetLabel} (#{e.TargetIndex})");
-    }
-
-    private void OnFinishedAsync() {
-        Console.WriteLine("Finished wizard");
-    }
     private void stepDone(int StepNumber) {
-        Console.WriteLine("can advance to the next step");
         if (steps != null) {
             steps[StepNumber].IsCompleted = true;
             foreach (var step in steps) {
                 Console.WriteLine($"Step '{step.Label}' is completed: {step.IsCompleted}");
                 if (!step.IsCompleted) {
-                    Finalize = false;
+                    OrderFinalized = false;
                     return;
                 } else {
-                    Finalize = true;
+                    OrderFinalized = true;
                 }
             }
         }
-
-        StateHasChanged(); // Refresh the UI
     }
 
     private void stepUnDone(int StepNumber) {
@@ -193,34 +171,9 @@
         if (steps != null && StepNumber < steps.Count - 1) {
             steps[StepNumber + 1].IsCompleted = false;
             if (StepNumber == steps.Count - 1) {
-                Finalize = false;
+                OrderFinalized = false;
             }
         }
-
-        StateHasChanged(); // Refresh the UI
-    }
-
-    private void stepStarted(int StepNumber) {
-        /*if (steps != null && StepNumber != 0) {
-            steps[StepNumber].IsCompleted = false;
-            Console.WriteLine($"Step '{steps[StepNumber - 1].Label}' marked as not completed.");
-        }
-
-        StateHasChanged(); // Refresh the UI*/
-    }
-
-    private int trulyCompletedIndex() {
-    if (steps == null) {
-        return -1; // Return -1 if the steps list is null
-    }
-
-    for (int i = steps.Count - 1; i >= 0; i--) {
-        if (steps[i].IsCompleted) {
-            return i; // Return the highest index where IsCompleted is true
-        }
-    }
-
-    return -1;
     }
 
     private bool IsStepCompleted(int stepNumber) {
