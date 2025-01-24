@@ -3,88 +3,104 @@
 @inject OrdersService OrdersDb
 @inject ComponentesService ComponentesDb
 
-<div class="w-full flex justify-center items-center gap-16 pt-6">
-    <div class="w-1/2 flex flex-col gap-8">
-        <div class="pl-4 italic m-0 font-bold">
-            <p class="m-0 font-bold">
-                Prepare the Case:
-            </p>
-            <p class="m-0">
-                - Open the side panels of the case;
-            </p>
-            <p class="m-0">
-                - Remove any included screws, cable ties, or packaging materials;
-            </p>
-            <p>
-                - Check for pre-installed case fans and ensure they are properly connected to the fan controller (if present).
-            </p>
-            <p class="m-0 not-italic">Correspondent Order's @getTitleLowerCase() is <span class="underline font-bold">@PartToAssemble?.Name</span></p>
-        </div>
-        <div class="w-full flex gap-8 items-center">
-            <div class="w-3/5">
-                <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2">
-                    <h1>
-                        Order
-                    </h1>
-                    <div class="h-60 flex flex-col justify-center items-center">
-                        @if (partInDisplay != null) 
-                        {
-                            <img class="h-5/6 @animationClass" src=@partInDisplay.Image alt="Part in Display">
+<div class="w-full flex flex-col lg:px-8 lg:py-4">
+    <FluentBadge class="w-full">
+        <span class="flex flex-col items-center">
+            <span class="text-lg font-bold">Step @(StepNumber+1): Assemble @PartToAssemble?.Name</span>
+            <div class="flex flex-col text-left gap-2 mb-2">
+            @if (PartToAssemble!.Tipo.ToString() == "Case")  {
+                <span>1.) Open the side panels of the case;</span>
+                <span>2.) Remove any included screws, cable ties, or packaging materials;</span>
+                <span>3.) Check for pre-installed case fans and ensure they are properly connected to the fan controller (if present);</span>
+                <span>4.) Install the motherboard standoffs.</span>
+            } else if (PartToAssemble!.Tipo.ToString() == "Motherboard")  {
+                <span>1.) Remove the motherboard from its packaging;</span>
+                <span>2.) Remove protective plastics from the motherboard (if present);</span>
+                <span>3.) Install the motherboard into the case.</span>
+            } else if (PartToAssemble!.Tipo.ToString() == "Processor")  {
+                <span>1.) Remove the CPU from its packaging;</span>
+                <span>3.) Remove the socket protection from the motherboard.</span>
+                <span>3.) Install the CPU into the motherboard;</span>
+            } else if (PartToAssemble!.Tipo.ToString() == "Memory")  {
+                <span>1.) Remove the RAM from its packaging;</span>
+                <span>2.) Install the RAM into the motherboard.</span>
+                <span>3.) Verify that the RAM is properly seated and locked into place.</span>
+            } else if (PartToAssemble!.Tipo.ToString() == "Storage")  {
+                <span>1.) Remove the storage device from its packaging;</span>
+                <span>2.) Install the storage device into the case.</span>
+                <span>3.) Connect the storage device to the motherboard and power supply.</span>
+            } else if (PartToAssemble!.Tipo.ToString() == "GraphicsCard")  {
+                <span>1.) Remove the GPU from its packaging;</span>
+                <span>2.) Check PCIe slot compatibility with the motherboard;</span>
+                <span>3.) Install the GPU into the motherboard;</span>
+                <span>4.) Connect the GPU to the power supply.</span>
+            } else if (PartToAssemble!.Tipo.ToString() == "PowerSupply")  {
+                <span>1.) Remove the PSU from its packaging;</span>
+                <span>2.) Install the PSU into the case;</span>
+                <span>3.) Connect the PSU to the motherboard and other components.</span>
+            } else if (PartToAssemble!.Tipo.ToString() == "Cooling")  {
+                <span>1.) Remove the cooler from its packaging;</span>
+                <span>2.) Apply thermal paste to the CPU;</span>
+                <span>3.) Install the cooler onto the CPU and tighten the screws.</span>
+            }
+            </div>
+        </span>
+    </FluentBadge>
+    <div class="w-full flex flex-col lg:flex-row justify-center items-center lg:gap-16 gap-4 mt-6">
+        <div class="w-full h-full flex flex-col gap-2 items-center">
+            <FluentBadge class="w-full"><span class="text-lg font-bold">Correspondent Order Part Is: <span style="color: var(--accent-fill-rest);">@PartToAssemble?.Name</span></span></FluentBadge>
+            <FluentAccordion Class="w-full">
+                <FluentAccordionItem Heading="Select Part In Stock">
+                    <div class="grid h-32 grid-cols-2 gap-4 overflow-y-auto overflow-x-hidden">
+                        @if (PartsList != null)  {
+                            @foreach (Part part in PartsList!)  {
+                                <FluentButton Appearance="Appearance.Accent" Class="h-full w-full" @onclick="() => setActiveCase(part)">
+                                    <div class="flex flex-col justify-center items-center py-2 gap-2">
+                                        <span class="text-sm text-center font-bold break-words">@part.Name</span>
+                                        <img class="h-12" src="@part.Image" alt="Part Image">
+                                    </div>
+                                </FluentButton>
+                            }
                         }
                     </div>
-                    <div class="h-20"></div>
-                    <div class="absolute timepos">
-                        <FluentCard class="flex flex-col items-center nopad">
-                            <FluentIcon Value="@(new Icons.Regular.Size24.Clock())" />
-                            <span class="font-bold">First step takes @(StepEta-1)-@StepEta minutes</span>
-                        </FluentCard>
-                    </div>
-                </FluentCard>
-            </div>
-            
-            <div class="w-2/5 pq">
-                <FluentCard MinimalStyle="true" class="relative nopad flex flex-col items-center text-center gap-2">
-                    <h1 class="pb-6">
-                        Part selected
-                    </h1>
-                    <div class="h-48 flex flex-col justify-center items-center">
-                    @if (activeCase != null && partInDisplay == null) 
-                    {
-                        <p class="font-bold @animationClass">
-                            @activeCase.Name
-                        </p>
-                        <img class="h-5/6 @animationClass" src=@activeCase.Image alt="Part in Selection">
-                        <FluentButton class="mt-6 w-3/4" IconStart="@(new Icons.Filled.Size24.Wrench())" Appearance="Appearance.Accent" @onclick="() => setPartInDisplay(activeCase)"></FluentButton>
+                </FluentAccordionItem>
+            </FluentAccordion>
+            <FluentCard MinimalStyle="true" class="relative nopad flex flex-col items-center text-center gap-2">
+                <span class="text-2xl font-medium">Selected Part</span>
+                <div class="h-full flex flex-col justify-center items-center">
+                    @if (activeCase != null && partInDisplay == null)  {
+                        <img class="mt-2 h-44 @animationClass" src=@activeCase.Image alt="Part in Selection">
+                        <p class="font-bold @animationClass">@activeCase.Name</p>
+                        <FluentButton class="mb-2 w-full" IconStart="@(new Icons.Filled.Size24.Wrench())" Appearance="Appearance.Accent" @onclick="() => setPartInDisplay(activeCase)">Place</FluentButton>
+                    } else {
+                        <p class="h-52"></p>
                     }
-                    </div>
-                </FluentCard>
-            </div>
-        </div>
-    </div>
-    <div class="w-1/3 partsContainer">
-        <FluentCard MinimalStyle="true" class="relative flex flex-col text-center">
-            <p class="text-2xl font-medium">
-                All @getTitle() IN STOCK
-            </p>
-            <FluentCard class="grid grid-cols-2 gap-y-6 gap-x-4 overflow-y-scroll overflow-x-visible">
-                @if (PartsList != null)  {
-                    @foreach (Part part in PartsList!)  {
-                        <FluentButton Appearance="Appearance.Accent" class="h-56 text-lg font-bold" @onclick="() => setActiveCase(part)">
-                            <div class="flex flex-col justify-center items-center py-2 gap-2">
-                                <span class="text-center break-words w-11/12">
-                                    @part.Name
-                                </span>
-                                <img class="h-24 font-extrabold" src="@part.Image" alt="Part Image">
-                            </div>
-                        </FluentButton>
-                    }
-                }
+                </div>
             </FluentCard>
-        </FluentCard>
+        </div>
+        <div class="sm:flex hidden">
+            <FluentIcon Value="@(new Icons.Regular.Size24.ArrowRight())" Width="50px" />
+        </div>
+        <div class="w-full flex gap-8 items-center">
+            <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2">
+                <h1>Order</h1>
+                <div class="h-60 flex flex-col justify-center items-center">
+                    @if (partInDisplay != null)  {
+                        <img class="h-5/6 @animationClass" src=@partInDisplay.Image alt="Part in Display">
+                    }
+                </div>
+                <FluentCard class="flex flex-col items-center nopad">
+                    <FluentIcon Value="@(new Icons.Regular.Size24.Clock())" />
+                    <span class="font-bold">First step takes @(StepEta-1)-@StepEta minutes</span>
+                </FluentCard>
+            </FluentCard>
+        </div>
     </div>
 </div>
 
 @code {
+    public string Highlight = "";
+
     [Parameter]
     public List<Part>? PartsList { get; set; }
     [Parameter]
@@ -128,47 +144,6 @@
         {
             Console.WriteLine($"Sending step number {StepNumber} to parent...");
             await OnStepNumberChanged.InvokeAsync(StepNumber);
-        }
-    }
-
-    private string getTitle() {
-        if (PartToAssemble?.Tipo == PartTipo.Case) {
-            return "CASES";
-        } else if (PartToAssemble?.Tipo == PartTipo.PowerSupply) {
-            return "POWER SUPPLIES";
-        } else if (PartToAssemble?.Tipo == PartTipo.Motherboard) {
-            return "MOTHERBOARDS";
-        } else if (PartToAssemble?.Tipo == PartTipo.Processor) {
-            return "CPUs";
-        } else if (PartToAssemble?.Tipo == PartTipo.Memory) {
-            return "RAMs";
-        } else if (PartToAssemble?.Tipo == PartTipo.GraphicsCard) {
-            return "GPUs";
-        } else if (PartToAssemble?.Tipo == PartTipo.Storage) {
-            return "STORAGES";
-        } else {
-            return "COOLERS";
-        }
-    }
-
-    private string getTitleLowerCase()
-    {
-        if (PartToAssemble?.Tipo == PartTipo.Case) {
-            return "Case";
-        } else if (PartToAssemble?.Tipo == PartTipo.PowerSupply) {
-            return "Power Supply";
-        } else if (PartToAssemble?.Tipo == PartTipo.Motherboard) {
-            return "Motherboard";
-        } else if (PartToAssemble?.Tipo == PartTipo.Processor) {
-            return "CPU";
-        } else if (PartToAssemble?.Tipo == PartTipo.Memory) {
-            return "RAM";
-        } else if (PartToAssemble?.Tipo == PartTipo.GraphicsCard) {
-            return "GPU";
-        } else if (PartToAssemble?.Tipo == PartTipo.Storage) {
-            return "Storage";
-        } else {
-            return "Cooler";
         }
     }
 
@@ -280,4 +255,8 @@
 .pq {
     height: 300px;
 }
+
+.h-step-screen {
+        max-height: calc(100vh - 18.0rem);
+    }
 </style>
