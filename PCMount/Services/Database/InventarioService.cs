@@ -62,26 +62,6 @@ public class InventarioService : IDbContextAcessor<Inventario> {
             semaphore.Release();
         }
     }
-    
-    public async Task<Inventario?> UpdateAsync2(int PartId, int newQuantidade) {
-        await semaphore.WaitAsync();
-        try {
-            var inventario = await _dbContext.Inventario
-                .FirstOrDefaultAsync(i => i.PartId == PartId);
-
-            if (inventario == null) {
-                return null;
-            }
-
-            inventario.Quantidade = newQuantidade;
-
-            await _dbContext.SaveChangesAsync();
-
-            return inventario; 
-        } finally {
-            semaphore.Release();
-        }
-    }
 
     public async Task<Inventario?> CreateAsync(Inventario item) {
         await semaphore.WaitAsync();
@@ -183,6 +163,21 @@ public class InventarioService : IDbContextAcessor<Inventario> {
                 await transaction.RollbackAsync();
                 return null;
             }
+        } finally {
+            semaphore.Release();
+        }
+    }
+
+    public async Task<Inventario?> UpdateFirstOrDefaultAsync(int PartId, int newQuantidade) {
+        await semaphore.WaitAsync();
+        try {
+            var inventario = await _dbContext.Inventario.FirstOrDefaultAsync(i => i.PartId == PartId);
+            if (inventario == null) {
+                return null;
+            }
+            inventario.Quantidade = newQuantidade;
+            await _dbContext.SaveChangesAsync();
+            return inventario; 
         } finally {
             semaphore.Release();
         }

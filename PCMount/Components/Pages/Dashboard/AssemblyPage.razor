@@ -12,62 +12,66 @@
 @if (Id <= 0) {
     <span class="text-center text-xl text-gray-200 mt-8">Invalid Assembly ID.</span>
 } else {
-    if (order == null) {
+    if (order == null || steps == null) {
         <span class="text-center text-xl text-gray-200 mt-8">No order found with the ID @Id to be assembled.</span>
     } else {
-        <div class="relative w-full h-screen-space -mt-4">
-            <FluentBadge Appearance="Appearance.Accent" Class="text-md md:text-xl p-2"><span class="flex flex-row justify-center items-center gap-1"><FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Wrench())" />You're Assemblying An <b>@order?.Name</b> In Order Id:<b>@Id</b></span></FluentBadge>
-            <FluentWizard Class="min-h-full h-full" StepperPosition="StepperPosition.Left" StepSequence="WizardStepSequence.Any" DisplayStepNumber="@(WizardStepStatus.Current | WizardStepStatus.Next)" StepTitleHiddenWhen="@GridItemHidden.XsAndDown" OnFinish="@OnFinishedAsync">
-                <Steps>
-                    <FluentWizardStep Label="Overview" OnChange="@OnStepChange">
-                        <div class="flex flex-row justify-center items-center gap-4 p-8">
-                            <div class="w-1/3 flex flex-col justify-center items-center relative">
-                                <ColorImage imageUrl="@imageUrl" />
-                            </div>
-                            <div class="w-2/3 flex flex-col justify-center items-center gap-4">
-                                <div class="grid grid-cols-3 grid-rows-6 gap-4 p-8" style="border: 1px solid transparent;">
-                                    @for (int i = 0; i <= 7; i++) {
-                                        int currentStep = i; 
-                                        <div class="p-4 flex justify-center items-center relative" 
-                                            style="border: 1px solid @(IsStepCompleted(i) ? "green" : "red");" 
-                                            @onmouseover="@(e => hoveringItem(currentStep))">
-                                            @GetStepLabel(i)
-                                            @if (IsStepCompleted(i)) {
-                                                <span class="absolute top-0 right-1 text-green-500">✔️</span>
-                                            }
-                                        </div>
-                                    }
+        @if (order.Status == OrderStatus.Done) {
+            <span class="text-center text-xl text-gray-200 mt-8">Order ID: @Id has already been assembled.</span>
+        } else {
+            <div class="relative w-full h-screen-space -mt-4">
+                <FluentBadge Appearance="Appearance.Accent" Class="text-md md:text-xl p-2"><span class="flex flex-row justify-center items-center gap-1"><FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Wrench())" />You're Assemblying An <b>@order?.Name</b> In Order Id:<b>@Id</b></span></FluentBadge>
+                <FluentWizard Class="min-h-full h-full" StepperPosition="StepperPosition.Left" StepSequence="WizardStepSequence.Any" DisplayStepNumber="@(WizardStepStatus.Current | WizardStepStatus.Next)" StepTitleHiddenWhen="@GridItemHidden.XsAndDown" OnFinish="@OnFinishedAsync">
+                    <Steps>
+                        <FluentWizardStep Label="Overview" OnChange="@OnStepChange">
+                            <div class="flex flex-row justify-center items-center gap-4 p-8">
+                                <div class="w-1/3 flex flex-col justify-center items-center relative">
+                                    <ColorImage imageUrl="@imageUrl" />
                                 </div>
-                            </div>
-                        </div>
-                    </FluentWizardStep>
-                    @foreach (var step in steps!) {
-                        <FluentWizardStep Label="@step.Label" Disabled="!step.IsCompleted" OnChange="@OnStepChange">
-                            <AssemblyStep OnComplete="@stepDone" OnUncomplete="@stepUnDone" OnStepNumberChanged="@stepStarted" StepNumber="@step.StepNumber" PartsList="@step.AvaliableParts" PartToAssemble="@step.PartToAssemble" />
-                        </FluentWizardStep>
-                    }
-                    <FluentWizardStep Label="Finalize" Disabled=@(!Finalize) OnChange="@OnStepChange">
-                        <div class="flex flex-row justify-center items-center gap-4 p-8">
-                            <div class="w-4/5 flex flex-col justify-center items-center relative">
-                            <div class="flex">
-                                <div class="flex flex-col w-1/2 gap-2 justify-center">
-                                    @if (partsWithQuantities != null) {
-                                        @foreach (var (part, quantity) in partsWithQuantities) {
-                                            <p class="text-lg">@part.Tipo: <FluentBadge class="text-lg font-medium">@part.Name</FluentBadge> ✔️</p>
+                                <div class="w-2/3 flex flex-col justify-center items-center gap-4">
+                                    <div class="grid grid-cols-3 grid-rows-6 gap-4 p-8" style="border: 1px solid transparent;">
+                                        @for (int i = 0; i <= 7; i++) {
+                                            int currentStep = i; 
+                                            <div class="p-4 flex justify-center items-center relative" 
+                                                style="border: 1px solid @(IsStepCompleted(i) ? "green" : "red");" 
+                                                @onmouseover="@(e => hoveringItem(currentStep))">
+                                                @GetStepLabel(i)
+                                                @if (IsStepCompleted(i)) {
+                                                    <span class="absolute top-0 right-1 text-green-500">✔️</span>
+                                                }
+                                            </div>
                                         }
-                                    }
+                                    </div>
                                 </div>
-                                <img class="w-1/2" src=@order?.Image alt="Final Order Image">
                             </div>
-                                <FluentButton IconStart="@(new Icons.Regular.Size24.Box())" Appearance="Appearance.Accent" @onclick="() => OrderDone()" class="text-2xl font-light mt-8">
-                                    MARK ORDER ID: <span class="font-medium">@order?.OrderId</span> AS DONE
-                                </FluentButton>
+                        </FluentWizardStep>
+                        @foreach (var step in steps!) {
+                            <FluentWizardStep Label="@step.Label" Disabled="!step.IsCompleted" OnChange="@OnStepChange">
+                                <AssemblyStep OnComplete="@stepDone" OnUncomplete="@stepUnDone" OnStepNumberChanged="@stepStarted" StepNumber="@step.StepNumber" PartsList="@step.AvaliableParts" PartToAssemble="@step.PartToAssemble" />
+                            </FluentWizardStep>
+                        }
+                        <FluentWizardStep Label="Finalize" Disabled=@(!Finalize) OnChange="@OnStepChange">
+                            <div class="flex flex-row justify-center items-center gap-4 p-8">
+                                <div class="w-4/5 flex flex-col justify-center items-center relative">
+                                <div class="flex">
+                                    <div class="flex flex-col w-1/2 gap-2 justify-center">
+                                        @if (partsWithQuantities != null) {
+                                            @foreach (var (part, quantity) in partsWithQuantities) {
+                                                <p class="text-lg">@part.Tipo: <FluentBadge class="text-lg font-medium">@part.Name</FluentBadge> ✔️</p>
+                                            }
+                                        }
+                                    </div>
+                                    <img class="w-1/2" src=@order?.Image alt="Final Order Image">
+                                </div>
+                                    <FluentButton IconStart="@(new Icons.Regular.Size24.Box())" Appearance="Appearance.Accent" @onclick="() => OrderDone()" class="text-2xl font-light mt-8">
+                                        MARK ORDER ID: <span class="font-medium">@order?.OrderId</span> AS DONE
+                                    </FluentButton>
+                                </div>
                             </div>
-                        </div>
-                    </FluentWizardStep>
-                </Steps>
-            </FluentWizard>
-        </div>
+                        </FluentWizardStep>
+                    </Steps>
+                </FluentWizard>
+            </div>
+        }
     }
 }
 
@@ -125,7 +129,7 @@
                     Console.WriteLine($"Cannot update PartId: {part.PartId}. Quantity would become negative.");
                     continue;
                 }
-                var updatedInventario = await InventarioDb.UpdateAsync2(part.PartId, newQuantidade);
+                var updatedInventario = await InventarioDb.UpdateFirstOrDefaultAsync(part.PartId, newQuantidade);
 
                 if (updatedInventario == null) {
                     Console.WriteLine($"Failed to update PartId: {part.PartId}");

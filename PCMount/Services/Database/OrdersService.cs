@@ -15,18 +15,6 @@ public class OrdersService : IDbContextAcessor<Order> {
         _dbContext = new ApplicationDbContext(optionsBuilder.Options);
     }
 
-    public async Task<Order[]> GetPendingOrdersAsync() {
-        await semaphore.WaitAsync(); // Wait for the lock to be available
-        try {
-            // Fetch all orders with Status = Pending
-            return await _dbContext.Orders
-                .Where(o => o.Status == OrderStatus.Pending)
-                .AsNoTracking()
-                .ToArrayAsync();
-        } finally {
-            semaphore.Release(); // Release the lock
-        }
-    }
     public async Task<Order[]> GetArrayAsync() {
         await semaphore.WaitAsync(); // Wait for the lock to be available
         try {
@@ -72,24 +60,6 @@ public class OrdersService : IDbContextAcessor<Order> {
             return order;
         } finally {
             semaphore.Release(); // Release the lock
-        }
-    }
-
-    public async Task<Order?> UpdateOrderStatusToDoneAsync(int orderId) {
-        await semaphore.WaitAsync(); 
-        try {
-            var order = await _dbContext.Orders.FindAsync(orderId);
-            if (order == null) {
-                return null; 
-            }
-
-            order.Status = OrderStatus.Done;
-
-            await _dbContext.SaveChangesAsync();
-
-            return order; 
-        } finally {
-            semaphore.Release();
         }
     }
 
@@ -169,6 +139,34 @@ public class OrdersService : IDbContextAcessor<Order> {
             await AddPartWithQuantityAsync(order.PowerSupplyId);
             await AddPartWithQuantityAsync(order.CaseId);
             return partsWithQuantities;
+        } finally {
+            semaphore.Release();
+        }
+    }
+
+    public async Task<Order[]> GetPendingOrdersAsync() {
+        await semaphore.WaitAsync(); // Wait for the lock to be available
+        try {
+            // Fetch all orders with Status = Pending
+            return await _dbContext.Orders
+                .Where(o => o.Status == OrderStatus.Pending)
+                .AsNoTracking()
+                .ToArrayAsync();
+        } finally {
+            semaphore.Release(); // Release the lock
+        }
+    }
+
+    public async Task<Order?> UpdateOrderStatusToDoneAsync(int orderId) {
+        await semaphore.WaitAsync(); 
+        try {
+            var order = await _dbContext.Orders.FindAsync(orderId);
+            if (order == null) {
+                return null; 
+            }
+            order.Status = OrderStatus.Done;
+            await _dbContext.SaveChangesAsync();
+            return order; 
         } finally {
             semaphore.Release();
         }

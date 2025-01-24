@@ -145,7 +145,7 @@
     }
 
     private async Task LoadOrdersAsync() {
-        orders = await OrdersDb.GetArrayAsync(); // Fetch orders from database
+        orders = await OrdersDb.GetPendingOrdersAsync(); // Fetch orders from database
         StateHasChanged(); // Trigger UI update
     }
 
