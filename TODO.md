@@ -1,5 +1,5 @@
 - [ ] Add Mobile Support
-- [x] Fix main page price with discount calculation
-- [x] Check if cart is doing price for each item inside or are all items going with the same price
 - [ ] Fix Gome's 90s styling
 - [ ] Option in dashboard to add new products (Computers)
+- [ ] No incomplete custom builds?
+- [ ] Check parts before assembly page loads (because we can bypass the button writing the url manually)

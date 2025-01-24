@@ -38,7 +38,7 @@
         </FluentPaginator>
         <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.ReceiptBag())" /> Most Shopped Products</h4>
         @if (computerOrdersQueryable != null) {
-            <FluentDataGrid Items="@computerOrdersQueryable" ShowHover="false" Pagination="@computerOrdersPagination" Class="h-1/2 overflow-y-auto overflow-x-hidden">
+            <FluentDataGrid Items="@computerOrdersQueryable" ShowHover="true" Pagination="@computerOrdersPagination" Class="h-1/2 overflow-y-auto overflow-x-hidden">
                 <PropertyColumn Property="@(o => o.Id)" Title="ID" Sortable="true" />
                 <PropertyColumn Property="@(o => o.Name)" Title="Name" />
                 <TemplateColumn Title="Price" Align="@Align.Center">

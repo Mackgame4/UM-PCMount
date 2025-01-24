@@ -24,23 +24,14 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-6">
                 @foreach (var order in filteredOrders.Select((Order order, int index) => new { order, index })) {
                     <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2 hover:translate-y-2">
-                        <FluentBadge Class="font-medium">@order.order.Status.ToString() Order Id: @order.order.OrderId</FluentBadge>
+                        <FluentBadge Class="font-medium">@order.order.Status.ToString() Order: @order.order.OrderId</FluentBadge>
                         <div class="h-40 rounded-md">
                             <img src="@order.order.Image" class="object-cover w-full h-full rounded-md" />
                         </div>
-                        <h3 class= "h-14">
-                            @order.order.Name
-                        </h3>
-                        <div class="flex flex-row gap-2 justify-center items-center text-center text-xl">
-                            <span>
-                                Ordered for:
-                            </span>
-                            <FluentBadge Appearance="Appearance.Neutral" class="text-lg mt-1">
-                                <span class="text-green-500">
-                                    @order.order.Price.ToString("C")
-                                </span>
-                            </FluentBadge>
-                        </div>
+                        <h3 class="mb-0">@order.order.Name</h3>
+                        <FluentBadge Appearance="Appearance.Neutral">
+                            <span class="flex flex-row justify-center items-center text-center font-bold gap-1">Ordered for:<span class="text-green-500">@order.order.Price.ToString("C")</span></span>
+                        </FluentBadge>
                         <FluentButton IconStart="@(new Icons.Regular.Size20.PuzzlePiece())" Appearance="Appearance.Lightweight" class="w-4/5" @onclick="() => ShowNeededParts(order.order)">Parts Needed
                         @{
                             int count = MissingPartsCount(order.order.OrderId);
