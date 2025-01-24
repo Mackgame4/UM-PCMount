@@ -83,7 +83,7 @@
         </div>
         <div class="w-full flex gap-8 items-center">
             <FluentCard MinimalStyle="true" class="relative flex flex-col justify-center items-center text-center gap-2">
-                <h1>Order</h1>
+                <span class="text-2xl font-medium">Current Build</span>
                 <div class="h-60 flex flex-col justify-center items-center">
                     @if (partInDisplay != null)  {
                         <img class="h-5/6 @animationClass" src=@partInDisplay.Image alt="Part in Display">
@@ -91,7 +91,7 @@
                 </div>
                 <FluentCard class="flex flex-col items-center nopad">
                     <FluentIcon Value="@(new Icons.Regular.Size24.Clock())" />
-                    <span class="font-bold">First step takes @(StepEta-1)-@StepEta minutes</span>
+                    <span class="font-bold">This step takes @(StepEta-1)-@StepEta minutes</span>
                 </FluentCard>
             </FluentCard>
         </div>
@@ -99,7 +99,6 @@
 </div>
 
 @code {
-    public string Highlight = "";
 
     [Parameter]
     public List<Part>? PartsList { get; set; }
@@ -113,9 +112,7 @@
     public EventCallback<int> OnComplete { get; set; }
     [Parameter]
     public EventCallback<int> OnUncomplete { get; set; }
-    [Parameter]
-    public EventCallback<int> OnStepNumberChanged { get; set; }
-    
+
     private bool IsCompleted = false;
     private Part? activeCase;
     private Part? partInDisplay = null;
@@ -137,19 +134,8 @@
         }
     }
 
-    
-    private async Task NotifyParentStepNumber()
-    {
-        if (OnStepNumberChanged.HasDelegate)
-        {
-            Console.WriteLine($"Sending step number {StepNumber} to parent...");
-            await OnStepNumberChanged.InvokeAsync(StepNumber);
-        }
-    }
-
     private async Task setActiveCase(Part iCase)
     {
-        await NotifyParentStepNumber();
         if (activeCase != iCase) {
             if (activeCase != null)
             {
