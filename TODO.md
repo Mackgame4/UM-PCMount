@@ -2,5 +2,4 @@
 - [x] Fix main page price with discount calculation
 - [x] Check if cart is doing price for each item inside or are all items going with the same price
 - [ ] Fix Gome's 90s styling
-- [ ] Remove computers description
 - [ ] Option in dashboard to add new products (Computers)

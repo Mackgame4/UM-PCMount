@@ -4,20 +4,19 @@
 @rendermode InteractiveServer
 <PageTitle>PCMount - Dashboard</PageTitle>
 <FluentToastProvider Position="ToastPosition.BottomRight" />
+<FluentDialogProvider />
 
 @inject NavigationManager Navigation
 @inject ComputersService ComputersDb
 @inject OrdersService OrdersDb
 @inject InventarioService InventarioDb
 @inject IToastService ToastService
+@inject IDialogService DialogService
 
 <div class="grid grid-cols-12 gap-4 w-full h-screen-space">
     <!-- Main Vertical Section -->
     <FluentCard MinimalStyle="true" Class="col-span-12 lg:col-span-4 p-4 shadow-md flex flex-col gap-4 max-h-screen-space">
-        <div class="flex sm:flex-row flex-col gap-1">
-            <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.DocumentBulletListCube())" /> Manage Store Products</h4>
-            <FluentButton class="sm:ml-auto" IconStart="@(new Icons.Regular.Size16.Add())" Appearance="Appearance.Lightweight">Add New Computer</FluentButton>
-        </div>
+        <h4 class="text-xl font-semibold flex flex-row gap-1.5"><FluentIcon Value="@(new Icons.Regular.Size20.DocumentBulletListCube())" /> Manage Store Products</h4>
         @if (computersQueryable != null) {
             <FluentDataGrid Items="@computersQueryable" ShowHover="false" Pagination="@computersPagination" Class="h-1/2 overflow-y-auto overflow-x-hidden">
                 <PropertyColumn Property="@(o => o.Id)" Title="ID" InitialSortDirection=SortDirection.Ascending Sortable="true" IsDefaultSortColumn=true />
@@ -29,8 +28,7 @@
                     <span class="text-sm text-red-500">@(context.Discount > 0 ? $"-{context.Discount}%" : "None")</span>
                 </TemplateColumn>
                 <TemplateColumn Title="Actions" Align="@Align.End">
-                    <FluentButton IconStart="@(new Icons.Regular.Size16.Edit())" Appearance="Appearance.Lightweight"></FluentButton>
-                    <FluentButton IconStart="@(new Icons.Regular.Size16.Delete())" Appearance="Appearance.Lightweight"></FluentButton>
+                    <FluentButton IconStart="@(new Icons.Regular.Size16.Edit())" Appearance="Appearance.Lightweight" @onclick="() => editComputerProduct(context)"></FluentButton>
                 </TemplateColumn>
             </FluentDataGrid>
         }
@@ -125,9 +123,9 @@
                         </TemplateColumn>
                         <TemplateColumn Title="Actions" Align="@Align.End">
                             @if (context.Status != OrderStatus.Done.ToString()) {
-                                <FluentButton IconEnd="@(new Icons.Regular.Size16.Wrench())" @onclick="() => Navigation.NavigateTo(getOrderAssemblyPath(context.OrderId!), true)"></FluentButton>
+                                <FluentButton IconEnd="@(new Icons.Regular.Size16.Wrench())" Appearance="Appearance.Lightweight" @onclick="() => Navigation.NavigateTo(getOrderAssemblyPath(context.OrderId!), true)"></FluentButton>
                             }
-                            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" @onclick="() => deleteOrder(context.OrderId!)"></FluentButton>
+                            <FluentButton IconEnd="@(new Icons.Regular.Size16.Delete())" Appearance="Appearance.Lightweight" @onclick="() => deleteOrder(context.OrderId!)"></FluentButton>
                         </TemplateColumn>
                     </FluentDataGrid>
                 }
@@ -167,12 +165,13 @@
     IQueryable<ComputerOrderQuery> computerOrdersQueryable = Array.Empty<ComputerOrderQuery>().AsQueryable();
     IQueryable<OrderQuery> ordersQueryable = Array.Empty<OrderQuery>().AsQueryable();
     IQueryable<PartQuery> partsQueryable = Array.Empty<PartQuery>().AsQueryable();
+    Computer[]? computers;
 
     Order[]? orders;
 
     protected override async Task OnInitializedAsync() {
+        computers = await ComputersDb.GetArrayAsync();
         // Computers Queryable
-        Computer[]? computers = await ComputersDb.GetArrayAsync();
         foreach (Computer c in computers) {
             computersQueryable = computersQueryable.Append(new ComputerQuery(c.Id, c.Name, c.Price, c.Discount, c.Image));
         }
@@ -238,6 +237,36 @@
             ToastService.ShowSuccess("Order deleted successfully.");
         } else {
             ToastService.ShowError("An error occurred while deleting the order.");
+        }
+    }
+
+    private async void editComputerProduct(ComputerQuery computerQuery) {
+        // get the computer from the database
+        Computer? computer = computers!.FirstOrDefault(c => c.Id == computerQuery.Id);
+        DialogParameters parameters = new() {
+            Title = $"Editing {computer!.Name}",
+            TrapFocus = true,
+            Modal = true,
+            PreventScroll = true 
+        };
+        IDialogReference dialog = await DialogService.ShowDialogAsync<ComputerEditDialog>(computer!, parameters);
+        DialogResult? result = await dialog.Result;
+        if (result.Data is not null) {
+            Computer? editedComputer = result.Data as Computer;
+            if (editedComputer != null) {
+                var response = await ComputersDb.UpdateAsync(computer.Id, editedComputer);
+                if (response != null) {
+                    computers = await ComputersDb.GetArrayAsync();
+                    computersQueryable = Array.Empty<ComputerQuery>().AsQueryable();
+                    foreach (Computer c in computers) {
+                        computersQueryable = computersQueryable.Append(new ComputerQuery(c.Id, c.Name, c.Price, c.Discount, c.Image));
+                    }
+                    StateHasChanged();
+                    ToastService.ShowSuccess("Computer product edited successfully.");
+                } else {
+                    ToastService.ShowError("An error occurred while editing the computer product.");
+                }
+            }
         }
     }
 }

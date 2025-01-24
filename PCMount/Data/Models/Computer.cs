@@ -9,8 +9,4 @@ public class Computer : ComputerComponents {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Column("Id")]
     public int Id { get; set; }
-
-    [Column("Description")]
-    [StringLength(255)]
-    public string? Description { get; set; }
 }
