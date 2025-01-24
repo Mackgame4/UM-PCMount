@@ -36,7 +36,7 @@
                     <div class="absolute timepos">
                         <FluentCard class="flex flex-col items-center nopad">
                             <FluentIcon Value="@(new Icons.Regular.Size24.Clock())" />
-                            <span class="font-bold">First step takes 5-8 minutes</span>
+                            <span class="font-bold">First step takes @(StepEta-1)-@StepEta minutes</span>
                         </FluentCard>
                     </div>
                 </FluentCard>
@@ -91,6 +91,8 @@
     public Part? PartToAssemble { get; set; }
     [Parameter]
     public int StepNumber { get; set; }
+    [Parameter]
+    public int StepEta { get; set; }
     [Parameter]
     public EventCallback<int> OnComplete { get; set; }
     [Parameter]
