@@ -2,6 +2,7 @@
 @implements IDialogContentComponent<Computer>
 
 @inject ComponentesService ComponentesDb
+@inject IToastService ToastService
 
 <FluentDialogHeader ShowDismiss="true">
     <FluentStack VerticalAlignment="VerticalAlignment.Center">
@@ -73,6 +74,7 @@
     private async Task SaveAsync() {
         Content = new Computer { Name = "Custom Build", Price = calculatePrice(), Image = "/assets/cdn/computer-custom-build.png", MotherboardId = SelectedMotherboards.FirstOrDefault()?.PartId, ProcessorId = SelectedProcessors.FirstOrDefault()?.PartId, MemoryId = SelectedMemories.FirstOrDefault()?.PartId, GraphicsCardId = SelectedGraphicsCards.FirstOrDefault()?.PartId, StorageId = SelectedStorages.FirstOrDefault()?.PartId, PowerSupplyId = SelectedPowerSupplies.FirstOrDefault()?.PartId, CaseId = SelectedCases.FirstOrDefault()?.PartId, CoolingId = SelectedCooling.FirstOrDefault()?.PartId, Motherboard = SelectedMotherboards.FirstOrDefault(), Processor = SelectedProcessors.FirstOrDefault(), Memory = SelectedMemories.FirstOrDefault(), GraphicsCard = SelectedGraphicsCards.FirstOrDefault(), Storage = SelectedStorages.FirstOrDefault(), PowerSupply = SelectedPowerSupplies.FirstOrDefault(), Case = SelectedCases.FirstOrDefault(), Cooling = SelectedCooling.FirstOrDefault() };
         if (Content.MotherboardId == null || Content.ProcessorId == null || Content.MemoryId == null || Content.GraphicsCardId == null || Content.StorageId == null || Content.PowerSupplyId == null || Content.CaseId == null) {
+            ToastService.ShowWarning("Please select all components to add to cart.");
             return;
         }
         await Dialog!.CloseAsync(Content);

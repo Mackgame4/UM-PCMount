@@ -22,7 +22,7 @@
                 <FluentBadge Appearance="Appearance.Accent" Class="text-md md:text-xl p-2"><span class="flex flex-row justify-center items-center gap-1"><FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Wrench())" />You're Assemblying An <b>@order?.Name</b> For Order Id:<b>@Id</b></span></FluentBadge>
                 <FluentWizard @ref="wizardInstance" Class="min-h-full" StepperPosition="StepperPosition.Left" StepSequence="WizardStepSequence.Any" DisplayStepNumber="@(WizardStepStatus.Current | WizardStepStatus.Next)" StepTitleHiddenWhen="@GridItemHidden.XsAndDown" OnFinish="@OnFinishedAsync">
                     <Steps>
-                        <FluentWizardStep Label="Overview" OnChange="@OnStepChange">
+                        <FluentWizardStep Label="Overview">
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
                                 <ColorImage imageUrl="@imageUrl" Class="w-full h-step-screen" />
                                 <div class="flex flex-col justify-center items-center relative">
@@ -52,28 +52,21 @@
                             </div>
                         </FluentWizardStep>
                         @foreach (var step in steps!) {
-                            <FluentWizardStep Label="@step.Label" OnChange="@OnStepChange">
+                            <FluentWizardStep Label="@step.Label">
                                 <AssemblyStep OnComplete="@stepDone" OnUncomplete="@stepUnDone" OnStepNumberChanged="@stepStarted" StepNumber="@step.StepNumber" PartsList="@step.AvaliableParts" PartToAssemble="@step.PartToAssemble" />
                             </FluentWizardStep>
                         }
-                        <FluentWizardStep Label="Finalize" Disabled=@(!Finalize) OnChange="@OnStepChange">
-                            <div class="flex flex-row justify-center items-center gap-4 p-8">
-                                <div class="w-4/5 flex flex-col justify-center items-center relative">
-                                <div class="flex">
-                                    <div class="flex flex-col w-1/2 gap-2 justify-center">
+                        <FluentWizardStep Label="Finalize" Disabled=@(!Finalize)>
+                                <div class="w-full flex flex-row justify-center items-center relative h-step-screen">
+                                    <div class="flex flex-col gap-2 justify-center">
                                         @if (partsWithQuantities != null) {
                                             @foreach (var (part, quantity) in partsWithQuantities) {
-                                                <p class="text-lg">@part.Tipo: <FluentBadge class="text-lg font-medium">@part.Name</FluentBadge> ✔️</p>
+                                                <FluentBadge Circular="true"><span class="text-lg flex flex-row gap-2 p-3">@part.Tipo: <b>@part.Name</b><FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" /></span></FluentBadge>
                                             }
                                         }
                                     </div>
                                     <img class="w-1/2" src=@order?.Image alt="Final Order Image">
                                 </div>
-                                    <FluentButton IconStart="@(new Icons.Regular.Size24.Box())" Appearance="Appearance.Accent" @onclick="() => OrderDone()" class="text-2xl font-light mt-8">
-                                        MARK ORDER ID: <span class="font-medium">@order?.OrderId</span> AS DONE
-                                    </FluentButton>
-                                </div>
-                            </div>
                         </FluentWizardStep>
                     </Steps>
                 </FluentWizard>
@@ -117,7 +110,7 @@
                     new Steps { StepNumber = 4, Name = "Memory", Label = "Install RAM", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Memory)), PartToAssemble = getPartByType(PartTipo.Memory), ETA = 7 },
                     new Steps { StepNumber = 5, Name = "Graphics Card", Label = "Install GPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.GraphicsCard)), PartToAssemble = getPartByType(PartTipo.GraphicsCard), ETA = 4 },
                     new Steps { StepNumber = 6, Name = "Storage", Label = "Install Storage", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage), ETA = 8 },
-                    //new Steps { StepNumber = 7, Name = "Cooling", Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Cooling)), PartToAssemble = getPartByType(PartTipo.Cooling), ETA = 15 },
+                    new Steps { StepNumber = 7, Name = "Cooling", Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Cooling)), PartToAssemble = getPartByType(PartTipo.Cooling), ETA = 15 },
                 };
             }
         }
@@ -163,12 +156,8 @@
         return match.Part;
     }
 
-    private void OnStepChange(FluentWizardStepChangeEventArgs e) {
-        Console.WriteLine($"Go to step {e.TargetLabel} (#{e.TargetIndex})");
-    }
-
     private void OnFinishedAsync() {
-        Console.WriteLine("Finished wizard");
+        OrderDone();
     }
     private void stepDone(int StepNumber) {
         Console.WriteLine("can advance to the next step");
