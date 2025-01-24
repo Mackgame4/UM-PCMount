@@ -20,32 +20,39 @@
         } else {
             <div class="relative w-full h-screen-space -mt-4">
                 <FluentBadge Appearance="Appearance.Accent" Class="text-md md:text-xl p-2"><span class="flex flex-row justify-center items-center gap-1"><FluentIcon Color="Color.Fill" Value="@(new Icons.Regular.Size20.Wrench())" />You're Assemblying An <b>@order?.Name</b> In Order Id:<b>@Id</b></span></FluentBadge>
-                <FluentWizard Class="min-h-full h-full" StepperPosition="StepperPosition.Left" StepSequence="WizardStepSequence.Any" DisplayStepNumber="@(WizardStepStatus.Current | WizardStepStatus.Next)" StepTitleHiddenWhen="@GridItemHidden.XsAndDown" OnFinish="@OnFinishedAsync">
+                <FluentWizard @ref="wizardInstance" Class="min-h-full" StepperPosition="StepperPosition.Left" StepSequence="WizardStepSequence.Any" DisplayStepNumber="@(WizardStepStatus.Current | WizardStepStatus.Next)" StepTitleHiddenWhen="@GridItemHidden.XsAndDown" OnFinish="@OnFinishedAsync">
                     <Steps>
                         <FluentWizardStep Label="Overview" OnChange="@OnStepChange">
-                            <div class="flex flex-row justify-center items-center gap-4 p-8">
-                                <div class="w-1/3 flex flex-col justify-center items-center relative">
-                                    <ColorImage imageUrl="@imageUrl" />
-                                </div>
-                                <div class="w-2/3 flex flex-col justify-center items-center gap-4">
-                                    <div class="grid grid-cols-3 grid-rows-6 gap-4 p-8" style="border: 1px solid transparent;">
-                                        @for (int i = 0; i <= 7; i++) {
-                                            int currentStep = i; 
-                                            <div class="p-4 flex justify-center items-center relative" 
-                                                style="border: 1px solid @(IsStepCompleted(i) ? "green" : "red");" 
-                                                @onmouseover="@(e => hoveringItem(currentStep))">
-                                                @GetStepLabel(i)
-                                                @if (IsStepCompleted(i)) {
-                                                    <span class="absolute top-0 right-1 text-green-500">✔️</span>
-                                                }
-                                            </div>
-                                        }
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4">
+                                <ColorImage imageUrl="@imageUrl" Class="w-full h-step-screen" />
+                                <div class="flex flex-col justify-center items-center relative">
+                                    <div class="flex flex-col gap-4 p-4">
+                                        <h3 class="text-xl">Estimated Total Assembly Time</h3>
+                                        <FluentBadge Class="text-2xl font-medium">
+                                            <span class="flex flex-row justify-center items-center gap-1">
+                                                <FluentIcon Value="@(new Icons.Regular.Size20.Clock())" />
+                                                <span>@calculateTotalETA() minutes</span>
+                                            </span>
+                                        </FluentBadge>
+                                    </div>
+                                    <div class="flex flex-col justify-center items-center p-4">
+                                        <h3 class="text-xl">Assembly Steps</h3>
+                                        <div class="grid grid-cols-4 gap-3 p-4">
+                                            @foreach (var step in steps!) {
+                                                <FluentCard MinimalStyle="true" Class="p-4 flex justify-center items-center relative cursor-pointer" @onmouseover="@(e => hoveringItem(step.StepNumber))" @onclick="() => jumpToStep(step.StepNumber)">
+                                                    @if (IsStepCompleted(step.StepNumber)) {
+                                                        <FluentIcon Value="@(new Icons.Regular.Size20.Checkmark())" />
+                                                    }
+                                                    <FluentBadge Appearance="Appearance.Lightweight"><span class="text-lg font-bold">@step.Name</span></FluentBadge>
+                                                </FluentCard>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </FluentWizardStep>
                         @foreach (var step in steps!) {
-                            <FluentWizardStep Label="@step.Label" Disabled="!step.IsCompleted" OnChange="@OnStepChange">
+                            <FluentWizardStep Label="@step.Label" OnChange="@OnStepChange">
                                 <AssemblyStep OnComplete="@stepDone" OnUncomplete="@stepUnDone" OnStepNumberChanged="@stepStarted" StepNumber="@step.StepNumber" PartsList="@step.AvaliableParts" PartToAssemble="@step.PartToAssemble" />
                             </FluentWizardStep>
                         }
@@ -84,17 +91,18 @@
     private bool Finalize = false;
     public class Steps {
         public int StepNumber {get; set; }
+        public string? Name { get; set; }
         public string? Label { get; set; }
         public bool IsCompleted { get; set; }
         public List<Part>? AvaliableParts { get; set; }
         public Part? PartToAssemble { get; set; }
+        public int ETA { get; set; }
     }
 
     private List<Steps>? steps;
 
     protected override async Task OnParametersSetAsync() {
-        // Invalid ID
-        if (Id <= 0) {
+        if (Id <= 0) { // Invalid ID
             order = null;
             return;
         } else {
@@ -102,14 +110,14 @@
             if (order != null) {
                 partsWithQuantities = await OrdersDb.GetPartsForOrderAsync(order);
                 steps = new List<Steps> {
-                    new Steps { StepNumber = 0, Label = "Prepare Case", IsCompleted = true, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Case)), PartToAssemble = getPartByType(PartTipo.Case) },
-                    new Steps { StepNumber = 1, Label = "Place Power Supply", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.PowerSupply)), PartToAssemble = getPartByType(PartTipo.PowerSupply) },
-                    new Steps { StepNumber = 2, Label = "Install Motherboard", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Motherboard)), PartToAssemble = getPartByType(PartTipo.Motherboard) },
-                    new Steps { StepNumber = 3, Label = "Install CPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Processor)), PartToAssemble = getPartByType(PartTipo.Processor) },
-                    new Steps { StepNumber = 4, Label = "Install RAM", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Memory)), PartToAssemble = getPartByType(PartTipo.Memory) },
-                    new Steps { StepNumber = 5, Label = "Install GPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.GraphicsCard)), PartToAssemble = getPartByType(PartTipo.GraphicsCard) },
-                    new Steps { StepNumber = 6, Label = "Install Storage", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
-                    //new Steps { StepNumber = 7, Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage) },
+                    new Steps { StepNumber = 0, Name = "Case", Label = "Prepare Case", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Case)), PartToAssemble = getPartByType(PartTipo.Case), ETA = 2 },
+                    new Steps { StepNumber = 1, Name = "Power Supply", Label = "Install PSU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.PowerSupply)), PartToAssemble = getPartByType(PartTipo.PowerSupply), ETA = 3 },
+                    new Steps { StepNumber = 2, Name = "Motherboard", Label = "Install Motherboard", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Motherboard)), PartToAssemble = getPartByType(PartTipo.Motherboard), ETA = 5 },
+                    new Steps { StepNumber = 3, Name = "Processor", Label = "Install CPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Processor)), PartToAssemble = getPartByType(PartTipo.Processor), ETA = 8 },
+                    new Steps { StepNumber = 4, Name = "Memory", Label = "Install RAM", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Memory)), PartToAssemble = getPartByType(PartTipo.Memory), ETA = 7 },
+                    new Steps { StepNumber = 5, Name = "Graphics Card", Label = "Install GPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.GraphicsCard)), PartToAssemble = getPartByType(PartTipo.GraphicsCard), ETA = 4 },
+                    new Steps { StepNumber = 6, Name = "Storage", Label = "Install Storage", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage), ETA = 8 },
+                    new Steps { StepNumber = 7, Name = "Cooling", Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage), ETA = 15 },
                 };
             }
         }
@@ -217,24 +225,27 @@
         return completedIndex > stepNumber;
     }
 
-    private string GetStepLabel(int stepNumber) {
-        return stepNumber switch {
-            3 => "CPU",
-            7 => "CPU Cooler",
-            2 => "Motherboard",
-            4 => "Memory",
-            5 => "Graphics Card",
-            6 => "Storage",
-            1 => "Power Supply",
-            0 => "Case",
-            _ => "Unknown"
-        };
+    private int calculateTotalETA() {
+        if (steps == null) {
+            return 0;
+        }
+        int totalETA = 0;
+        foreach (var step in steps) {
+            totalETA += step.ETA;
+        }
+        return totalETA;
+    }
+
+    private FluentWizard? wizardInstance;
+
+    private void jumpToStep(int stepNumber) {
+        if (steps != null && wizardInstance != null) {
+            wizardInstance.GoToStepAsync(stepNumber+1); // +1 to offset the overview step
+        }
     }
 
     private string imageUrl { get; set; } = "/assets/pcbuild-step-0.png";
-
     private void hoveringItem(int item) {
-         Console.WriteLine($"Hovering over item: {item}"); // Debugging
         switch (item) {
             case 3:
                 imageUrl = "/assets/pcbuild-step-1.png";
@@ -271,5 +282,9 @@
     .h-screen-space {
         /* Calculate the height of the screen without the height of the header */
         height: calc(100vh - 12.0rem);
+    }
+
+    .h-step-screen {
+        height: calc(100vh - 18.0rem);
     }
 </style>
