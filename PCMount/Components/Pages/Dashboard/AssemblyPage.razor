@@ -177,8 +177,13 @@
         }
 
 
-        if (steps != null && StepNumber == steps.Count - 1) {
-            Finalize = true;
+        if (steps != null) {
+            foreach (var step in steps) {
+                if (!step.IsCompleted) {
+                    Finalize = false;
+                    return;
+                }
+            }
         }
 
         StateHasChanged(); // Refresh the UI
@@ -220,9 +225,10 @@
     }
 
     private bool IsStepCompleted(int stepNumber) {
-        int completedIndex = trulyCompletedIndex();
-        if (Finalize) return true;
-        return completedIndex > stepNumber;
+        if (steps == null) {
+            return false;
+        }
+        return steps[stepNumber].IsCompleted;
     }
 
     private int calculateTotalETA() {
