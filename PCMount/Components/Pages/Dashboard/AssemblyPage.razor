@@ -117,7 +117,7 @@
                     new Steps { StepNumber = 4, Name = "Memory", Label = "Install RAM", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Memory)), PartToAssemble = getPartByType(PartTipo.Memory), ETA = 7 },
                     new Steps { StepNumber = 5, Name = "Graphics Card", Label = "Install GPU", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.GraphicsCard)), PartToAssemble = getPartByType(PartTipo.GraphicsCard), ETA = 4 },
                     new Steps { StepNumber = 6, Name = "Storage", Label = "Install Storage", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Storage)), PartToAssemble = getPartByType(PartTipo.Storage), ETA = 8 },
-                    new Steps { StepNumber = 7, Name = "Cooling", Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Cooling)), PartToAssemble = getPartByType(PartTipo.Cooling), ETA = 15 },
+                    //new Steps { StepNumber = 7, Name = "Cooling", Label = "Install Cooling", IsCompleted = false, AvaliableParts = (await ComponentesDb.GetPartsByTypeAsync(PartTipo.Cooling)), PartToAssemble = getPartByType(PartTipo.Cooling), ETA = 15 },
                 };
             }
         }
@@ -172,16 +172,13 @@
     }
     private void stepDone(int StepNumber) {
         Console.WriteLine("can advance to the next step");
-        if (steps != null && StepNumber < steps.Count - 1) {
-            steps[StepNumber + 1].IsCompleted = true;
-        }
-
-
         if (steps != null) {
+            steps[StepNumber].IsCompleted = true;
             foreach (var step in steps) {
+                Console.WriteLine($"Step '{step.Label}' is completed: {step.IsCompleted}");
                 if (!step.IsCompleted) {
                     Finalize = false;
-                    return;
+                    //return;
                 }
             }
         }
@@ -202,12 +199,12 @@
     }
 
     private void stepStarted(int StepNumber) {
-        if (steps != null && StepNumber != 0) {
-            steps[StepNumber - 1].IsCompleted = false;
+        /*if (steps != null && StepNumber != 0) {
+            steps[StepNumber].IsCompleted = false;
             Console.WriteLine($"Step '{steps[StepNumber - 1].Label}' marked as not completed.");
         }
 
-        StateHasChanged(); // Refresh the UI
+        StateHasChanged(); // Refresh the UI*/
     }
 
     private int trulyCompletedIndex() {
