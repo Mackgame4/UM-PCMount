@@ -116,7 +116,8 @@
                 @if (ordersQueryable != null) {
                     <FluentDataGrid Items="@ordersQueryable" ShowHover="false" Pagination="@ordersPagination">
                         <PropertyColumn Property="@(o => o.OrderId)" Title="ID" Sortable="true" />
-                        <PropertyColumn Property="@(o => o.Name)" Title="Name" />
+                        <PropertyColumn Property="@(o => o.Client)" Title="Client" />
+                        <PropertyColumn Property="@(o => o.Name)" Title="Order" />
                         <TemplateColumn Title="Status" Align="@Align.Center">
                             <FluentBadge Appearance="Appearance.Lightweight">@context.Status</FluentBadge>
                         </TemplateColumn>
@@ -156,7 +157,7 @@
     }
 
     record ComputerQuery(int Id, string? Name, double? Price, double? Discount, string? Image);
-    record OrderQuery(int OrderId, string? Name, string? Status, double? Price);
+    record OrderQuery(int OrderId, string? Client, string? Name, string? Status, double? Price);
     record PartQuery(int PartId, string? Name, double? Preco, string? Tipo, string? Image, int Quantidade);
     record ComputerOrderQuery(int Id, string? Name, double? Price, double? Discount, string? Image, int Quantity);
     PaginationState computersPagination = new PaginationState { ItemsPerPage = 4 };
@@ -169,7 +170,7 @@
     IQueryable<PartQuery> partsQueryable = Array.Empty<PartQuery>().AsQueryable();
     Computer[]? computers;
 
-    Order[]? orders;
+    private List<(Order Order, User User)>? ordersWithUsers;
 
     protected override async Task OnInitializedAsync() {
         computers = await ComputersDb.GetArrayAsync();
@@ -178,9 +179,9 @@
             computersQueryable = computersQueryable.Append(new ComputerQuery(c.Id, c.Name, c.Price, c.Discount, c.Image));
         }
         // Orders Queryable
-        orders = await OrdersDb.GetArrayAsync();
-        foreach (Order o in orders) {
-            ordersQueryable = ordersQueryable.Append(new OrderQuery(o.OrderId, o.Name, o.Status.ToString(), o.Price));
+        ordersWithUsers = await OrdersDb.GetOrdersWithUsersAsync();
+        foreach (var (o, user) in ordersWithUsers) {
+            ordersQueryable = ordersQueryable.Append(new OrderQuery(o.OrderId, user.UserName, o.Name, o.Status.ToString(), o.Price));
             if (o.Status == OrderStatus.Done) {
                 // Calculate Discounts Loss
                 DiscountsLossValue += o.Price * ((o.Discount ?? 0) / 100);
@@ -206,7 +207,7 @@
         // Computer Orders Queryable
         Dictionary<string, int> computerOrders = new();
         // Start by getting all the orders and setting quantity by 0
-        foreach (Order o in orders) {
+        foreach (var (o, user) in ordersWithUsers) {
             if (o.Name != null) {
                 if (computerOrders.ContainsKey(o.Name)) {
                     computerOrders[o.Name] += 1;
@@ -230,10 +231,10 @@
     private async void deleteOrder(int orderId) {
         var result = await OrdersDb.DeleteAsync(orderId);
         if (result != null) {
-            orders = await OrdersDb.GetArrayAsync();
+
             ordersQueryable = Array.Empty<OrderQuery>().AsQueryable();
-            foreach (Order order in orders) {
-                ordersQueryable = ordersQueryable.Append(new OrderQuery(order.OrderId, order.Name, order.Status.ToString(), order.Price));
+            foreach (var (order, user) in ordersWithUsers) {
+                ordersQueryable = ordersQueryable.Append(new OrderQuery(order.OrderId, user.UserName, order.Name, order.Status.ToString(), order.Price));
             }
             StateHasChanged();
             ToastService.ShowSuccess("Order deleted successfully.");

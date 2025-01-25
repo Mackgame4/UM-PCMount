@@ -129,6 +129,7 @@
     private List<Computer>? cart = new List<Computer>();
     private string? userRole;
     private string? userName;
+    private string? userId;
 
     private void filterMenuChanged(MenuChangeEventArgs args) {
         if (!string.IsNullOrEmpty(args.Id)) {
@@ -146,8 +147,9 @@
             {
                 userRole = user.FindFirst(ClaimTypes.Role)?.Value;
                 userName = user.FindFirst(ClaimTypes.Name)?.Value;
+                userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userRole != null) {
-                    Console.WriteLine("userrole é " + userRole);
+                    Console.WriteLine("userrole do " + userName + " de id " + userId + " é " + userRole);
                 }
             }
         }
@@ -205,7 +207,8 @@
                         StorageId = product.StorageId,
                         PowerSupplyId = product.PowerSupplyId,
                         CaseId = product.CaseId,
-                        CoolingId = product.CoolingId
+                        CoolingId = product.CoolingId,
+                        UserId = (userId != null) ? int.Parse(userId) : 0,
                     };
                     await OrdersDb.CreateAsync(order);
                 }

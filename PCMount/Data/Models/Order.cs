@@ -16,4 +16,10 @@ public class Order : ComputerComponents {
     [Column("Status")]
     [EnumDataType(typeof(OrderStatus))]
     public required OrderStatus? Status { get; set; }
+
+    [Required]
+    [Column("UserId")]
+    [ForeignKey("UserId")]
+    public required int UserId { get; set; }
+    public User? Buyer { get; set; }
 }

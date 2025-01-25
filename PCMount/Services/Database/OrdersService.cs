@@ -172,4 +172,25 @@ public class OrdersService : IDbContextAcessor<Order> {
             semaphore.Release();
         }
     }
+
+    public async Task<List<(Order Order, User User)>> GetOrdersWithUsersAsync() {
+        await semaphore.WaitAsync(); 
+        try {
+            
+            var ordersWithUsers = await _dbContext.Orders
+                .Join(
+                    _dbContext.Users, 
+                    order => order.UserId, 
+                    user => user.Id,
+                    (order, user) => new { Order = order, User = user } 
+                )
+                .AsNoTracking()
+                .ToListAsync();
+
+            // Convert the anonymous type to a list of tuples
+            return ordersWithUsers.Select(x => (x.Order, x.User)).ToList();
+        } finally {
+            semaphore.Release(); // Release the lock
+        }
+    }
 }
