@@ -70,5 +70,7 @@ $ make relatorio
 
 ### Developement Team
 A104365 - Fabio Magalhaes
+
 A104540 - Pedro Gomes
+
 A104084 - João Machado
