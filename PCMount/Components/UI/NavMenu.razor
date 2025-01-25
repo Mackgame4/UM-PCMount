@@ -23,7 +23,7 @@
                 <FluentButton id="notificationsPopover" IconStart="@(new Icons.Regular.Size20.BoxMultiple())" Appearance="Appearance.Outline" @onclick="() => _visibleNotificationsPopover = !_visibleNotificationsPopover"></FluentButton>
             </FluentCounterBadge>
         }
-        <AuthorizeView Roles="Admin, User">
+        <AuthorizeView Roles="Admin">
             <Authorized>
                 <FluentProfileMenu Initials="@(context.User.Identity!.Name?.Substring(0, 1).ToUpper() ?? string.Empty)">
                     <HeaderTemplate>

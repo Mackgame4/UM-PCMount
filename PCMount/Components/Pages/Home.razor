@@ -1,8 +1,10 @@
 ﻿@page "/"
-@attribute [Authorize(Roles = "Admin, User")]
+@attribute [Authorize(Roles = "Admin, Client")]
 @attribute [AllowAnonymous]
 @attribute [StreamRendering]
 @rendermode InteractiveServer
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
 <PageTitle>PCMount - Shop</PageTitle>
 <FluentDialogProvider />
 <FluentMenuProvider />
@@ -36,11 +38,31 @@
             </NavLink>
         </NotAuthorized>
         <Authorized>
-            <NavLink href="/dashboard" Match="NavLinkMatch.All">
-                <FluentButton class="text-lg" IconStart="@(new Icons.Regular.Size24.Board())" Appearance="Appearance.Lightweight">Dashboard</FluentButton>
-            </NavLink>
+            @if (userRole == "Admin") {
+                <NavLink href="/dashboard" Match="NavLinkMatch.All">
+                    <FluentButton class="text-lg" IconStart="@(new Icons.Regular.Size24.Board())" Appearance="Appearance.Lightweight">Dashboard</FluentButton>
+                </NavLink>
+            }
         </Authorized>
     </AuthorizeView>
+    <AuthorizeView Roles="Client">
+            <Authorized>
+                <FluentProfileMenu Initials="@(userName?.Substring(0, 1).ToUpper() ?? string.Empty)">
+                    <HeaderTemplate>
+                        <FluentLabel Typo="@Typography.Subject">Welcome back, <b>@userName</b>.</FluentLabel>
+                    </HeaderTemplate>
+                    <ChildContent>
+                    </ChildContent>
+                    <FooterTemplate>
+                        <FluentStack>
+                            <NavLink href="/logout" Match="NavLinkMatch.All">
+                                <FluentButton IconStart="@(new Icons.Regular.Size20.ArrowExit())" Appearance="Appearance.Outline">Logout</FluentButton>
+                            </NavLink>
+                        </FluentStack>
+                    </FooterTemplate>
+                </FluentProfileMenu>
+            </Authorized>
+        </AuthorizeView>
 </FluentToolbar>
 <div class="p-5">
     @if (computers == null || filteredProducts == null) {
@@ -89,7 +111,14 @@
     </Body>
     <Footer>
         <span><b>Total:</b> @(calculateTotalPrice(cart!).ToString("C"))</span>
-        <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.ShoppingBag())" Appearance="Appearance.Lightweight" @onclick="OrderCart">Confirm Order</FluentButton>
+        
+        @if (userRole == "Admin" || userRole == "Client") {
+            <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.ShoppingBag())" Appearance="Appearance.Lightweight" @onclick="OrderCart">Confirm Order</FluentButton>
+        } else {
+            <NavLink href="/login" Match="NavLinkMatch.All">
+                <FluentButton class="w-full" IconStart="@(new Icons.Regular.Size16.ShoppingBag())" Appearance="Appearance.Lightweight">Confirm Order</FluentButton>
+            </NavLink>
+        }
     </Footer>
 </FluentPopover>
 
@@ -98,6 +127,8 @@
     private Computer[]? computers;
     private List<Computer>? filteredProducts = new List<Computer>();
     private List<Computer>? cart = new List<Computer>();
+    private string? userRole;
+    private string? userName;
 
     private void filterMenuChanged(MenuChangeEventArgs args) {
         if (!string.IsNullOrEmpty(args.Id)) {
@@ -107,6 +138,22 @@
     }
 
     protected override async Task OnInitializedAsync() {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity != null) {
+            if (user.Identity.IsAuthenticated)
+            {
+                userRole = user.FindFirst(ClaimTypes.Role)?.Value;
+                userName = user.FindFirst(ClaimTypes.Name)?.Value;
+                if (userRole != null) {
+                    Console.WriteLine("userrole é " + userRole);
+                }
+            }
+        }
+        StateHasChanged(); 
+
+
         Part[] components = await ComponentesDb.GetArrayAsync() ?? Array.Empty<Part>();
         computers = (await ComputersDb.GetArrayAsync())?.Select(c => {
             c.Motherboard = components.FirstOrDefault(p => p.PartId == c.MotherboardId);
