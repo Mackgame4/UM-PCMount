@@ -36,13 +36,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             new Part { PartId = 6, Name = "Corsair Vengeance RGB Pro 16GB", Preco = 87, Tipo = PartTipo.Memory, Descricao = "", Image = "/assets/cdn/part-vengeance-rgbpro.png", PortId = 5 },
             new Part { PartId = 7, Name = "Samsung 970 EVO Plus", Preco = 164, Tipo = PartTipo.Storage, Descricao = "", Image = "/assets/cdn/part-samsung-970-ssd.png", PortId = 6 },
             new Part { PartId = 8, Name = "Corsair RM850x", Preco = 189.13, Tipo = PartTipo.PowerSupply, Descricao = "", Image = "/assets/cdn/part-corsair-rm850x.png", PortId = 7 },
-            new Part { PartId = 9, Name = "NZXT H510", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/part-atx-nzxt-case.png", PortId = 8 },
+            new Part { PartId = 9, Name = "NZXT H510 Case", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/part-atx-nzxt-case.png", PortId = 8 },
             new Part { PartId = 10, Name = "MGC 50 Black Tower", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/part-mgc-50-tower.png", PortId = 9 },
             new Part { PartId = 11, Name = "Corsair 4000D Case", Preco = 100, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/part-corsair4000d.png", PortId = 10 },
             new Part { PartId = 12, Name = "Lian-Li ROG Edition White Tower", Preco = 212, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/part-rog-tower-atx.png", PortId = 11 },
             new Part { PartId = 13, Name = "Fractal Design Meshify", Preco = 141.32, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/part-fractal-design.png", PortId = 12 },
             new Part { PartId = 14, Name = "Phanteks Eclipse P500A", Preco = 177.21, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/part-phanteks-eclipse.png", PortId = 13 },
-            new Part { PartId = 15, Name = "ASUS TUF Gaming GT501", Preco = 237.99, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 14 },
+            new Part { PartId = 15, Name = "ASUS TUF Gaming GT501", Preco = 237.99, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/part-atx-asuscase.png", PortId = 14 },
             new Part { PartId = 16, Name = "Cooler Master", Preco = 100, Tipo = PartTipo.Cooling, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 14 },
             new Part { PartId = 17, Name = "NVIDIA GeForce RTX 4060", Preco = 384.69, Tipo = PartTipo.GraphicsCard, Descricao = "", Image = "/assets/cdn/part-nvidia-rtx4060.png", PortId = 15 },
             new Part { PartId = 18, Name = "NVIDIA GeForce RTX 3060", Preco = 318.89, Tipo = PartTipo.GraphicsCard, Descricao = "", Image = "/assets/cdn/part-nvidia-rtx3060.png", PortId = 16 },
@@ -100,7 +100,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             new Inventario { PartId = 8, Quantidade = 10 }
         );
         modelBuilder.Entity<Computer>().HasData(
-            new Computer { Id = 1, Name = "NZXT H5 Gaming Elite", Price = 1000, Image = "/assets/cdn/computer-nzxt-h5.png", Discount = 10, MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
+            new Computer { Id = 1, Name = "NZXT H5 Gaming Elite", Price = 1000, Image = "/assets/cdn/part-atx-nzxt-case.png", Discount = 10, MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
             new Computer { Id = 2, Name = "Panorama Glass Gaming", Price = 2000, Image = "/assets/cdn/computer-panorama-gaming.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
             new Computer { Id = 3, Name = "Periphio Astral 5600G", Price = 1500, Image = "/assets/cdn/computer-periphio-astral-5600g.png", Discount = 25, MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
             new Computer { Id = 4, Name = "Elite AvaDirect 3687Y", Price = 1500, Image = "/assets/cdn/computer-elite-avadirect.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
