@@ -43,7 +43,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             new Part { PartId = 13, Name = "Fractal Design Meshify", Preco = 141.32, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/part-fractal-design.png", PortId = 12 },
             new Part { PartId = 14, Name = "Phanteks Eclipse P500A", Preco = 177.21, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/part-phanteks-eclipse.png", PortId = 13 },
             new Part { PartId = 15, Name = "ASUS TUF Gaming GT501", Preco = 237.99, Tipo = PartTipo.Case, Descricao = "", Image = "/assets/cdn/part-atx-asuscase.png", PortId = 14 },
-            new Part { PartId = 16, Name = "Cooler Master", Preco = 100, Tipo = PartTipo.Cooling, Descricao = "", Image = "/assets/cdn/computer-nzxt-h5.png", PortId = 14 },
+            new Part { PartId = 16, Name = "Cooler Master", Preco = 57, Tipo = PartTipo.Cooling, Descricao = "", Image = "/assets/cdn/part-cooler.png", PortId = 14 },
             new Part { PartId = 17, Name = "NVIDIA GeForce RTX 4060", Preco = 384.69, Tipo = PartTipo.GraphicsCard, Descricao = "", Image = "/assets/cdn/part-nvidia-rtx4060.png", PortId = 15 },
             new Part { PartId = 18, Name = "NVIDIA GeForce RTX 3060", Preco = 318.89, Tipo = PartTipo.GraphicsCard, Descricao = "", Image = "/assets/cdn/part-nvidia-rtx3060.png", PortId = 16 },
             new Part { PartId = 19, Name = "NVIDIA GeForce RTX 3050", Preco = 207.99, Tipo = PartTipo.GraphicsCard, Descricao = "", Image = "/assets/cdn/part-nvidia-rtx3050.png", PortId = 17 },
@@ -84,7 +84,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             new Part { PartId = 54, Name = "Kingston M.2 4,096 TB", Preco = 1019.99, Tipo = PartTipo.Storage, Descricao = "", Image = "/assets/cdn/part-kingstom-4tb.png", PortId = 6 },
             new Part { PartId = 55, Name = "Corsair CX750", Preco = 79.99, Tipo = PartTipo.PowerSupply, Descricao = "", Image = "/assets/cdn/part-corsair-cx750.png", PortId = 7 },
             new Part { PartId = 56, Name = "Nfortec Sagitta X 1000W", Preco = 147.99, Tipo = PartTipo.PowerSupply, Descricao = "", Image = "/assets/cdn/part-nfortec.png", PortId = 7 },
-            new Part { PartId = 57, Name = "Tempest Gaming GPSU 650W", Preco = 26.39, Tipo = PartTipo.PowerSupply, Descricao = "", Image = "/assets/cdn/part-tempest-650w.png", PortId = 7 }
+            new Part { PartId = 57, Name = "Tempest Gaming GPSU 650W", Preco = 26.39, Tipo = PartTipo.PowerSupply, Descricao = "", Image = "/assets/cdn/part-tempest-650w.png", PortId = 7 },
+            new Part { PartId = 58, Name = "Water Cooler Master (X2)", Preco = 78.21, Tipo = PartTipo.Cooling, Descricao = "", Image = "/assets/cdn/part-cooler2.png", PortId = 14 },
+            new Part { PartId = 59, Name = "Water Cooler Master (X1)", Preco = 51.99, Tipo = PartTipo.Cooling, Descricao = "", Image = "/assets/cdn/part-cooler3.png", PortId = 14 },
+            new Part { PartId = 60, Name = "Atmos Cooler Kit", Preco = 129.99, Tipo = PartTipo.Cooling, Descricao = "", Image = "/assets/cdn/part-cooler4.png", PortId = 14 }
             
             
         );
@@ -100,12 +103,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             new Inventario { PartId = 8, Quantidade = 10 }
         );
         modelBuilder.Entity<Computer>().HasData(
-            new Computer { Id = 1, Name = "NZXT H5 Gaming Elite", Price = 1000, Image = "/assets/cdn/part-atx-nzxt-case.png", Discount = 10, MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
-            new Computer { Id = 2, Name = "Panorama Glass Gaming", Price = 2000, Image = "/assets/cdn/computer-panorama-gaming.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
-            new Computer { Id = 3, Name = "Periphio Astral 5600G", Price = 1500, Image = "/assets/cdn/computer-periphio-astral-5600g.png", Discount = 25, MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
-            new Computer { Id = 4, Name = "Elite AvaDirect 3687Y", Price = 1500, Image = "/assets/cdn/computer-elite-avadirect.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
-            new Computer { Id = 5, Name = "CyberPower MultiColor", Price = 1000, Image = "/assets/cdn/computer-cyberpower-pc.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
-            new Computer { Id = 6, Name = "Corsair Vengeance", Price = 1000, Image = "/assets/cdn/computer-vengeance-i5200.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 }
+            new Computer { Id = 1, Name = "NZXT H5 Gaming Elite", Price = 1300, Image = "/assets/cdn/part-atx-nzxt-case.png", Discount = 10, MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 5, MemoryId = 6, StorageId = 7, PowerSupplyId = 8, CaseId = 9, CoolingId = 16 },
+            new Computer { Id = 2, Name = "MGC-50 Gaming", Price = 2368, Image = "/assets/cdn/part-mgc-50-tower.png", MotherboardId = 41, GraphicsCardId = 24, ProcessorId = 32, MemoryId = 46, StorageId = 50, PowerSupplyId = 8, CaseId = 10, CoolingId = 60 },
+            new Computer { Id = 3, Name = "Desktop Corsair 4000", Price = 1870, Image = "/assets/cdn/part-corsair4000d.png", Discount = 25, MotherboardId = 36, GraphicsCardId = 19, ProcessorId = 35, MemoryId = 45, StorageId = 7, PowerSupplyId = 55, CaseId = 11, CoolingId = 59 },
+            new Computer { Id = 4, Name = "Lian-Li Desktop Edition", Price = 1460, Image = "/assets/cdn/part-rog-tower-atx.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 32, MemoryId = 44, StorageId = 51, PowerSupplyId = 57, CaseId = 12, CoolingId = 58 },
+            new Computer { Id = 5, Name = "Fractal Meshify Desktop", Price = 1230, Image = "/assets/cdn/part-fractal-design.png", MotherboardId = 3, GraphicsCardId = 4, ProcessorId = 31, MemoryId = 47, StorageId = 52, PowerSupplyId = 55, CaseId = 13, CoolingId = 16 },
+            new Computer { Id = 6, Name = "ASUS TUF Gaming", Price = 2100, Image = "/assets/cdn/part-atx-asuscase.png", MotherboardId = 37, GraphicsCardId = 22, ProcessorId = 29, MemoryId = 48, StorageId = 50, PowerSupplyId = 56, CaseId = 15, CoolingId = 58 }
         );
     }
 
