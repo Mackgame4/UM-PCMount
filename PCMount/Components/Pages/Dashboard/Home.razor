@@ -231,10 +231,11 @@
     private async void deleteOrder(int orderId) {
         var result = await OrdersDb.DeleteAsync(orderId);
         if (result != null) {
-
             ordersQueryable = Array.Empty<OrderQuery>().AsQueryable();
-            foreach (var (order, user) in ordersWithUsers) {
-                ordersQueryable = ordersQueryable.Append(new OrderQuery(order.OrderId, user.UserName, order.Name, order.Status.ToString(), order.Price));
+            if (ordersWithUsers != null) {
+                foreach (var (order, user) in ordersWithUsers) {
+                    ordersQueryable = ordersQueryable.Append(new OrderQuery(order.OrderId, user.UserName, order.Name, order.Status.ToString(), order.Price));
+                }
             }
             StateHasChanged();
             ToastService.ShowSuccess("Order deleted successfully.");
@@ -242,7 +243,6 @@
             ToastService.ShowError("An error occurred while deleting the order.");
         }
     }
-
     private async void editComputerProduct(ComputerQuery computerQuery) {
         // get the computer from the database
         Computer? computer = computers!.FirstOrDefault(c => c.Id == computerQuery.Id);
