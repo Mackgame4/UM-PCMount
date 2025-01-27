@@ -30,8 +30,7 @@
         text(size: 9pt, fill: light_gray, [Mestrado Integrado em Engenharia Informática])
       })
       place(dy: 300pt, {
-  
-      // podes alterar o espaçamento entre paragrafos com `set par()` acho
+
         text(size: 20pt, fill: blue, weight: "bold", [Unidade Curricular de \ Laboratórios de Informática IV\ ])
         text(size: 10pt, [Ano Letivo de 2024/2025])
       })
@@ -66,8 +65,7 @@
       string_date
     })
   }
-  
+
 }
 
 
-// quando tiveres a fazer os autores mete usa a variavel, faz tambem o titulo e a data da mesma forma
