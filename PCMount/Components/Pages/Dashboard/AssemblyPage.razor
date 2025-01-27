@@ -132,6 +132,10 @@
             ToastService.ShowError("No parts found to update.");
             return;
         }
+        if (!OrderFinalized) {
+            ToastService.ShowWarning("Please complete all the steps before finalizing the order.");
+            return;
+        }
         foreach (var (part, quantity) in OrderedParts) {
             try {
                 int newQuantidade = quantity - 1;
