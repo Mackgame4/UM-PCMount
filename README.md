@@ -76,3 +76,5 @@ A104540 - Pedro Gomes
 A104084 - João Machado
 
 A104267 - André Pinto
+
+A104524 - Ricardo Sousa
