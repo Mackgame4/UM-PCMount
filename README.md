@@ -1,4 +1,4 @@
-# PCMount
+# UM-PCMount
 This project was developed for the subject LI4 from University of Minho - Software Engineering degree.
 
 #### Requirements:
